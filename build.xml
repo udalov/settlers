@@ -1,0 +1,26 @@
+<project name="Settlers" default="dist">
+
+    <target name="init">
+        <mkdir dir="build"/>
+        <mkdir dir="bin"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac srcdir="src" destdir="build" includeantruntime="false" debug="true" debuglevel="lines,vars,source"/>
+    </target>
+
+    <target name="dist" depends="compile">
+        <jar jarfile="bin/Settlers.jar" basedir="build">
+            <manifest>
+                <attribute name="Main-Class" value="settlers.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean">
+        <delete dir="build"/>
+        <delete dir="bin"/>
+    </target>
+    
+</project>
+
