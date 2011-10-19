@@ -8,8 +8,8 @@ public class ExampleBot extends Bot {
 
     private Random rnd = new Random();
     
-    public ExampleBot(Game game) {
-        super(game);
+    public ExampleBot(Game.API api) {
+        super(api);
     }
 
     public String getName() {
@@ -36,7 +36,7 @@ public class ExampleBot extends Bot {
             Board.Cell cell = Board.allCells().get(cellno);
             int dir = rnd.nextInt(6);
             Board.Intersection ints = Board.ints(cell, dir);
-            if (!game.board().canBuildTownAt(ints))
+            if (!api.game().board().canBuildTownAt(ints))
                 continue;
             for (Board.Path p : Board.allPaths())
                 if (Board.areAdjacent(ints, p))
@@ -50,7 +50,7 @@ public class ExampleBot extends Bot {
             private int sum(Board.Intersection a) {
                 int ans = 0;
                 for (Board.Cell c : Board.adjacentCells(a)) {
-                    Integer x = game.board().numberAt(c);
+                    Integer x = api.game().board().numberAt(c);
                     if (x != null)
                         ans += 6 - Math.abs(x - 7);
                 }
@@ -60,8 +60,8 @@ public class ExampleBot extends Bot {
                 int sa = sum(a), sb = sum(b);
                 if (sa < sb) return 1;
                 if (sa > sb) return -1;
-                boolean pa = game.board().portAt(a).first();
-                boolean pb = game.board().portAt(b).first();
+                boolean pa = api.game().board().portAt(a).first();
+                boolean pb = api.game().board().portAt(b).first();
                 if (!pa && pb) return 1;
                 if (pa && !pb) return -1;
                 return 0;
@@ -69,7 +69,7 @@ public class ExampleBot extends Bot {
         });
 
         for (Board.Intersection i : l) {
-            if (game.board().canBuildTownAt(i)) {
+            if (api.game().board().canBuildTownAt(i)) {
                 List<Board.Path> paths = Board.adjacentPaths(i);
                 int pathno = rnd.nextInt(paths.size());
                 return Pair.make(i, paths.get(pathno));

@@ -5,10 +5,10 @@ import settlers.util.*;
 
 public abstract class Bot {
 
-    protected final Game game;
+    protected final Game.API api;
 
-    public Bot(Game game) {
-        this.game = game;
+    public Bot(Game.API api) {
+        this.api = api;
     }
 
     public abstract String getName();

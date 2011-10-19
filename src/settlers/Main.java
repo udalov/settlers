@@ -23,17 +23,19 @@ public class Main {
                     int nbots = -Integer.parseInt(args[i]);
                     bots = new Bot[nbots];
                     for (int j = 0; j < nbots; j++) {
+                        Game.API api = game.new API();
                         String bot = args[++i];
                         if ("Example".equals(bot)) {
-                            bots[j] = new ExampleBot(game);
+                            bots[j] = new ExampleBot(api);
                         } else {
                             int colon = bot.indexOf(':');
                             File jar = new File(bot.substring(0, colon));
                             String className = bot.substring(colon + 1);
                             ClassLoader cl = new URLClassLoader(new URL[]{jar.toURI().toURL()});
-                            Constructor<?> cns = cl.loadClass(className).getConstructor(Game.class);
-                            bots[j] = (Bot)cns.newInstance(game);
+                            Constructor<?> cns = cl.loadClass(className).getConstructor(Game.API.class);
+                            bots[j] = (Bot)cns.newInstance(api);
                         }
+                        api.setBot(bots[j]);
                     }
                 } else if ("-vis".equals(args[i])) {
                     vis = true;
@@ -44,7 +46,7 @@ public class Main {
                 game.addPlayer(new Player(bots[i], Player.Color.values()[i]));
             }
 
-            game.start();
+            game.play();
 
             JFrame jf = new JFrame();
             Vis v = new Vis(game.board());

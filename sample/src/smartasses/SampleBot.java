@@ -6,8 +6,8 @@ import settlers.util.*;
 
 public class SampleBot extends Bot {
     
-    public SampleBot(Game game) {
-        super(game);
+    public SampleBot(Game.API api) {
+        super(api);
     }
 
     public String getName() {
