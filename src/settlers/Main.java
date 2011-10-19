@@ -28,7 +28,7 @@ public class Main {
                         if ("Example".equals(bot)) {
                             bots[j] = new ExampleBot(api);
                         } else {
-                            int colon = bot.indexOf(':');
+                            int colon = bot.lastIndexOf(':');
                             File jar = new File(bot.substring(0, colon));
                             String className = bot.substring(colon + 1);
                             ClassLoader cl = new URLClassLoader(new URL[]{jar.toURI().toURL()});

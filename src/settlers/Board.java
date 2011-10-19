@@ -261,6 +261,7 @@ public class Board {
     }
 
 
+    // TODO: rename? Checks only existence of other towns at i and in neighbors
     public boolean canBuildTownAt(Intersection i) {
         if (towns.get(i) != null)
             return false;
@@ -272,12 +273,23 @@ public class Board {
 
 
 
+
+
     void buildTown(Intersection i, Town t) {
         towns.put(i, t);
     }
 
     void buildRoad(Path p, Player pl) {
         roads.put(p, pl);
+    }
+
+    Set<Pair<Intersection, Town>> allTowns() {
+        Set<Pair<Intersection, Town>> ans =
+            new HashSet<Pair<Intersection, Town>>();
+        for (Intersection i : towns.keySet()) {
+            ans.add(Pair.make(i, towns.get(i)));
+        }
+        return ans;
     }
 
 
