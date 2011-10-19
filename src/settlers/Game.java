@@ -34,7 +34,6 @@ public class Game {
 
 
     void addPlayer(Player player) {
-        // TODO: check validity
         players.add(player);
     }
 
@@ -42,10 +41,14 @@ public class Game {
         for (int it = 0; it < 2; it++) {
             for (Player player : players) {
                 Pair<Board.Intersection, Board.Path> p = player.bot().placeFirstSettlements(it == 0);
-                // TODO: check validity
+                if (!board.canBuildTownAt(p.first()))
+                    throw new RuntimeException("Cannot build a town here");
+                if (!board.areAdjacent(p.first(), p.second()))
+                    throw new RuntimeException("Cannot build a road not connected to a town");
                 board.buildTown(p.first(), new Town(player, false));
                 board.buildRoad(p.second(), player);
             }
+            Collections.reverse(players);
         }
     }
 

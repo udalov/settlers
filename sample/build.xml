@@ -1,4 +1,4 @@
-<project name="Settlers" default="dist">
+<project name="SettlersSampleBot" default="dist">
 
     <target name="init">
         <mkdir dir="build"/>
@@ -7,14 +7,14 @@
 
     <target name="compile" depends="init">
         <javac srcdir="src" destdir="build" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
-            <compilerarg value="-Xlint:unchecked"/>
+            <classpath path="lib/Settlers.jar"/>
         </javac>
     </target>
 
     <target name="dist" depends="clean,compile">
-        <jar jarfile="bin/Settlers.jar" basedir="build">
+        <jar jarfile="bin/SampleBot.jar" basedir="build">
             <manifest>
-                <attribute name="Main-Class" value="settlers.Main"/>
+                <attribute name="Main-Class" value="smartasses.SampleBot"/>
             </manifest>
         </jar>
     </target>

@@ -5,10 +5,10 @@ import settlers.bot.Bot;
 public class Player {
     
     public static enum Color {
+        RED,
         BLUE,
-        WHITE,
         YELLOW,
-        RED
+        WHITE,
     }
 
     private final Bot bot;
