@@ -20,7 +20,7 @@ public class Game {
         public Random rnd() { return game.rnd; }
         void setBot(Bot bot) { this.bot = bot; }
 
-        public CardStack cards() { return game.cards[index(bot)]; }
+        public CardStack cards() { return player(bot).cards(); }
         public int rollDice() { return game.rollDice(); }
     }
 
@@ -34,11 +34,8 @@ public class Game {
     private int whichPlayerTurn;
     private int diceRolled;
 
-    private int[] armyStrength;
     private Player largestArmy;
     private Player longestRoad;
-    private CardStack[] cards;
-    private DevelopmentStack[] developments;
 
     Game() {
         board = Board.create(rnd);
@@ -65,13 +62,13 @@ public class Game {
             throw new RuntimeException("Cannot roll the dice twice a turn");
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
         if (diceRolled == 7) {
-            for (int i = 0; i < n; i++) {
-                int were = cards[i].size();
+            for (Player p : players) {
+                int were = p.cards().size();
                 if (were > 7) {
-                    List<Resource> discard = players.get(i).bot().discardHalfOfTheCards();
+                    List<Resource> discard = p.bot().discardHalfOfTheCards();
                     for (Resource r : discard)
-                        cards[i].sub(r, 1);
-                    if (cards[i].size() != (were + 1) / 2)
+                        p.cards().sub(r, 1);
+                    if (p.cards().size() != (were + 1) / 2)
                         throw new RuntimeException("You must discard half of your cards");
                 }
             }
@@ -85,7 +82,7 @@ public class Game {
                     Town town = board.townAt(ints);
                     if (town == null)
                         continue;
-                    cards[index(town.player())].add(
+                    town.player().cards().add(
                         board.resourceAt(cell),
                         town.isCity() ? 2 : 1
                     );
@@ -123,7 +120,7 @@ public class Game {
             updateLongestRoad();
             updateLargestArmy();
 
-            if (turnNumber > 10000) break;
+if (turnNumber > 10000) break;
             // if (playerHasWon()) break;
         }
 
@@ -134,13 +131,6 @@ public class Game {
     void init() {
         n = players.size();
         Collections.shuffle(players, rnd);
-        cards = new CardStack[n];
-        developments = new DevelopmentStack[n];
-        armyStrength = new int[n];
-        for (int i = 0; i < n; i++) {
-            cards[i] = new CardStack();
-            developments[i] = new DevelopmentStack();
-        }
     }
 
     void placeFirstSettlements() {
@@ -179,7 +169,7 @@ public class Game {
             points += 2;
         if (largestArmy == player)
             points += 2;
-        points += developments[whichPlayerTurn].victoryPoint();
+        points += player.developments().victoryPoint();
         return points >= 10;
     }
 
@@ -193,11 +183,12 @@ public class Game {
     }
 
     void updateLargestArmy() {
-        int z = armyStrength[whichPlayerTurn];
-        for (int i = 0; i < n; i++)
-            if (i != whichPlayerTurn && armyStrength[i] >= z)
+        Player player = players.get(whichPlayerTurn);
+        int z = player.armyStrength();
+        for (Player p : players)
+            if (p != player && p.armyStrength() >= z)
                 return;
-        largestArmy = players.get(whichPlayerTurn);
+        largestArmy = player;
     }
 
     int index(Player player) {
