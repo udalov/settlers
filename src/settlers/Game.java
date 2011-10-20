@@ -18,10 +18,15 @@ public class Game {
 
         public Game game() { return game; }
         public Random rnd() { return game.rnd; }
+        public Board board() { return game.board; }
+        public List<Player> players() { return game.players(); }
+        public int turnNumber() { return turnNumber; }
+        public int whichPlayerTurn() { return whichPlayerTurn; }
         void setBot(Bot bot) { this.bot = bot; }
 
         public CardStack cards() { return player(bot).cards(); }
         public int rollDice() { return game.rollDice(); }
+        public void moveRobber(Board.Cell c) { game.moveRobber(c); }
     }
 
     private final Random rnd = new Random();
@@ -33,6 +38,7 @@ public class Game {
     private int turnNumber;
     private int whichPlayerTurn;
     private int diceRolled;
+    private boolean robberMoved;
 
     private Player largestArmy;
     private Player longestRoad;
@@ -41,11 +47,11 @@ public class Game {
         board = Board.create(rnd);
     }
 
-    public List<Player> players() { return Collections.unmodifiableList(players); }
+    List<Player> players() { return Collections.unmodifiableList(players); }
     public Board board() { return board; }
-    
-    public int turnNumber() { return turnNumber; }
-    public int whichPlayerTurn() { return whichPlayerTurn; }
+
+    int turnNumber() { return turnNumber; }
+    int whichPlayerTurn() { return whichPlayerTurn; }
 
 
     TradeOffer createTradeOffer(
@@ -76,7 +82,7 @@ public class Game {
             for (Board.Cell cell : Board.allCells()) {
                 if (board.numberAt(cell) != diceRolled)
                     continue;
-                if (board.robberAt() == cell)
+                if (board.robber() == cell)
                     continue;
                 for (Board.Intersection ints : Board.adjacentIntersections(cell)) {
                     Town town = board.townAt(ints);
@@ -90,6 +96,12 @@ public class Game {
             }
         }
         return diceRolled;
+    }
+
+    void moveRobber(Board.Cell cell) {
+        if (cell == board.robber())
+            throw new RuntimeException("You cannot leave the robber at his current position");
+        board.moveRobber(cell);
     }
 
 
@@ -114,6 +126,7 @@ public class Game {
             turnNumber++;
             whichPlayerTurn = (whichPlayerTurn + 1) % n;
             diceRolled = 0;
+            robberMoved = false;
 
             players.get(whichPlayerTurn).bot().makeTurn();
 
@@ -122,6 +135,11 @@ public class Game {
 
 if (turnNumber > 10000) break;
             // if (playerHasWon()) break;
+
+            if (diceRolled == 0)
+                throw new RuntimeException("You must roll the dice once a turn");
+            if (diceRolled == 7 && !robberMoved)
+                throw new RuntimeException("You must move the robber if you rolled 7");
         }
 
         System.out.println("Winner: " + players.get(whichPlayerTurn).color() + ", " +

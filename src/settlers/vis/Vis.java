@@ -30,12 +30,14 @@ public class Vis extends JPanel implements WindowListener {
         "605,600,715,710,825"
     };
 
+    private final Game game;
     private final Board board;
     private final Map<Board.Cell, Point> hex;
     private final Map<Board.Path, Polygon> path;
 
-    public Vis(Board board) {
-        this.board = board;
+    public Vis(Game game) {
+        this.game = game;
+        this.board = game.board();
         this.hex = new HashMap<Board.Cell, Point>();
         for (Board.Cell c : Board.allCells()) {
             hex.put(c, new Point(X0_POS + c.x() * HEX_SIZE, Y0_POS - c.y() * HEX_SIZE * 3 / 2));
@@ -79,9 +81,9 @@ public class Vis extends JPanel implements WindowListener {
         Point z = hex.get(c);
         Polygon p = createHexagon(z);
         Color color = resourceToColor(board.resourceAt(c));
-        Integer number = board.numberAt(c);
         g.setColor(color);
         g.fillPolygon(p);
+        int number = board.numberAt(c);
         if (number != 0) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Tahoma",

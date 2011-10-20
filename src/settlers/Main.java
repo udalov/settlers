@@ -48,7 +48,7 @@ public class Main {
             game.play();
 
             JFrame jf = new JFrame();
-            Vis v = new Vis(game.board());
+            Vis v = new Vis(game);
             jf.getContentPane().add(v);
             jf.addWindowListener(v);
             jf.setSize(1002, 824);

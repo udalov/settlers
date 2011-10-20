@@ -238,7 +238,7 @@ public class Board {
         return towns.get(i);
     }
 
-    public Cell robberAt() {
+    public Cell robber() {
         return robber;
     }
 
@@ -254,6 +254,16 @@ public class Board {
                 return Pair.make(true, null);
         }
         return Pair.make(false, null);
+    }
+
+    public List<Town> adjacentTowns(Cell c) {
+        List<Town> ans = new ArrayList<Town>();
+        for (Intersection i : adjacentIntersections(c)) {
+            Town t = towns.get(i);
+            if (t != null)
+                ans.add(t);
+        }
+        return ans;
     }
 
 
@@ -277,6 +287,10 @@ public class Board {
 
     void buildRoad(Path p, Player pl) {
         roads.put(p, pl);
+    }
+
+    void moveRobber(Cell c) {
+        robber = c;
     }
 
     Set<Pair<Intersection, Town>> allTowns() {
