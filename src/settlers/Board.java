@@ -63,7 +63,6 @@ public class Board {
     public static final int[] DX = {1, -1, -2, -1, 1, 2};
     public static final int[] DY = {1, 1, 0, -1, -1, 0};
 
-    static final Random rnd = new Random(42);
 
     
     private final Map<Cell, Resource> resources;
@@ -95,7 +94,7 @@ public class Board {
         }
     }
 
-    static Board create() {
+    static Board create(Random rnd) {
         Map<Cell, Resource> resources = new HashMap<Cell, Resource>();
         Map<Cell, Integer> numbers = new HashMap<Cell, Integer>();
         Map<Path, Resource> ports2to1 = new HashMap<Path, Resource>();
@@ -163,12 +162,12 @@ public class Board {
             }
         }
 
-        generatePorts(ports2to1, ports3to1);
+        generatePorts(rnd, ports2to1, ports3to1);
 
         return new Board(resources, numbers, ports2to1, ports3to1);
     }
 
-    static void generatePorts(Map<Path, Resource> ports2to1, List<Path> ports3to1) {
+    static void generatePorts(Random rnd, Map<Path, Resource> ports2to1, List<Path> ports3to1) {
         List<Path> coast = new ArrayList<Path>();
         int d = 0, x = 8, y = 2;
         for (int i = 0; i < 6; i++) {
@@ -226,16 +225,9 @@ public class Board {
         return resources.get(cell);
     }
 
-    public Resource resourceAt(int x, int y) {
-        return resourceAt(cell(x, y));
-    }
-
-    public Integer numberAt(Cell cell) {
-        return numbers.get(cell);
-    }
-
-    public Integer numberAt(int x, int y) {
-        return numberAt(cell(x, y));
+    public int numberAt(Cell cell) {
+        Integer i = numbers.get(cell);
+        return i == null ? 0 : i;
     }
 
     public Player roadAt(Path p) {
@@ -244,6 +236,10 @@ public class Board {
 
     public Town townAt(Intersection i) {
         return towns.get(i);
+    }
+
+    public Cell robberAt() {
+        return robber;
     }
 
     public Pair<Boolean, Resource> portAt(Intersection i) {
@@ -265,7 +261,7 @@ public class Board {
     public boolean canBuildTownAt(Intersection i) {
         if (towns.get(i) != null)
             return false;
-        for (Intersection j : adjacent(i))
+        for (Intersection j : adjacentIntersections(i))
             if (towns.get(j) != null)
                 return false;
         return true;
@@ -392,30 +388,33 @@ public class Board {
 
     public static List<Cell> adjacentCells(Intersection a) {
         List<Cell> ans = new ArrayList<Cell>(3);
-        for (Cell cell : allCells()) {
-            for (int d = 0; d < 6; d++) {
+        for (Cell cell : allCells())
+            for (int d = 0; d < 6; d++)
                 if (ints(cell, d) == a)
                     ans.add(cell);
-            }
-        }
         return ans;
     }
 
     public static List<Path> adjacentPaths(Intersection a) {
         List<Path> ans = new ArrayList<Path>(3);
-        for (Path path : allPaths()) {
+        for (Path path : allPaths())
             if (areAdjacent(a, path))
                 ans.add(path);
-        }
         return ans;
     }
 
-    public static List<Intersection> adjacent(Intersection a) {
+    public static List<Intersection> adjacentIntersections(Intersection a) {
         List<Intersection> ans = new ArrayList<Intersection>(3);
-        for (Intersection b : allIntersections()) {
+        for (Intersection b : allIntersections())
             if (areAdjacent(a, b))
                 ans.add(b);
-        }
+        return ans;
+    }
+
+    public static List<Intersection> adjacentIntersections(Cell c) {
+        List<Intersection> ans = new ArrayList<Intersection>(6);
+        for (int d = 0; d < 6; d++)
+            ans.add(ints(c, d));
         return ans;
     }
 
@@ -439,8 +438,8 @@ public class Board {
     }
 
     public static boolean areAdjacent(Intersection a, Path p) {
-        return a == ints(p.cell, p.direction)
-            || a == ints(p.cell, (p.direction + 1) % 6);
+        Intersection[] ends = endpoints(p);
+        return ends[0] == a || ends[1] == a;
     }
 
     public static boolean areAdjacent(Path p, Intersection a) {

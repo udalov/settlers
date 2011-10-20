@@ -5,7 +5,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.lang.reflect.Constructor;
 import javax.swing.JFrame;
-import settlers.*;
 import settlers.bot.Bot;
 import settlers.bot.ExampleBot;
 import settlers.vis.Vis;

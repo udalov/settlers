@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class DevelopmentStack {
 
-    private final Map<Development, Integer> developments = 
+    private final Map<Development, Integer> developments =
         new HashMap<Development, Integer>();
 
     DevelopmentStack() {
@@ -15,6 +15,14 @@ public class DevelopmentStack {
     }
 
     public int howMany(Development d) { return developments.get(d); }
+
+    public int size() {
+        int ans = 0;
+        for (Development d : Development.class.getEnumConstants()) {
+            ans += developments.get(d);
+        }
+        return ans;
+    }
 
     public int knight() { return howMany(Development.KNIGHT); }
     public int roadBuilding() { return howMany(Development.ROAD_BUILDING); }

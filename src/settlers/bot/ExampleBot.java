@@ -6,24 +6,29 @@ import settlers.util.*;
 
 public class ExampleBot extends Bot {
 
-    private Random rnd = new Random();
+    private Random rnd = api.rnd();
     
-    public ExampleBot(Game.API api) {
-        super(api);
-    }
-
-    public String getName() {
-        return "Example Bot";
-    }
+    public ExampleBot(Game.API api) { super(api); }
 
     public void makeTurn() {
+        api.rollDice();
+    }
+
+    public String toString() {
+        return "Example Bot";
     }
 
     public TradeResult trade(TradeOffer offer) {
         return offer.decline();
     }
 
-    public void discardHalfOfTheCards() {
+    public List<Resource> discardHalfOfTheCards() {
+        List<Resource> cards = api.cards().list();
+        Collections.shuffle(cards, rnd);
+        List<Resource> ans = new ArrayList<Resource>();
+        for (int i = 0; i < cards.size() / 2; i++)
+            ans.add(cards.get(i));
+        return ans;
     }
 
     public void tradeWithOtherPlayerOnHisTurn() {

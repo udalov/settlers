@@ -1,5 +1,6 @@
 package smartasses;
 
+import java.util.List;
 import settlers.*;
 import settlers.bot.*;
 import settlers.util.*;
@@ -10,9 +11,7 @@ public class SampleBot extends Bot {
         super(api);
     }
 
-    public String getName() {
-        return "Smart Ass";
-    }
+    public String toString() { return "Smart Ass"; }
 
     public void makeTurn() {
     }
@@ -21,7 +20,8 @@ public class SampleBot extends Bot {
         return offer.decline();
     }
 
-    public void discardHalfOfTheCards() {
+    public List<Resource> discardHalfOfTheCards() {
+        return null;
     }
 
     public Pair<Board.Intersection, Board.Path> placeFirstSettlements(boolean first) {

@@ -82,7 +82,7 @@ public class Vis extends JPanel implements WindowListener {
         Integer number = board.numberAt(c);
         g.setColor(color);
         g.fillPolygon(p);
-        if (number != null) {
+        if (number != 0) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Tahoma",
                 number == 6 || number == 8 ? Font.BOLD : Font.PLAIN, 36));
@@ -165,7 +165,7 @@ public class Vis extends JPanel implements WindowListener {
         switch (c) {
             case BLUE: return new Color(0x0000FF);
             case WHITE: return new Color(0xFFFFFF);
-            case YELLOW: return new Color(0xFF9900);
+            case ORANGE: return new Color(0xFF9900);
             case RED: return new Color(0xFF0000);
             default: return Color.WHITE;
         }

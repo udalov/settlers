@@ -7,7 +7,7 @@ public class Player {
     public static enum Color {
         RED,
         BLUE,
-        YELLOW,
+        ORANGE,
         WHITE,
     }
 
