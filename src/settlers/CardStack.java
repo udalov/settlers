@@ -32,6 +32,15 @@ public class CardStack {
         return list;
     }
 
+    public boolean areThere(String needed) {
+        for (Resource r : Resource.class.getEnumConstants()) {
+            int x = needed.replaceAll("[^" + r.toString().charAt(0) + "]", "").length();
+            if (resources.get(r) < x)
+                return false;
+        }
+        return true;
+    }
+
     public int brick() { return howMany(Resource.BRICK); }
     public int wool() { return howMany(Resource.WOOL); }
     public int ore() { return howMany(Resource.ORE); }
@@ -47,6 +56,13 @@ public class CardStack {
             throw new RuntimeException("Not enough resources: " +
                 (x - howMany(r)) + " more " + r + " needed!");
         resources.put(r, resources.get(r) - x);
+    }
+
+    public String toString() {
+        String ans = "";
+        for (Resource r : list())
+            ans += r.toString().charAt(0);
+        return ans;
     }
 
 }
