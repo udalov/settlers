@@ -27,10 +27,25 @@ public class Game {
 
         public CardStack cards() { return player(bot).cards(); }
         public int rollDice() { return game.rollDice(); }
-        public void moveRobber(Board.Cell c, Player p) { game.moveRobber(c, p); }
+        public void moveRobber(Board.Cell c, Player whoToRob)
+            { game.moveRobber(c, player(bot), whoToRob); }
+
+        public boolean canBuildFirstTownsAt(Board.Intersection i)
+            { return game.board.canBuildTownAt(i, false, player(bot)); }
+        public boolean canBuildTownAt(Board.Intersection i)
+            { return game.board.canBuildTownAt(i, true, player(bot)); }
+        public boolean canBuildRoadAt(Board.Path p)
+            { return game.board.canBuildRoadAt(p, player(bot)); }
+
+        public void buildSettlement(Board.Intersection i)
+            { game.buildSettlement(i, player(bot)); }
+        public void buildCity(Board.Intersection i)
+            { game.buildCity(i, player(bot)); }
+        public void buildRoad(Board.Path p)
+            { game.buildRoad(p, player(bot)); }
     }
 
-    private final Random rnd = new Random();
+    private final Random rnd = new Random(256);
     
     private final List<Player> players = new ArrayList<Player>();
     private final Board board;
@@ -68,11 +83,16 @@ public class Game {
         if (diceRolled != 0)
             throw new RuntimeException("Cannot roll the dice twice a turn");
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
+for (Player p : players) System.out.println(p.color() + ": " + p.cards());
+System.out.println("Dice rolled: " + diceRolled + " (" + players.get(whichPlayerTurn).color() + ")");
         if (diceRolled == 7) {
             for (Player p : players) {
                 int were = p.cards().size();
                 if (were > 7) {
                     List<Resource> discard = p.bot().discardHalfOfTheCards();
+System.out.println(p.color() + " discards: ");
+for (Resource r : discard) System.out.print(r.toString().charAt(0));
+System.out.println();
                     for (Resource r : discard)
                         p.cards().sub(r, 1);
                     if (p.cards().size() != (were + 1) / 2)
@@ -99,22 +119,76 @@ public class Game {
         return diceRolled;
     }
 
-    void moveRobber(Board.Cell cell, Player player) {
+    void moveRobber(Board.Cell cell, Player player, Player whoToRob) {
         if (cell == board.robber())
             throw new RuntimeException("You cannot leave the robber at his current position");
         List<Town> ts = board.adjacentTowns(cell);
-        boolean ok = false;
+        List<Player> okToRob = new ArrayList<Player>();
         for (Town t : ts)
-            ok |= t.player() == player;
-        if (!ok)
+            if (t.player().cardsNumber() > 0)
+                okToRob.add(t.player());
+        if (!okToRob.isEmpty() && whoToRob == null)
+            throw new RuntimeException("You must rob somebody");
+        if (!okToRob.isEmpty() && !okToRob.contains(whoToRob))
             throw new RuntimeException("You cannot rob a player not having a town near the robber");
-        if (player.cardsNumber() == 0)
+        if (whoToRob.cardsNumber() == 0)
             throw new RuntimeException("You cannot rob a player who has no cards");
         board.moveRobber(cell);
-        List<Resource> list = player.cards().list();
+        List<Resource> list = whoToRob.cards().list();
         Resource r = list.get(rnd.nextInt(list.size()));
-        player.cards().sub(r, 1);
-        players.get(whichPlayerTurn).cards().add(r, 1);
+        whoToRob.cards().sub(r, 1);
+        player.cards().add(r, 1);
+        robberMoved = true;
+System.out.println(player.color() + " moves robber to " + cell + " and robbes " + (whoToRob == null ? "nobody" : whoToRob.color().toString()));
+    }
+
+    void buildSettlement(Board.Intersection i, Player player) {
+        if (player.settlementsLeft() == 0)
+            throw new RuntimeException("You do not have any settlements left");
+        if (!player.cards().areThere("BWGL"))
+            throw new RuntimeException("Not enough resources to build a settlement");
+        if (!board.canBuildTownAt(i, true, player))
+            throw new RuntimeException("You cannot build a settlement here");
+        player.expendSettlement();
+        board.buildTown(i, new Town(player, false));
+        player.cards().sub(Resource.BRICK, 1);
+        player.cards().sub(Resource.WOOL, 1);
+        player.cards().sub(Resource.GRAIN, 1);
+        player.cards().sub(Resource.LUMBER, 1);
+System.out.println(player.color() + " builds a settlement at " + i);
+    }
+
+    void buildCity(Board.Intersection i, Player player) {
+        if (player.citiesLeft() == 0)
+            throw new RuntimeException("You do not have any cities left");
+        if (!player.cards().areThere("OOOGG"))
+            throw new RuntimeException("Not enough resources to build a city");
+        if (board.townAt(i) == null)
+            throw new RuntimeException("You must first build a settlement to be able to upgrade it");
+        if (board.townAt(i).player() != player)
+            throw new RuntimeException("You cannot upgrade other player's settlement");
+        if (board.townAt(i).isCity())
+            throw new RuntimeException("You cannot build a city over your city");
+        player.expendCity();
+        board.buildTown(i, new Town(player, true));
+        player.cards().sub(Resource.ORE, 1);
+        player.cards().sub(Resource.ORE, 1);
+        player.cards().sub(Resource.ORE, 1);
+        player.cards().sub(Resource.GRAIN, 1);
+        player.cards().sub(Resource.GRAIN, 1);
+System.out.println(player.color() + " builds a city at " + i);
+    }
+
+    void buildRoad(Board.Path p, Player player) {
+        if (player.roadsLeft() == 0)
+            throw new RuntimeException("You do not have any roads left");
+        if (!board.canBuildRoadAt(p, player))
+            throw new RuntimeException("You cannot build a road here");
+        player.expendRoad();
+        board.buildRoad(p, player);
+        player.cards().sub(Resource.BRICK, 1);
+        player.cards().sub(Resource.LUMBER, 1);
+System.out.println(player.color() + " builds a road at " + p);
     }
 
 
@@ -136,6 +210,7 @@ public class Game {
         whichPlayerTurn = -1;
 
         while (true) {
+System.out.println();
             turnNumber++;
             whichPlayerTurn = (whichPlayerTurn + 1) % n;
             diceRolled = 0;
@@ -146,8 +221,7 @@ public class Game {
             updateLongestRoad();
             updateLargestArmy();
 
-if (turnNumber > 10000) break;
-            // if (playerHasWon()) break;
+            if (playerHasWon()) break;
 
             if (diceRolled == 0)
                 throw new RuntimeException("You must roll the dice once a turn");
@@ -155,8 +229,12 @@ if (turnNumber > 10000) break;
                 throw new RuntimeException("You must move the robber if you rolled 7");
         }
 
-        System.out.println("Winner: " + players.get(whichPlayerTurn).color() + ", " +
-            players.get(whichPlayerTurn).bot().toString());
+        // TODO: do not output VP for players who lost
+        System.out.println();
+        System.out.println("Game lasted " + turnNumber + " turns");
+        System.out.println("Scores:");
+        for (Player player : players)
+            System.out.println(points(player) + " " + player.color() + " (" + player.bot() + ")");
     }
 
     void init() {
@@ -171,37 +249,36 @@ if (turnNumber > 10000) break;
                 Pair<Board.Intersection, Board.Path> p = player.bot().placeFirstSettlements(it == 0);
                 if (!board.areAdjacent(p.first(), p.second()))
                     throw new RuntimeException("Cannot build a road not connected to a town");
-                tryBuildTown(player, p.first(), false);
-                tryBuildRoad(player, p.second());
+                if (!board.canBuildTownAt(p.first(), false, player))
+                    throw new RuntimeException("Cannot build a town here");
+                board.buildTown(p.first(), new Town(player, false));
+                board.buildRoad(p.second(), player);
+                if (it == 1) {
+                    for (Board.Cell c : Board.adjacentCells(p.first())) {
+                        Resource r = board.resourceAt(c);
+                        if (r != null)
+                            player.cards().add(r, 1);
+                    }
+                }
             }
         }
     }
 
-    void tryBuildTown(Player player, Board.Intersection i, boolean mustBeRoad) {
-        if (!board.canBuildTownAt(i))
-            throw new RuntimeException("Cannot build a town here");
-        if (mustBeRoad) {
-            // TODO: check for roads
-        }
-        board.buildTown(i, new Town(player, false));
-    }
-
-    void tryBuildRoad(Player player, Board.Path p) {
-        // TODO: check a road nearby
-        board.buildRoad(p, player);
-    }
-
-    boolean playerHasWon() {
-        Player player = players.get(whichPlayerTurn);
+    int points(Player player) {
         int points = 0;
-        for (Pair<Board.Intersection, Town> t : board.allTowns())
-            points += t.second().isCity() ? 2 : 1;
+        for (Pair<Board.Intersection, Town> pair : board.allTowns())
+            if (pair.second().player() == player)
+                points += pair.second().isCity() ? 2 : 1;
         if (longestRoad == player)
             points += 2;
         if (largestArmy == player)
             points += 2;
         points += player.developments().victoryPoint();
-        return points >= 10;
+        return points;
+    }
+
+    boolean playerHasWon() {
+        return points(players.get(whichPlayerTurn)) >= 10;
     }
 
     void updateLongestRoad() {

@@ -17,10 +17,17 @@ public class Player {
     private final CardStack cards = new CardStack();
     private final DevelopmentStack developments = new DevelopmentStack();
     private int armyStrength;
+    
+    private int settlementsLeft;
+    private int citiesLeft;
+    private int roadsLeft;
 
     Player(Bot bot, Color color) {
         this.bot = bot;
         this.color = color;
+        settlementsLeft = 5;
+        citiesLeft = 4;
+        roadsLeft = 15;
     }
 
     public Color color() { return color; }
@@ -31,6 +38,13 @@ public class Player {
     public int armyStrength() { return armyStrength; }
     public int cardsNumber() { return cards.size(); }
     public int developmentsNumber() { return developments.size(); }
+
+    public int settlementsLeft() { return settlementsLeft; }
+    public int citiesLeft() { return citiesLeft; }
+    public int roadsLeft() { return roadsLeft; }
+    void expendSettlement() { settlementsLeft--; }
+    void expendCity() { citiesLeft--; }
+    void expendRoad() { roadsLeft--; }
     
 }
 

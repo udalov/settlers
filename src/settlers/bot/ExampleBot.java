@@ -15,6 +15,8 @@ public class ExampleBot extends Bot {
     }
 
     public void makeTurn() {
+        Player me = api.me();
+        CardStack cards = api.cards();
         if (api.rollDice() == 7) {
             c: for (Board.Cell c : Board.allCells()) {
                 if (board.robber() == c)
@@ -23,7 +25,7 @@ public class ExampleBot extends Bot {
                 if (ts.isEmpty())
                     continue;
                 for (Town t : ts)
-                    if (t.player() == api.me())
+                    if (t.player() == me)
                         continue c;
                 Player rob = null;
                 for (Town t : ts)
@@ -31,6 +33,32 @@ public class ExampleBot extends Bot {
                         rob = t.player();
                 api.moveRobber(c, rob);
                 break;
+            }
+        }
+        if (me.citiesLeft() > 0 && cards.areThere("OOOGG")) {
+            for (Board.Intersection i : Board.allIntersections()) {
+                Town t = board.townAt(i);
+                if (t == null || t.player() != me || t.isCity())
+                    continue;
+                api.buildCity(i);
+                break;
+            }
+        }
+        if (me.settlementsLeft() > 0 && cards.areThere("BWGL")) {
+            for (Board.Intersection i : Board.allIntersections()) {
+                if (api.canBuildTownAt(i)) {
+                    api.buildSettlement(i);
+                    break;
+                }
+            }
+        }
+        if (me.roadsLeft() > 0 && cards.areThere("BL")) {
+            for (Board.Path p : Board.allPaths()) {
+                if (api.canBuildRoadAt(p)) {
+                    api.buildRoad(p);
+                    if (!cards.areThere("BL") || me.roadsLeft() == 0)
+                        break;
+                }
             }
         }
     }
@@ -56,22 +84,11 @@ public class ExampleBot extends Bot {
     }
 
     public Pair<Board.Intersection, Board.Path> placeFirstSettlements(boolean first) {
-        /*
-        while (true) {
-            int cellno = rnd.nextInt(19);
-            Board.Cell cell = Board.allCells().get(cellno);
-            int dir = rnd.nextInt(6);
-            Board.Intersection ints = Board.ints(cell, dir);
-            if (!api.board().canBuildTownAt(ints))
-                continue;
-            for (Board.Path p : Board.allPaths())
-                if (Board.areAdjacent(ints, p))
-                    return Pair.make(ints, p);
-            return null;
-        }
-        */
-        
-        List<Board.Intersection> l = new ArrayList<Board.Intersection>(Board.allIntersections());
+        List<Board.Intersection> l = new ArrayList<Board.Intersection>();
+        for (Board.Intersection i : Board.allIntersections())
+            if (api.canBuildFirstTownsAt(i))
+                l.add(i);
+
         Collections.sort(l, new Comparator<Board.Intersection>() {
             private int sum(Board.Intersection a) {
                 int ans = 0;
@@ -94,15 +111,10 @@ public class ExampleBot extends Bot {
             }
         });
 
-        for (Board.Intersection i : l) {
-            if (api.board().canBuildTownAt(i)) {
-                List<Board.Path> paths = Board.adjacentPaths(i);
-                int pathno = rnd.nextInt(paths.size());
-                return Pair.make(i, paths.get(pathno));
-            }
-        }
-
-        return null;
+        Board.Intersection i = l.get(0);
+        List<Board.Path> paths = Board.adjacentPaths(i);
+        int pathno = rnd.nextInt(paths.size());
+        return Pair.make(i, paths.get(pathno));
     }
 
 }
