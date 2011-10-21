@@ -15,18 +15,19 @@ public class Game {
         private Bot bot;
 
         API() { game = Game.this; }
+        void setBot(Bot bot) { this.bot = bot; }
 
         public Game game() { return game; }
+        public Player me() { return player(bot); }
         public Random rnd() { return game.rnd; }
         public Board board() { return game.board; }
         public List<Player> players() { return game.players(); }
         public int turnNumber() { return turnNumber; }
         public int whichPlayerTurn() { return whichPlayerTurn; }
-        void setBot(Bot bot) { this.bot = bot; }
 
         public CardStack cards() { return player(bot).cards(); }
         public int rollDice() { return game.rollDice(); }
-        public void moveRobber(Board.Cell c) { game.moveRobber(c); }
+        public void moveRobber(Board.Cell c, Player p) { game.moveRobber(c, p); }
     }
 
     private final Random rnd = new Random();
@@ -98,10 +99,22 @@ public class Game {
         return diceRolled;
     }
 
-    void moveRobber(Board.Cell cell) {
+    void moveRobber(Board.Cell cell, Player player) {
         if (cell == board.robber())
             throw new RuntimeException("You cannot leave the robber at his current position");
+        List<Town> ts = board.adjacentTowns(cell);
+        boolean ok = false;
+        for (Town t : ts)
+            ok |= t.player() == player;
+        if (!ok)
+            throw new RuntimeException("You cannot rob a player not having a town near the robber");
+        if (player.cardsNumber() == 0)
+            throw new RuntimeException("You cannot rob a player who has no cards");
         board.moveRobber(cell);
+        List<Resource> list = player.cards().list();
+        Resource r = list.get(rnd.nextInt(list.size()));
+        player.cards().sub(r, 1);
+        players.get(whichPlayerTurn).cards().add(r, 1);
     }
 
 
@@ -227,7 +240,7 @@ if (turnNumber > 10000) break;
         for (Player player : players)
             if (player.bot() == bot)
                 return player;
-        throw new IllegalStateException("Internal: no player corresponds to the given bot");
+        return null;
     }
 
 }

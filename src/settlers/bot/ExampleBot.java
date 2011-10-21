@@ -16,11 +16,21 @@ public class ExampleBot extends Bot {
 
     public void makeTurn() {
         if (api.rollDice() == 7) {
-            for (Board.Cell c : Board.allCells()) {
-                if (board.robber() != c) {
-                    api.moveRobber(c);
-                    break;
-                }
+            c: for (Board.Cell c : Board.allCells()) {
+                if (board.robber() == c)
+                    continue;
+                List<Town> ts = board.adjacentTowns(c); 
+                if (ts.isEmpty())
+                    continue;
+                for (Town t : ts)
+                    if (t.player() == api.me())
+                        continue c;
+                Player rob = null;
+                for (Town t : ts)
+                    if (t.player().cardsNumber() > 0)
+                        rob = t.player();
+                api.moveRobber(c, rob);
+                break;
             }
         }
     }

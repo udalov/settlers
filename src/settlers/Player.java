@@ -23,11 +23,14 @@ public class Player {
         this.color = color;
     }
 
-    Bot bot() { return bot; }
     public Color color() { return color; }
+    Bot bot() { return bot; }
     CardStack cards() { return cards; }
     DevelopmentStack developments() { return developments; }
+
     public int armyStrength() { return armyStrength; }
+    public int cardsNumber() { return cards.size(); }
+    public int developmentsNumber() { return developments.size(); }
     
 }
 
