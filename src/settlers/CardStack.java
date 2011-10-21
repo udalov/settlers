@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import settlers.util.Util;
 
 public class CardStack {
 
@@ -11,7 +12,7 @@ public class CardStack {
         new HashMap<Resource, Integer>();
 
     CardStack() {
-        for (Resource r : Resource.class.getEnumConstants())
+        for (Resource r : Resource.all())
             resources.put(r, 0);
     }
 
@@ -19,22 +20,22 @@ public class CardStack {
 
     public int size() {
         int ans = 0;
-        for (Resource r : Resource.class.getEnumConstants())
+        for (Resource r : Resource.all())
             ans += resources.get(r);
         return ans;
     }
 
     public List<Resource> list() {
         List<Resource> list = new ArrayList<Resource>();
-        for (Resource r : Resource.class.getEnumConstants())
+        for (Resource r : Resource.all())
             for (int i = 0, n = resources.get(r); i < n; i++)
                 list.add(r);
         return list;
     }
 
     public boolean areThere(String needed) {
-        for (Resource r : Resource.class.getEnumConstants()) {
-            int x = needed.replaceAll("[^" + r.toString().charAt(0) + "]", "").length();
+        for (Resource r : Resource.all()) {
+            int x = Util.numberOfOccurrences(r.toString().charAt(0), needed);
             if (resources.get(r) < x)
                 return false;
         }
@@ -56,6 +57,14 @@ public class CardStack {
             throw new RuntimeException("Not enough resources: " +
                 (x - howMany(r)) + " more " + r + " needed!");
         resources.put(r, resources.get(r) - x);
+    }
+
+    void sub(String res) {
+        for (Resource r : Resource.all()) {
+            int x = Util.numberOfOccurrences(r.toString().charAt(0), res);
+            if (x > 0)
+                sub(r, x);
+        }
     }
 
     public String toString() {

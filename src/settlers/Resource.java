@@ -5,6 +5,10 @@ public enum Resource {
     WOOL,
     ORE,
     GRAIN,
-    LUMBER,
+    LUMBER;
+
+    public static Resource[] all() {
+        return Resource.class.getEnumConstants();
+    }
 }
 
