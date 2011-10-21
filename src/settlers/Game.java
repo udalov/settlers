@@ -2,11 +2,13 @@ package settlers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import settlers.bot.Bot;
 import settlers.util.Pair;
+import settlers.util.Util;
 
 public class Game {
     
@@ -43,6 +45,22 @@ public class Game {
             { game.buildCity(i, player(bot)); }
         public void buildRoad(Board.Path p)
             { game.buildRoad(p, player(bot)); }
+
+        public boolean havePort(Resource r)
+            { return game.hasPort(r, player(bot)); }
+        public boolean havePort3to1()
+            { return game.hasPort3to1(player(bot)); }
+        public boolean hasPort(Resource r, Player player)
+            { return game.hasPort(r, player); }
+        public boolean hasPort3to1(Player player)
+            { return game.hasPort3to1(player); }
+        public boolean canChange(String sell, String buy)
+            { return game.canChange(sell, buy, player(bot)); }
+        public void change(String sell, String buy)
+            { game.change(sell, buy, player(bot)); }
+
+        public boolean getIfPossible(String what)
+            { return game.getIfPossible(what, player(bot)); }
     }
 
     private final Random rnd = new Random(256);
@@ -83,15 +101,14 @@ public class Game {
         if (diceRolled != 0)
             throw new RuntimeException("Cannot roll the dice twice a turn");
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
-for (Player p : players) System.out.println(p.color() + ": " + p.cards());
 System.out.println("Dice rolled: " + diceRolled + " (" + players.get(whichPlayerTurn).color() + ")");
         if (diceRolled == 7) {
             for (Player p : players) {
                 int were = p.cards().size();
                 if (were > 7) {
                     List<Resource> discard = p.bot().discardHalfOfTheCards();
-System.out.println(p.color() + " discards: ");
-for (Resource r : discard) System.out.print(r.toString().charAt(0));
+System.out.print(p.color() + " discards: ");
+for (Resource r : discard) System.out.print(r.chr());
 System.out.println();
                     for (Resource r : discard)
                         p.cards().sub(r, 1);
@@ -116,12 +133,15 @@ System.out.println();
                 }
             }
         }
+for (Player p : players) System.out.println(p.color() + ": " + p.cards());
         return diceRolled;
     }
 
     void moveRobber(Board.Cell cell, Player player, Player whoToRob) {
         if (cell == board.robber())
             throw new RuntimeException("You cannot leave the robber at his current position");
+        if (whoToRob == player)
+            throw new RuntimeException("You cannot rob yourself");
         List<Town> ts = board.adjacentTowns(cell);
         List<Player> okToRob = new ArrayList<Player>();
         for (Town t : ts)
@@ -131,15 +151,18 @@ System.out.println();
             throw new RuntimeException("You must rob somebody");
         if (!okToRob.isEmpty() && !okToRob.contains(whoToRob))
             throw new RuntimeException("You cannot rob a player not having a town near the robber");
+        board.moveRobber(cell);
+        robberMoved = true;
+if (whoToRob == null) System.out.println(player.color() + " moves robber to " + cell + " and robs nobody");
+        if (whoToRob == null)
+            return;
         if (whoToRob.cardsNumber() == 0)
             throw new RuntimeException("You cannot rob a player who has no cards");
-        board.moveRobber(cell);
         List<Resource> list = whoToRob.cards().list();
         Resource r = list.get(rnd.nextInt(list.size()));
         whoToRob.cards().sub(r, 1);
         player.cards().add(r, 1);
-        robberMoved = true;
-System.out.println(player.color() + " moves robber to " + cell + " and robbes " + (whoToRob == null ? "nobody" : whoToRob.color().toString()));
+System.out.println(player.color() + " moves robber to " + cell + " and robs " + players.get(whichPlayerTurn).color());
     }
 
     void buildSettlement(Board.Intersection i, Player player) {
@@ -151,10 +174,7 @@ System.out.println(player.color() + " moves robber to " + cell + " and robbes " 
             throw new RuntimeException("You cannot build a settlement here");
         player.expendSettlement();
         board.buildTown(i, new Town(player, false));
-        player.cards().sub(Resource.BRICK, 1);
-        player.cards().sub(Resource.WOOL, 1);
-        player.cards().sub(Resource.GRAIN, 1);
-        player.cards().sub(Resource.LUMBER, 1);
+        player.cards().sub("BWGL");
 System.out.println(player.color() + " builds a settlement at " + i);
     }
 
@@ -171,24 +191,126 @@ System.out.println(player.color() + " builds a settlement at " + i);
             throw new RuntimeException("You cannot build a city over your city");
         player.expendCity();
         board.buildTown(i, new Town(player, true));
-        player.cards().sub(Resource.ORE, 1);
-        player.cards().sub(Resource.ORE, 1);
-        player.cards().sub(Resource.ORE, 1);
-        player.cards().sub(Resource.GRAIN, 1);
-        player.cards().sub(Resource.GRAIN, 1);
+        player.cards().sub("OOOGG");
 System.out.println(player.color() + " builds a city at " + i);
     }
 
+    // TODO: ensure all player actions happen on his turn
     void buildRoad(Board.Path p, Player player) {
         if (player.roadsLeft() == 0)
             throw new RuntimeException("You do not have any roads left");
+        if (!player.cards().areThere("BL"))
+            throw new RuntimeException("Not enough resources to build a road");
         if (!board.canBuildRoadAt(p, player))
             throw new RuntimeException("You cannot build a road here");
         player.expendRoad();
         board.buildRoad(p, player);
-        player.cards().sub(Resource.BRICK, 1);
-        player.cards().sub(Resource.LUMBER, 1);
+        player.cards().sub("BL");
 System.out.println(player.color() + " builds a road at " + p);
+    }
+
+    boolean hasPort(Resource r, Player player) {
+        for (Pair<Board.Intersection, Resource> p : board.allPorts()) {
+            if (p.second() == r) {
+                Town t = board.townAt(p.first());
+                if (t != null && t.player() == player)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    boolean hasPort3to1(Player player) {
+        for (Pair<Board.Intersection, Resource> p : board.allPorts()) {
+            if (p.second() == null) {
+                Town t = board.townAt(p.first());
+                if (t != null && t.player() == player)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    boolean canChange(String sell, String buy, Player player) {
+        int res = 0;
+        for (Resource r : Resource.all()) {
+            int rsell = Util.numberOfOccurrences(r.chr(), sell);
+            int rbuy = Util.numberOfOccurrences(r.chr(), buy);
+            int min = Math.min(rsell, rbuy);
+            rsell -= min;
+            rbuy -= min;
+            if (rbuy > 0) {
+                res -= rbuy;
+                continue;
+            }
+            if (hasPort(r, player)) {
+                if (rsell % 2 != 0)
+                    return false;
+                res += rsell / 2;
+            } else if (hasPort3to1(player)) {
+                if (rsell % 3 != 0)
+                    return false;
+                res += rsell / 3;
+            } else {
+                if (rsell % 4 != 0)
+                    return false;
+                res += rsell / 4;
+            }
+        }
+        return res == 0;
+    }
+
+    void change(String sell, String buy, Player player) {
+        if (!canChange(sell, buy, player))
+            throw new RuntimeException("You cannot change " + sell + " to " + buy);
+        player.cards().sub(sell);
+        player.cards().add(buy);
+System.out.println(player.color() + " changes " + sell + " to " + buy);
+    }
+
+    boolean getIfPossible(String what, Player player) {
+        Map<Resource, Integer> left = new HashMap<Resource, Integer>();
+        String buy = "";
+        for (Resource r : Resource.all()) {
+            int needed = Util.numberOfOccurrences(r.chr(), what);
+            int has = player.cards().howMany(r);
+            if (has >= needed) {
+                left.put(r, has - needed);
+            } else {
+                left.put(r, 0);
+                for (int i = has; i < needed; i++)
+                    buy += r.chr();
+            }
+        }
+        if (buy.isEmpty())
+            return true;
+        String sell = "";
+        int buyingIndex = 0;
+        // first 2:1, then 3:1 or 4:1
+        it: for (int it = 0; it < 2; it++) {
+            for (Resource r : Resource.all()) {
+                if (it == 0 && !hasPort(r, player))
+                    continue;
+                int x = left.get(r);
+                if (x == 0)
+                    continue;
+                int coeff = it == 0 ? 2 : 4;
+                if (hasPort3to1(player))
+                    coeff = 3;
+                int sub = Math.min(buy.length() - buyingIndex, x / coeff);
+                for (int i = 0; i < sub; i++)
+                    for (int j = 0; j < coeff; j++)
+                        sell += r.chr();
+                buyingIndex += sub;
+                if (buyingIndex == buy.length())
+                    break it;
+                left.put(r, x - sub * coeff);
+            }
+        }
+        if (buyingIndex < buy.length())
+            return false;
+        change(sell, buy, player);
+        return true;
     }
 
 

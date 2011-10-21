@@ -10,5 +10,9 @@ public enum Resource {
     public static Resource[] all() {
         return Resource.class.getEnumConstants();
     }
+
+    public char chr() {
+        return toString().charAt(0);
+    }
 }
 

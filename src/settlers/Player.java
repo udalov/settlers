@@ -43,7 +43,7 @@ public class Player {
     public int citiesLeft() { return citiesLeft; }
     public int roadsLeft() { return roadsLeft; }
     void expendSettlement() { settlementsLeft--; }
-    void expendCity() { citiesLeft--; }
+    void expendCity() { citiesLeft--; settlementsLeft++; }
     void expendRoad() { roadsLeft--; }
     
 }

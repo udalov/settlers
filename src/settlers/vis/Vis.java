@@ -14,8 +14,8 @@ public class Vis extends JPanel implements WindowListener {
     public static final int X0_POS = 200;
     public static final int Y0_POS = 500;
     public static final int HEX_SIZE = 54;
-    public static final int TOWN_RADIUS = 8;
-    public static final int PORT_DISTANCE = 6;
+    public static final int TOWN_RADIUS = 10;
+    public static final int PORT_DISTANCE = 8;
 
     public static final int[] DX = new int[] {2, 0, -2, -2, 0, 2};
     public static final int[] DY = new int[] {-1, -2, -1, 1, 2, 1};

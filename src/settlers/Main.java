@@ -45,7 +45,11 @@ public class Main {
                 game.addPlayer(new Player(bots[i], Player.Color.values()[i]));
             }
 
-            game.play();
+            try {
+                game.play();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             JFrame jf = new JFrame();
             Vis v = new Vis(game);

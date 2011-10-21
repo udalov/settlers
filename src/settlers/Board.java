@@ -317,11 +317,20 @@ public class Board {
     Set<Pair<Intersection, Town>> allTowns() {
         Set<Pair<Intersection, Town>> ans =
             new HashSet<Pair<Intersection, Town>>();
-        for (Intersection i : towns.keySet()) {
-            Town t = towns.get(i);
-            if (t != null)
-                ans.add(Pair.make(i, t));
-        }
+        for (Intersection i : towns.keySet())
+            ans.add(Pair.make(i, towns.get(i)));
+        return ans;
+    }
+
+    Set<Pair<Intersection, Resource>> allPorts() {
+        Set<Pair<Intersection, Resource>> ans =
+            new HashSet<Pair<Intersection, Resource>>();
+        for (Path p : ports2to1.keySet())
+            for (Intersection i : endpoints(p))
+                ans.add(Pair.make(i, ports2to1.get(i)));
+        for (Path p : ports3to1)
+            for (Intersection i : endpoints(p))
+                ans.add(Pair.make(i, (Resource)null));
         return ans;
     }
 

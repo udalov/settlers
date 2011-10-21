@@ -35,31 +35,39 @@ public class ExampleBot extends Bot {
                 break;
             }
         }
-        if (me.citiesLeft() > 0 && cards.areThere("OOOGG")) {
+        while (me.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
+            boolean can = false;
             for (Board.Intersection i : Board.allIntersections()) {
                 Town t = board.townAt(i);
                 if (t == null || t.player() != me || t.isCity())
                     continue;
                 api.buildCity(i);
+                can = true;
                 break;
             }
+            if (!can) break;
         }
-        if (me.settlementsLeft() > 0 && cards.areThere("BWGL")) {
+        while (me.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
+            boolean can = false;
             for (Board.Intersection i : Board.allIntersections()) {
                 if (api.canBuildTownAt(i)) {
                     api.buildSettlement(i);
+                    can = true;
                     break;
                 }
             }
+            if (!can) break;
         }
-        if (me.roadsLeft() > 0 && cards.areThere("BL")) {
+        while (me.roadsLeft() > 0 && api.getIfPossible("BL")) {
+            boolean can = false;
             for (Board.Path p : Board.allPaths()) {
                 if (api.canBuildRoadAt(p)) {
                     api.buildRoad(p);
-                    if (!cards.areThere("BL") || me.roadsLeft() == 0)
-                        break;
+                    can = true;
+                    break;
                 }
             }
+            if (!can) break;
         }
     }
 

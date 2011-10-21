@@ -35,7 +35,7 @@ public class CardStack {
 
     public boolean areThere(String needed) {
         for (Resource r : Resource.all()) {
-            int x = Util.numberOfOccurrences(r.toString().charAt(0), needed);
+            int x = Util.numberOfOccurrences(r.chr(), needed);
             if (resources.get(r) < x)
                 return false;
         }
@@ -59,9 +59,17 @@ public class CardStack {
         resources.put(r, resources.get(r) - x);
     }
 
+    void add(String res) {
+        for (Resource r : Resource.all()) {
+            int x = Util.numberOfOccurrences(r.chr(), res);
+            if (x > 0)
+                add(r, x);
+        }
+    }
+
     void sub(String res) {
         for (Resource r : Resource.all()) {
-            int x = Util.numberOfOccurrences(r.toString().charAt(0), res);
+            int x = Util.numberOfOccurrences(r.chr(), res);
             if (x > 0)
                 sub(r, x);
         }
@@ -70,7 +78,7 @@ public class CardStack {
     public String toString() {
         String ans = "";
         for (Resource r : list())
-            ans += r.toString().charAt(0);
+            ans += r.chr();
         return ans;
     }
 
