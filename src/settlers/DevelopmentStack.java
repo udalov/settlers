@@ -7,19 +7,29 @@ public class DevelopmentStack {
 
     private final Map<Development, Integer> developments =
         new HashMap<Development, Integer>();
+    private final Map<Development, Integer> disabled =
+        new HashMap<Development, Integer>();
 
     DevelopmentStack() {
-        for (Development d : Development.class.getEnumConstants()) {
+        for (Development d : Development.all()) {
             developments.put(d, 0);
+            disabled.put(d, 0);
         }
     }
 
-    public int howMany(Development d) { return developments.get(d); }
+    public int howMany(Development d) {
+        return developments.get(d);
+    }
+
+    public int howManyDisabled(Development d) {
+        return disabled.get(d);
+    }
 
     public int size() {
         int ans = 0;
-        for (Development d : Development.class.getEnumConstants()) {
+        for (Development d : Development.all()) {
             ans += developments.get(d);
+            ans += disabled.get(d);
         }
         return ans;
     }
@@ -31,13 +41,34 @@ public class DevelopmentStack {
     public int victoryPoint() { return howMany(Development.VICTORY_POINT); }
 
     void add(Development d) {
-        developments.put(d, developments.get(d) + 1);
+        disabled.put(d, 1);
     }
 
-    void sub(Development d) {
-        if (howMany(d) == 0)
+    void use(Development d) {
+        if (developments.get(d) == 0 && disabled.get(d) > 0)
+            throw new RuntimeException("You cannot use " + d + " development at this moment!");
+        if (developments.get(d) == 0)
             throw new RuntimeException("You don't have a " + d + " development!");
         developments.put(d, developments.get(d) - 1);
+        for (Development e : Development.all()) {
+            disabled.put(e, developments.get(e) + disabled.get(e));
+            developments.put(e, 0);
+        }
+    }
+
+    void reenable() {
+        for (Development d : Development.all()) {
+            developments.put(d, developments.get(d) + disabled.get(d));
+            disabled.put(d, 0);
+        }
+    }
+
+    public String toString() {
+        String ans = "";
+        for (Development d : Development.all())
+            for (int i = 0, n = developments.get(d) + disabled.get(d); i < n; i++)
+                ans += d.chr();
+        return ans;
     }
 
 }

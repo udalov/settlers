@@ -5,6 +5,14 @@ public enum Development {
     ROAD_BUILDING,
     INVENTION,
     MONOPOLY,
-    VICTORY_POINT,
+    VICTORY_POINT;
+
+    public static Development[] all() {
+        return Development.class.getEnumConstants();
+    }
+
+    public char chr() {
+        return toString().charAt(0);
+    }
 }
 

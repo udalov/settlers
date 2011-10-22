@@ -1,0 +1,5 @@
+1. ensure all player actions happen on his turn
+2. check all arguments of API on null values
+3. check before every action if not 7 or robber is moved
+4. count the number of cards of each resource
+

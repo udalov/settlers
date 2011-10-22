@@ -35,6 +35,9 @@ public class ExampleBot extends Bot {
                 break;
             }
         }
+        if (api.developments().monopoly() > 0) {
+            api.monopoly(cards.ore() >= 3 ? Resource.GRAIN : Resource.ORE);
+        }
         while (me.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             boolean can = false;
             for (Board.Intersection i : Board.allIntersections()) {
@@ -46,6 +49,39 @@ public class ExampleBot extends Bot {
                 break;
             }
             if (!can) break;
+        }
+        if (api.developments().invention() > 0) {
+            Resource[] invent = new Resource[5];
+            int inp = 0;
+            Resource[] priority = {
+                Resource.BRICK,
+                Resource.LUMBER,
+                Resource.GRAIN,
+                Resource.WOOL,
+                Resource.ORE
+            };
+            for (Resource r : priority)
+                if (cards.howMany(r) == 0)
+                    invent[inp++] = r;
+            if (inp < 2) {
+                invent[inp++] = Resource.GRAIN;
+                invent[inp++] = Resource.ORE;
+            }
+            api.invention(invent[0], invent[1]);
+        }
+        if (api.developments().roadBuilding() > 0) {
+            // TODO: the right behaviour
+            Board.Path[] roads = new Board.Path[2];
+            int inp = 0;
+            for (Board.Path p : Board.allPaths()) {
+                if (api.canBuildRoadAt(p)) {
+                    roads[inp++] = p;
+                    if (inp == 2)
+                        break;
+                }
+            }
+            if ((inp == 2 && me.roadsLeft() >= 2) || (inp == 1 && me.roadsLeft() >= 1))
+                api.roadBuilding(roads[0], roads[1]);
         }
         while (me.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
             boolean can = false;
@@ -68,6 +104,9 @@ public class ExampleBot extends Bot {
                 }
             }
             if (!can) break;
+        }
+        while (api.developmentsLeft() > 0 && api.getIfPossible("WOG")) {
+            api.drawDevelopment();
         }
     }
 

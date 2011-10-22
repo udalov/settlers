@@ -28,6 +28,8 @@ public class Game {
         public int whichPlayerTurn() { return whichPlayerTurn; }
 
         public CardStack cards() { return player(bot).cards(); }
+        public DevelopmentStack developments() { return player(bot).developments(); }
+
         public int rollDice() { return game.rollDice(); }
         public void moveRobber(Board.Cell c, Player whoToRob)
             { game.moveRobber(c, player(bot), whoToRob); }
@@ -61,6 +63,17 @@ public class Game {
 
         public boolean getIfPossible(String what)
             { return game.getIfPossible(what, player(bot)); }
+
+        public int developmentsLeft()
+            { return game.developments.size(); }
+        public void drawDevelopment()
+            { game.drawDevelopment(player(bot)); }
+        public void monopoly(Resource r)
+            { game.monopoly(r, player(bot)); }
+        public void roadBuilding(Board.Path p1, Board.Path p2)
+            { game.roadBuilding(p1, p2, player(bot)); }
+        public void invention(Resource r1, Resource r2)
+            { game.invention(r1, r2, player(bot)); }
     }
 
     private final Random rnd = new Random(256);
@@ -76,9 +89,20 @@ public class Game {
 
     private Player largestArmy;
     private Player longestRoad;
+    private List<Development> developments = new ArrayList<Development>();
 
     Game() {
         board = Board.create(rnd);
+        for (int i = 0; i < 14; i++)
+            developments.add(Development.KNIGHT);
+        for (int i = 0; i < 2; i++) {
+            developments.add(Development.ROAD_BUILDING);
+            developments.add(Development.INVENTION);
+            developments.add(Development.MONOPOLY);
+        }
+        for (int i = 0; i < 5; i++)
+            developments.add(Development.VICTORY_POINT);
+        Collections.shuffle(developments, rnd);
     }
 
     List<Player> players() { return Collections.unmodifiableList(players); }
@@ -133,7 +157,7 @@ System.out.println();
                 }
             }
         }
-for (Player p : players) System.out.println(p.color() + ": " + p.cards());
+for (Player p : players) System.out.println(p.color() + ": " + p.cards() + " " + p.developments());
         return diceRolled;
     }
 
@@ -162,7 +186,7 @@ if (whoToRob == null) System.out.println(player.color() + " moves robber to " + 
         Resource r = list.get(rnd.nextInt(list.size()));
         whoToRob.cards().sub(r, 1);
         player.cards().add(r, 1);
-System.out.println(player.color() + " moves robber to " + cell + " and robs " + players.get(whichPlayerTurn).color());
+System.out.println(player.color() + " moves robber to " + cell + " and robs " + whoToRob.color());
     }
 
     void buildSettlement(Board.Intersection i, Player player) {
@@ -185,17 +209,16 @@ System.out.println(player.color() + " builds a settlement at " + i);
             throw new RuntimeException("Not enough resources to build a city");
         if (board.townAt(i) == null)
             throw new RuntimeException("You must first build a settlement to be able to upgrade it");
+        if (board.townAt(i).isCity())
+            throw new RuntimeException("You cannot build a city over an existing city");
         if (board.townAt(i).player() != player)
             throw new RuntimeException("You cannot upgrade other player's settlement");
-        if (board.townAt(i).isCity())
-            throw new RuntimeException("You cannot build a city over your city");
         player.expendCity();
         board.buildTown(i, new Town(player, true));
         player.cards().sub("OOOGG");
 System.out.println(player.color() + " builds a city at " + i);
     }
 
-    // TODO: ensure all player actions happen on his turn
     void buildRoad(Board.Path p, Player player) {
         if (player.roadsLeft() == 0)
             throw new RuntimeException("You do not have any roads left");
@@ -313,6 +336,60 @@ System.out.println(player.color() + " changes " + sell + " to " + buy);
         return true;
     }
 
+    void drawDevelopment(Player player) {
+        if (developments.isEmpty())
+            throw new RuntimeException("No more developments left in the game");
+        if (!player.cards().areThere("WOG"))
+            throw new RuntimeException("Not enough resources to draw a development");
+        Development d = developments.remove(developments.size() - 1);
+        player.developments().add(d);
+        player.cards().sub("WOG");
+System.out.println(player.color() + " draws a development");
+System.out.println("(it's " + d + ")");
+    }
+
+    void monopoly(Resource r, Player player) {
+        player.developments().use(Development.MONOPOLY);
+int sum = 0;
+        for (Player p : players) {
+            if (p == player)
+                continue;
+            int x = p.cards().howMany(r);
+sum += x;
+            player.cards().add(r, x);
+            p.cards().sub(r, x);
+        }
+System.out.println(player.color() + " declared monopoly and received " + sum + " of " + r);
+    }
+
+    void roadBuilding(Board.Path p1, Board.Path p2, Player player) {
+        player.developments().use(Development.ROAD_BUILDING);
+        if (player.roadsLeft() == 0)
+            throw new RuntimeException("You do not have any roads left");
+        if (player.roadsLeft() == 1) {
+            if (p1 == null) { Board.Path p = p1; p1 = p2; p2 = p; }
+            if (p2 != null)
+                throw new RuntimeException("You have only 1 road left");
+        }
+        if (!board.canBuildRoadAt(p1, player))
+            throw new RuntimeException("You cannot build a road here");
+        player.expendRoad();
+        board.buildRoad(p1, player);
+        if (p2 != null) {
+            if (!board.canBuildRoadAt(p2, player))
+                throw new RuntimeException("You cannot build a road here");
+            player.expendRoad();
+            board.buildRoad(p2, player);
+        }
+System.out.println(player.color() + " plays road building and builds roads at " + p1 + " and " + p2);
+    }
+
+    void invention(Resource r1, Resource r2, Player player) {
+        player.developments().use(Development.INVENTION);
+        player.cards().add(r1, 1);
+        player.cards().add(r2, 1);
+System.out.println(player.color() + " plays invention and receives " + r1 + " and " + r2);
+    }
 
 
     int roadLength(Player player) {
@@ -337,9 +414,11 @@ System.out.println();
             whichPlayerTurn = (whichPlayerTurn + 1) % n;
             diceRolled = 0;
             robberMoved = false;
+            Player player = players.get(whichPlayerTurn);
 
-            players.get(whichPlayerTurn).bot().makeTurn();
+            player.bot().makeTurn();
 
+            player.developments().reenable();
             updateLongestRoad();
             updateLargestArmy();
 
@@ -355,8 +434,11 @@ System.out.println();
         System.out.println();
         System.out.println("Game lasted " + turnNumber + " turns");
         System.out.println("Scores:");
-        for (Player player : players)
-            System.out.println(points(player) + " " + player.color() + " (" + player.bot() + ")");
+        for (Player player : players) {
+            System.out.print(points(player) + " " + player.color() + " (" + player.bot() + ")");
+            int vp = player.developments().victoryPoint();
+            System.out.println(vp > 0 ? " (" + vp + " VP)" : "");
+        }
     }
 
     void init() {
