@@ -74,6 +74,8 @@ public class Game {
             { game.roadBuilding(p1, p2, player(bot)); }
         public void invention(Resource r1, Resource r2)
             { game.invention(r1, r2, player(bot)); }
+        public void knight(Board.Cell cell, Player whoToRob)
+            { game.knight(cell, player(bot), whoToRob); }
     }
 
     private final Random rnd = new Random(256);
@@ -359,7 +361,7 @@ sum += x;
             player.cards().add(r, x);
             p.cards().sub(r, x);
         }
-System.out.println(player.color() + " declared monopoly and received " + sum + " of " + r);
+System.out.println(player.color() + " declares monopoly and receives " + sum + " of " + r);
     }
 
     void roadBuilding(Board.Path p1, Board.Path p2, Player player) {
@@ -389,6 +391,13 @@ System.out.println(player.color() + " plays road building and builds roads at " 
         player.cards().add(r1, 1);
         player.cards().add(r2, 1);
 System.out.println(player.color() + " plays invention and receives " + r1 + " and " + r2);
+    }
+
+    void knight(Board.Cell cell, Player player, Player whoToRob) {
+        player.developments().use(Development.KNIGHT);
+System.out.println(player.color() + " plays knight");
+        moveRobber(cell, player, whoToRob);
+        player.increaseArmyStrength();
     }
 
 
@@ -437,7 +446,13 @@ System.out.println();
         for (Player player : players) {
             System.out.print(points(player) + " " + player.color() + " (" + player.bot() + ")");
             int vp = player.developments().victoryPoint();
-            System.out.println(vp > 0 ? " (" + vp + " VP)" : "");
+            if (vp > 0)
+                System.out.print(" (" + vp + " VP)");
+            if (largestArmy == player)
+                System.out.print(" (2 ARMY)");
+            if (longestRoad == player)
+                System.out.print(" (2 ROAD)");
+            System.out.println();
         }
     }
 
@@ -473,9 +488,9 @@ System.out.println();
         for (Pair<Board.Intersection, Town> pair : board.allTowns())
             if (pair.second().player() == player)
                 points += pair.second().isCity() ? 2 : 1;
-        if (longestRoad == player)
-            points += 2;
-        if (largestArmy == player)
+        // if (longestRoad == player)
+        //     points += 2;
+        if (largestArmy == player && player.armyStrength() >= 3)
             points += 2;
         points += player.developments().victoryPoint();
         return points;

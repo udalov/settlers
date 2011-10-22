@@ -45,6 +45,8 @@ public class Player {
     void expendSettlement() { settlementsLeft--; }
     void expendCity() { citiesLeft--; settlementsLeft++; }
     void expendRoad() { roadsLeft--; }
+
+    void increaseArmyStrength() { armyStrength++; }
     
 }
 

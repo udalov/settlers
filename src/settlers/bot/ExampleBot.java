@@ -14,25 +14,43 @@ public class ExampleBot extends Bot {
         board = api.board();
     }
 
+    
+    Pair<Board.Cell, Player> rob() {
+        List<Board.Cell> cells = new ArrayList<Board.Cell>(Board.allCells());
+        Collections.shuffle(cells, rnd);
+        c: for (Board.Cell c : cells) {
+            if (board.robber() == c)
+                continue;
+            List<Town> ts = board.adjacentTowns(c); 
+            if (ts.isEmpty())
+                continue;
+            for (Town t : ts)
+                if (t.player() == api.me())
+                    continue c;
+            Player rob = null;
+            for (Town t : ts)
+                if (t.player().cardsNumber() > 0)
+                    rob = t.player();
+            return Pair.make(c, rob);
+        }
+        return null;
+    }
+
     public void makeTurn() {
         Player me = api.me();
         CardStack cards = api.cards();
         if (api.rollDice() == 7) {
-            c: for (Board.Cell c : Board.allCells()) {
-                if (board.robber() == c)
-                    continue;
-                List<Town> ts = board.adjacentTowns(c); 
-                if (ts.isEmpty())
-                    continue;
-                for (Town t : ts)
-                    if (t.player() == me)
-                        continue c;
-                Player rob = null;
-                for (Town t : ts)
-                    if (t.player().cardsNumber() > 0)
-                        rob = t.player();
-                api.moveRobber(c, rob);
-                break;
+            Pair<Board.Cell, Player> rob = rob();
+            api.moveRobber(rob.first(), rob.second());
+        }
+        if (api.developments().knight() > 0) {
+            Board.Cell robber = board.robber();
+            boolean bad = false;
+            for (Town ts : board.adjacentTowns(robber))
+                bad |= ts.player() == me;
+            if (bad) {
+                Pair<Board.Cell, Player> rob = rob();
+                api.knight(rob.first(), rob.second());
             }
         }
         if (api.developments().monopoly() > 0) {
@@ -80,7 +98,7 @@ public class ExampleBot extends Bot {
                         break;
                 }
             }
-            if ((inp == 2 && me.roadsLeft() >= 2) || (inp == 1 && me.roadsLeft() >= 1))
+            if ((inp == 2 && me.roadsLeft() >= 2) || (inp == 1 && me.roadsLeft() == 1))
                 api.roadBuilding(roads[0], roads[1]);
         }
         while (me.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
@@ -94,6 +112,9 @@ public class ExampleBot extends Bot {
             }
             if (!can) break;
         }
+        while (api.developmentsLeft() > 0 && api.getIfPossible("WOG")) {
+            api.drawDevelopment();
+        }
         while (me.roadsLeft() > 0 && api.getIfPossible("BL")) {
             boolean can = false;
             for (Board.Path p : Board.allPaths()) {
@@ -104,9 +125,6 @@ public class ExampleBot extends Bot {
                 }
             }
             if (!can) break;
-        }
-        while (api.developmentsLeft() > 0 && api.getIfPossible("WOG")) {
-            api.drawDevelopment();
         }
     }
 
