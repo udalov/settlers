@@ -13,95 +13,44 @@ import settlers.util.Pair;
 
 public class Board {
 
-    public static class Cell {
-        private final int x;
-        private final int y;
-
-        private Cell(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int x() { return x; }
-        public int y() { return y; }
-        public String toString() { return "("+x+","+y+")"; }
-    }
-
-    public static class Path {
-        private final Cell cell;
-        private final int direction;
-
-        private Path(Cell cell, int direction) {
-            this.cell = cell;
-            this.direction = direction;
-        }
-
-        public Cell cell() { return cell; }
-        public int direction() { return direction; }
-        public int x() { return cell.x; }
-        public int y() { return cell.y; }
-        public String toString() { return "["+cell.x+","+cell.y+","+direction+"]"; }
-    }
-
-    public static class Intersection {
-        private final Cell cell;
-        private final int direction;
-
-        private Intersection(Cell cell, int direction) {
-            this.cell = cell;
-            this.direction = direction;
-        }
-
-        public Cell cell() { return cell; }
-        public int direction() { return direction; }
-        public int x() { return cell.x; }
-        public int y() { return cell.y; }
-        public String toString() { return "{"+cell.x+","+cell.y+","+direction+"}"; }
-    }
-
-
     public static final int[] DX = {1, -1, -2, -1, 1, 2};
     public static final int[] DY = {1, 1, 0, -1, -1, 0};
-
-
     
-    private final Map<Cell, Resource> resources;
-    private final Map<Cell, Integer> numbers;
+    private final Map<Hex, Resource> resources;
+    private final Map<Hex, Integer> numbers;
     private final Map<Path, Player> roads;
-    private final Map<Intersection, Town> towns;
+    private final Map<Xing, Town> towns;
     private final Map<Path, Resource> ports2to1;
     private final List<Path> ports3to1;
-    private Cell robber;
+    private Hex robber;
 
 
     private Board(
-        Map<Cell, Resource> resources,
-        Map<Cell, Integer> numbers,
+        Map<Hex, Resource> resources,
+        Map<Hex, Integer> numbers,
         Map<Path, Resource> ports2to1,
         List<Path> ports3to1
     ) {
         this.resources = resources;
         this.numbers = numbers;
         this.roads = new HashMap<Path, Player>();
-        this.towns = new HashMap<Intersection, Town>();
+        this.towns = new HashMap<Xing, Town>();
         this.ports2to1 = ports2to1;
         this.ports3to1 = ports3to1;
         robber = null;
-        for (Cell cell : resources.keySet()) {
-            if (resources.get(cell) == null) {
-                robber = cell;
-            }
-        }
+        for (Hex hex : resources.keySet())
+            if (resources.get(hex) == null)
+                robber = hex;
     }
 
     static Board create(Random rnd) {
-        Map<Cell, Resource> resources = new HashMap<Cell, Resource>();
-        Map<Cell, Integer> numbers = new HashMap<Cell, Integer>();
+        Map<Hex, Resource> resources = new HashMap<Hex, Resource>();
+        Map<Hex, Integer> numbers = new HashMap<Hex, Integer>();
         Map<Path, Resource> ports2to1 = new HashMap<Path, Resource>();
         List<Path> ports3to1 = new ArrayList<Path>();
 
-        List<Cell> allCells = new ArrayList<Cell>(allCells());
-        Collections.shuffle(allCells, rnd);
+        List<Hex> allHexes = new ArrayList<Hex>(allHexes());
+        Collections.shuffle(allHexes, rnd);
 
         List<Resource> allResources = new ArrayList<Resource>();
         for (int i = 0; i < 4; i++) {
@@ -116,39 +65,36 @@ public class Board {
         allResources.add(null); // desert
         Collections.shuffle(allResources, rnd);
 
-        for (int i = 0; i < allCells.size(); i++) {
-            resources.put(allCells.get(i), allResources.get(i));
-        }
+        for (int i = 0; i < allHexes.size(); i++)
+            resources.put(allHexes.get(i), allResources.get(i));
 
         List<Integer> allNumbers = new ArrayList<Integer>();
-        allNumbers.add(6);
-        allNumbers.add(6);
-        allNumbers.add(8);
-        allNumbers.add(8);
         for (int i = 2; i <= 12; i++) {
-            if (6 <= i && i <= 8) continue;
+            if (i == 7)
+                continue;
             allNumbers.add(i);
-            if (i == 2 || i == 12) continue;
+            if (i == 2 || i == 12)
+                continue;
             allNumbers.add(i);
         }
 
-        allCells.remove(allResources.indexOf(null));
+        allHexes.remove(allResources.indexOf(null));
 
         for (Integer number : allNumbers) {
             while (true) {
-                int i = rnd.nextInt(allCells.size());
-                Cell cell = allCells.get(i);
-                if (numbers.containsKey(cell))
+                int i = rnd.nextInt(allHexes.size());
+                Hex hex = allHexes.get(i);
+                if (numbers.containsKey(hex))
                     continue;
                 if (number != 6 && number != 8) {
-                    numbers.put(cell, number);
+                    numbers.put(hex, number);
                     break;
                 }
                 boolean ok = true;
                 for (int d = 0; d < 6; d++) {
-                    int x = cell.x + DX[d];
-                    int y = cell.y + DY[d];
-                    Cell c = cell(x, y);
+                    int x = hex.x() + DX[d];
+                    int y = hex.y() + DY[d];
+                    Hex c = hex(x, y);
                     if (c == null || !numbers.containsKey(c))
                         continue;
                     if (numbers.get(c) == 6 || numbers.get(c) == 8) {
@@ -157,7 +103,7 @@ public class Board {
                     }
                 }
                 if (!ok) continue;
-                numbers.put(cell, number);
+                numbers.put(hex, number);
                 break;
             }
         }
@@ -221,12 +167,12 @@ public class Board {
 
 
 
-    public Resource resourceAt(Cell cell) {
-        return resources.get(cell);
+    public Resource resourceAt(Hex hex) {
+        return resources.get(hex);
     }
 
-    public int numberAt(Cell cell) {
-        Integer i = numbers.get(cell);
+    public int numberAt(Hex hex) {
+        Integer i = numbers.get(hex);
         return i == null ? 0 : i;
     }
 
@@ -234,31 +180,31 @@ public class Board {
         return roads.get(p);
     }
 
-    public Town townAt(Intersection i) {
+    public Town townAt(Xing i) {
         return towns.get(i);
     }
 
-    public Cell robber() {
+    public Hex robber() {
         return robber;
     }
 
-    public Pair<Boolean, Resource> portAt(Intersection i) {
+    public Pair<Boolean, Resource> portAt(Xing i) {
         for (Path p : ports2to1.keySet()) {
-            Intersection[] u = endpoints(p);
+            Xing[] u = endpoints(p);
             if (u[0] == i || u[1] == i)
                 return Pair.make(true, ports2to1.get(p));
         }
         for (Path p : ports3to1) {
-            Intersection[] u = endpoints(p);
+            Xing[] u = endpoints(p);
             if (u[0] == i || u[1] == i)
                 return Pair.make(true, null);
         }
         return Pair.make(false, null);
     }
 
-    public List<Town> adjacentTowns(Cell c) {
+    public List<Town> adjacentTowns(Hex c) {
         List<Town> ans = new ArrayList<Town>();
-        for (Intersection i : adjacentIntersections(c)) {
+        for (Xing i : adjacentXings(c)) {
             Town t = towns.get(i);
             if (t != null)
                 ans.add(t);
@@ -267,10 +213,10 @@ public class Board {
     }
 
 
-    boolean canBuildTownAt(Intersection i, boolean mustBeRoad, Player player) {
+    boolean canBuildTownAt(Xing i, boolean mustBeRoad, Player player) {
         if (towns.get(i) != null)
             return false;
-        for (Intersection j : adjacentIntersections(i))
+        for (Xing j : adjacentXings(i))
             if (towns.get(j) != null)
                 return false;
         if (!mustBeRoad)
@@ -284,7 +230,7 @@ public class Board {
     public boolean canBuildRoadAt(Path p, Player player) {
         if (roads.get(p) != null)
             return false;
-        for (Intersection i : endpoints(p)) {
+        for (Xing i : endpoints(p)) {
             Town t = towns.get(i);
             if (t != null && t.player() != player)
                 continue;
@@ -302,7 +248,7 @@ public class Board {
 
 
 
-    void buildTown(Intersection i, Town t) {
+    void buildTown(Xing i, Town t) {
         towns.put(i, t);
     }
 
@@ -310,26 +256,26 @@ public class Board {
         roads.put(p, pl);
     }
 
-    void moveRobber(Cell c) {
+    void moveRobber(Hex c) {
         robber = c;
     }
 
-    Set<Pair<Intersection, Town>> allTowns() {
-        Set<Pair<Intersection, Town>> ans =
-            new HashSet<Pair<Intersection, Town>>();
-        for (Intersection i : towns.keySet())
+    Set<Pair<Xing, Town>> allTowns() {
+        Set<Pair<Xing, Town>> ans =
+            new HashSet<Pair<Xing, Town>>();
+        for (Xing i : towns.keySet())
             ans.add(Pair.make(i, towns.get(i)));
         return ans;
     }
 
-    Set<Pair<Intersection, Resource>> allPorts() {
-        Set<Pair<Intersection, Resource>> ans =
-            new HashSet<Pair<Intersection, Resource>>();
+    Set<Pair<Xing, Resource>> allPorts() {
+        Set<Pair<Xing, Resource>> ans =
+            new HashSet<Pair<Xing, Resource>>();
         for (Path p : ports2to1.keySet())
-            for (Intersection i : endpoints(p))
+            for (Xing i : endpoints(p))
                 ans.add(Pair.make(i, ports2to1.get(i)));
         for (Path p : ports3to1)
-            for (Intersection i : endpoints(p))
+            for (Xing i : endpoints(p))
                 ans.add(Pair.make(i, (Resource)null));
         return ans;
     }
@@ -337,23 +283,23 @@ public class Board {
 
 
 
-    private static Cell[] cells = new Cell[128];
+    private static Hex[] hexes = new Hex[128];
     private static Path[] paths = new Path[1024];
-    private static Intersection[] intss = new Intersection[1024];
+    private static Xing[] xings = new Xing[1024];
 
     static {
         for (int y = 0; y <= 4; y++) {
             for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2) {
-                cells[(x << 3) + y] = new Cell(x, y);
+                hexes[(x << 3) + y] = new Hex(x, y);
             }
         }
 
         for (int y = 0; y <= 4; y++) {
             for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2) {
                 int e = (x << 3) + y;
-                Cell cell = cells[e];
+                Hex hex = hexes[e];
                 for (int d = 0; d < 3; d++) {
-                    paths[(d << 7) + e] = new Path(cell, d);
+                    paths[(d << 7) + e] = new Path(hex, d);
                 }
             }
         }
@@ -361,12 +307,12 @@ public class Board {
         for (int y = 0; y <= 4; y++) {
             for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2) {
                 int e = (x << 3) + y;
-                Cell cell = cells[e];
-                if (x + y == 2 || y == 0) paths[(3 << 7) + e] = new Path(cell, 3);
+                Hex hex = hexes[e];
+                if (x + y == 2 || y == 0) paths[(3 << 7) + e] = new Path(hex, 3);
                     else paths[(3 << 7) + e] = paths[(0 << 7) + ((x - 1) << 3) + y - 1];
-                if (y == 0 || x - y == 6) paths[(4 << 7) + e] = new Path(cell, 4);
+                if (y == 0 || x - y == 6) paths[(4 << 7) + e] = new Path(hex, 4);
                     else paths[(4 << 7) + e] = paths[(1 << 7) + ((x + 1) << 3) + y - 1];
-                if (x - y == 6 || x + y == 10) paths[(5 << 7) + e] = new Path(cell, 5);
+                if (x - y == 6 || x + y == 10) paths[(5 << 7) + e] = new Path(hex, 5);
                     else paths[(5 << 7) + e] = paths[(2 << 7) + ((x + 2) << 3) + y];
             }
         }
@@ -376,72 +322,72 @@ public class Board {
                 if ((x + y) % 2 == 1)
                     continue;
                 for (int it = 0; it < 2; it++) {
-                    Cell c1, c2, c3;
+                    Hex c1, c2, c3;
                     if (it == 0) {
-                        c1 = cell(x + 1, y + 1);
-                        c2 = cell(x + 2, y);
-                        c3 = cell(x, y);
+                        c1 = hex(x + 1, y + 1);
+                        c2 = hex(x + 2, y);
+                        c3 = hex(x, y);
                     } else {
-                        c1 = cell(x, y);
-                        c2 = cell(x + 2, y);
-                        c3 = cell(x + 1, y - 1);
+                        c1 = hex(x, y);
+                        c2 = hex(x + 2, y);
+                        c3 = hex(x + 1, y - 1);
                     }
-                    Cell c = null;
+                    Hex c = null;
                     int d = -1;
                     if (c1 != null) { c = c1; d = 4 + it; }
                     if (c2 != null) { c = c2; d = 2 + it; }
                     if (c3 != null) { c = c3; d = 0 + it; }
                     if (c == null) continue;
-                    Intersection i = new Intersection(c, d);
-                    if (c1 != null) intss[((4 + it) << 7) + (c1.x << 3) + c1.y] = i;
-                    if (c2 != null) intss[((2 + it) << 7) + (c2.x << 3) + c2.y] = i;
-                    if (c3 != null) intss[((0 + it) << 7) + (c3.x << 3) + c3.y] = i;
+                    Xing i = new Xing(c, d);
+                    if (c1 != null) xings[((4 + it) << 7) + (c1.x() << 3) + c1.y()] = i;
+                    if (c2 != null) xings[((2 + it) << 7) + (c2.x() << 3) + c2.y()] = i;
+                    if (c3 != null) xings[((0 + it) << 7) + (c3.x() << 3) + c3.y()] = i;
                 }
             }
         }
     }
 
-    public static Cell cell(int x, int y) {
+    public static Hex hex(int x, int y) {
         int ind = (x << 3) + y;
-        if (ind < 0 || ind >= cells.length || cells[ind] == null)
+        if (ind < 0 || ind >= hexes.length || hexes[ind] == null)
             return null;
-        return cells[ind];
+        return hexes[ind];
     }
 
-    public static Path path(Cell cell, int direction) {
-        int ind = (direction << 7) + (cell.x << 3) + cell.y;
+    public static Path path(Hex hex, int direction) {
+        int ind = (direction << 7) + (hex.x() << 3) + hex.y();
         if (ind < 0 || ind >= paths.length || paths[ind] == null)
             return null;
         return paths[ind];
     }
 
     public static Path path(int x, int y, int direction) {
-        return path(cell(x, y), direction);
+        return path(hex(x, y), direction);
     }
 
-    public static Intersection ints(Cell cell, int direction) {
-        int ind = (direction << 7) + (cell.x << 3) + cell.y;
-        if (ind < 0 || ind >= intss.length || intss[ind] == null)
+    public static Xing xing(Hex hex, int direction) {
+        int ind = (direction << 7) + (hex.x() << 3) + hex.y();
+        if (ind < 0 || ind >= xings.length || xings[ind] == null)
             return null;
-        return intss[ind];
+        return xings[ind];
     }
 
-    public static Intersection ints(int x, int y, int direction) {
-        return ints(cell(x, y), direction);
+    public static Xing xing(int x, int y, int direction) {
+        return xing(hex(x, y), direction);
     }
 
 
 
-    public static List<Cell> adjacentCells(Intersection a) {
-        List<Cell> ans = new ArrayList<Cell>(3);
-        for (Cell cell : allCells())
+    public static List<Hex> adjacentHexes(Xing a) {
+        List<Hex> ans = new ArrayList<Hex>(3);
+        for (Hex hex : allHexes())
             for (int d = 0; d < 6; d++)
-                if (ints(cell, d) == a)
-                    ans.add(cell);
+                if (xing(hex, d) == a)
+                    ans.add(hex);
         return ans;
     }
 
-    public static List<Path> adjacentPaths(Intersection a) {
+    public static List<Path> adjacentPaths(Xing a) {
         List<Path> ans = new ArrayList<Path>(3);
         for (Path path : allPaths())
             if (areAdjacent(a, path))
@@ -449,63 +395,61 @@ public class Board {
         return ans;
     }
 
-    public static List<Intersection> adjacentIntersections(Intersection a) {
-        List<Intersection> ans = new ArrayList<Intersection>(3);
-        for (Intersection b : allIntersections())
+    public static List<Xing> adjacentXings(Xing a) {
+        List<Xing> ans = new ArrayList<Xing>(3);
+        for (Xing b : allXings())
             if (areAdjacent(a, b))
                 ans.add(b);
         return ans;
     }
 
-    public static List<Intersection> adjacentIntersections(Cell c) {
-        List<Intersection> ans = new ArrayList<Intersection>(6);
+    public static List<Xing> adjacentXings(Hex c) {
+        List<Xing> ans = new ArrayList<Xing>(6);
         for (int d = 0; d < 6; d++)
-            ans.add(ints(c, d));
+            ans.add(xing(c, d));
         return ans;
     }
 
-    public static Intersection[] endpoints(Path p) {
-        return new Intersection[] {
-            ints(p.cell, p.direction),
-            ints(p.cell, (p.direction + 1) % 6),
+    public static Xing[] endpoints(Path p) {
+        return new Xing[] {
+            xing(p.hex(), p.direction()),
+            xing(p.hex(), (p.direction() + 1) % 6),
         };
     }
 
-    public static boolean areAdjacent(Intersection a, Intersection b) {
-        for (Cell c : allCells()) {
+    public static boolean areAdjacent(Xing a, Xing b) {
+        for (Hex c : allHexes()) {
             for (int d = 0; d < 6; d++) {
-                if (ints(c, d) == a && ints(c, (d + 1) % 6) == b)
+                if (xing(c, d) == a && xing(c, (d + 1) % 6) == b)
                     return true;
-                if (ints(c, d) == b && ints(c, (d + 1) % 6) == a)
+                if (xing(c, d) == b && xing(c, (d + 1) % 6) == a)
                     return true;
             }
         }
         return false;
     }
 
-    public static boolean areAdjacent(Intersection a, Path p) {
-        Intersection[] ends = endpoints(p);
+    public static boolean areAdjacent(Xing a, Path p) {
+        Xing[] ends = endpoints(p);
         return ends[0] == a || ends[1] == a;
     }
 
-    public static boolean areAdjacent(Path p, Intersection a) {
+    public static boolean areAdjacent(Path p, Xing a) {
         return areAdjacent(a, p);
     }
 
 
 
-    private static List<Cell> ALL_CELLS = null;
-    public static List<Cell> allCells() {
-        if (ALL_CELLS != null)
-            return ALL_CELLS;
-        List<Cell> ans = new ArrayList<Cell>();
-        for (int y = 0; y <= 4; y++) {
-            for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2) {
-                ans.add(cell(x, y));
-            }
-        }
-        ALL_CELLS = Collections.unmodifiableList(ans);
-        return ALL_CELLS;
+    private static List<Hex> ALL_HEXES = null;
+    public static List<Hex> allHexes() {
+        if (ALL_HEXES != null)
+            return ALL_HEXES;
+        List<Hex> ans = new ArrayList<Hex>();
+        for (int y = 0; y <= 4; y++)
+            for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2)
+                ans.add(hex(x, y));
+        ALL_HEXES = Collections.unmodifiableList(ans);
+        return ALL_HEXES;
     }
 
     private static List<Path> ALL_PATHS = null;
@@ -513,31 +457,23 @@ public class Board {
         if (ALL_PATHS != null)
             return ALL_PATHS;
         Set<Path> ans = new HashSet<Path>();
-        for (Cell c : allCells()) {
-            for (int d = 0; d < 6; d++) {
-                Path p = path(c, d);
-                if (p != null)
-                    ans.add(p);
-            }
-        }
+        for (Hex c : allHexes())
+            for (int d = 0; d < 6; d++)
+                ans.add(path(c, d));
         ALL_PATHS = Collections.unmodifiableList(new ArrayList<Path>(ans));
         return ALL_PATHS;
     }
 
-    private static List<Intersection> ALL_INTSS = null;
-    public static List<Intersection> allIntersections() {
-        if (ALL_INTSS != null)
-            return ALL_INTSS;
-        Set<Intersection> ans = new HashSet<Intersection>();
-        for (Cell c : allCells()) {
-            for (int d = 0; d < 6; d++) {
-                Intersection i = ints(c, d);
-                if (i != null)
-                    ans.add(i);
-            }
-        }
-        ALL_INTSS = Collections.unmodifiableList(new ArrayList<Intersection>(ans));
-        return ALL_INTSS;
+    private static List<Xing> ALL_XINGS = null;
+    public static List<Xing> allXings() {
+        if (ALL_XINGS != null)
+            return ALL_XINGS;
+        Set<Xing> ans = new HashSet<Xing>();
+        for (Hex c : allHexes())
+            for (int d = 0; d < 6; d++)
+                ans.add(xing(c, d));
+        ALL_XINGS = Collections.unmodifiableList(new ArrayList<Xing>(ans));
+        return ALL_XINGS;
     }
 
 }

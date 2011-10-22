@@ -33,21 +33,21 @@ public class Game {
         public DevelopmentStack developments() { return player(bot).developments(); }
 
         public int rollDice() { return game.rollDice(); }
-        public void moveRobber(Board.Cell c, Player whoToRob)
+        public void moveRobber(Hex c, Player whoToRob)
             { game.moveRobber(c, player(bot), whoToRob); }
 
-        public boolean canBuildFirstTownsAt(Board.Intersection i)
+        public boolean canBuildFirstTownsAt(Xing i)
             { return game.board.canBuildTownAt(i, false, player(bot)); }
-        public boolean canBuildTownAt(Board.Intersection i)
+        public boolean canBuildTownAt(Xing i)
             { return game.board.canBuildTownAt(i, true, player(bot)); }
-        public boolean canBuildRoadAt(Board.Path p)
+        public boolean canBuildRoadAt(Path p)
             { return game.board.canBuildRoadAt(p, player(bot)); }
 
-        public void buildSettlement(Board.Intersection i)
+        public void buildSettlement(Xing i)
             { game.buildSettlement(i, player(bot)); }
-        public void buildCity(Board.Intersection i)
+        public void buildCity(Xing i)
             { game.buildCity(i, player(bot)); }
-        public void buildRoad(Board.Path p)
+        public void buildRoad(Path p)
             { game.buildRoad(p, player(bot)); }
 
         public boolean havePort(Resource r)
@@ -72,12 +72,12 @@ public class Game {
             { game.drawDevelopment(player(bot)); }
         public void monopoly(Resource r)
             { game.monopoly(r, player(bot)); }
-        public void roadBuilding(Board.Path p1, Board.Path p2)
+        public void roadBuilding(Path p1, Path p2)
             { game.roadBuilding(p1, p2, player(bot)); }
         public void invention(Resource r1, Resource r2)
             { game.invention(r1, r2, player(bot)); }
-        public void knight(Board.Cell cell, Player whoToRob)
-            { game.knight(cell, player(bot), whoToRob); }
+        public void knight(Hex hex, Player whoToRob)
+            { game.knight(hex, player(bot), whoToRob); }
     }
 
     private final Random rnd = new Random(256);
@@ -145,17 +145,17 @@ System.out.println();
                 }
             }
         } else {
-            for (Board.Cell cell : Board.allCells()) {
-                if (board.numberAt(cell) != diceRolled)
+            for (Hex hex : Board.allHexes()) {
+                if (board.numberAt(hex) != diceRolled)
                     continue;
-                if (board.robber() == cell)
+                if (board.robber() == hex)
                     continue;
-                for (Board.Intersection ints : Board.adjacentIntersections(cell)) {
+                for (Xing ints : Board.adjacentXings(hex)) {
                     Town town = board.townAt(ints);
                     if (town == null)
                         continue;
                     town.player().cards().add(
-                        board.resourceAt(cell),
+                        board.resourceAt(hex),
                         town.isCity() ? 2 : 1
                     );
                 }
@@ -165,12 +165,12 @@ for (Player p : players) System.out.println(p.color() + ": " + p.cards() + " " +
         return diceRolled;
     }
 
-    void moveRobber(Board.Cell cell, Player player, Player whoToRob) {
-        if (cell == board.robber())
+    void moveRobber(Hex hex, Player player, Player whoToRob) {
+        if (hex == board.robber())
             throw new RuntimeException("You cannot leave the robber at his current position");
         if (whoToRob == player)
             throw new RuntimeException("You cannot rob yourself");
-        List<Town> ts = board.adjacentTowns(cell);
+        List<Town> ts = board.adjacentTowns(hex);
         List<Player> okToRob = new ArrayList<Player>();
         for (Town t : ts)
             if (t.player().cardsNumber() > 0)
@@ -179,9 +179,9 @@ for (Player p : players) System.out.println(p.color() + ": " + p.cards() + " " +
             throw new RuntimeException("You must rob somebody");
         if (!okToRob.isEmpty() && !okToRob.contains(whoToRob))
             throw new RuntimeException("You cannot rob a player not having a town near the robber");
-        board.moveRobber(cell);
+        board.moveRobber(hex);
         robberMoved = true;
-if (whoToRob == null) System.out.println(player.color() + " moves robber to " + cell + " and robs nobody");
+if (whoToRob == null) System.out.println(player.color() + " moves robber to " + hex + " and robs nobody");
         if (whoToRob == null)
             return;
         if (whoToRob.cardsNumber() == 0)
@@ -190,10 +190,10 @@ if (whoToRob == null) System.out.println(player.color() + " moves robber to " + 
         Resource r = list.get(rnd.nextInt(list.size()));
         whoToRob.cards().sub(r, 1);
         player.cards().add(r, 1);
-System.out.println(player.color() + " moves robber to " + cell + " and robs " + whoToRob.color());
+System.out.println(player.color() + " moves robber to " + hex + " and robs " + whoToRob.color());
     }
 
-    void buildSettlement(Board.Intersection i, Player player) {
+    void buildSettlement(Xing i, Player player) {
         if (player.settlementsLeft() == 0)
             throw new RuntimeException("You do not have any settlements left");
         if (!player.cards().areThere("BWGL"))
@@ -206,7 +206,7 @@ System.out.println(player.color() + " moves robber to " + cell + " and robs " + 
 System.out.println(player.color() + " builds a settlement at " + i);
     }
 
-    void buildCity(Board.Intersection i, Player player) {
+    void buildCity(Xing i, Player player) {
         if (player.citiesLeft() == 0)
             throw new RuntimeException("You do not have any cities left");
         if (!player.cards().areThere("OOOGG"))
@@ -223,7 +223,7 @@ System.out.println(player.color() + " builds a settlement at " + i);
 System.out.println(player.color() + " builds a city at " + i);
     }
 
-    void buildRoad(Board.Path p, Player player) {
+    void buildRoad(Path p, Player player) {
         if (player.roadsLeft() == 0)
             throw new RuntimeException("You do not have any roads left");
         if (!player.cards().areThere("BL"))
@@ -237,7 +237,7 @@ System.out.println(player.color() + " builds a road at " + p);
     }
 
     boolean hasPort(Resource r, Player player) {
-        for (Pair<Board.Intersection, Resource> p : board.allPorts()) {
+        for (Pair<Xing, Resource> p : board.allPorts()) {
             if (p.second() == r) {
                 Town t = board.townAt(p.first());
                 if (t != null && t.player() == player)
@@ -248,7 +248,7 @@ System.out.println(player.color() + " builds a road at " + p);
     }
 
     boolean hasPort3to1(Player player) {
-        for (Pair<Board.Intersection, Resource> p : board.allPorts()) {
+        for (Pair<Xing, Resource> p : board.allPorts()) {
             if (p.second() == null) {
                 Town t = board.townAt(p.first());
                 if (t != null && t.player() == player)
@@ -366,12 +366,12 @@ sum += x;
 System.out.println(player.color() + " declares monopoly and receives " + sum + " of " + r);
     }
 
-    void roadBuilding(Board.Path p1, Board.Path p2, Player player) {
+    void roadBuilding(Path p1, Path p2, Player player) {
         player.developments().use(Development.ROAD_BUILDING);
         if (player.roadsLeft() == 0)
             throw new RuntimeException("You do not have any roads left");
         if (player.roadsLeft() == 1) {
-            if (p1 == null) { Board.Path p = p1; p1 = p2; p2 = p; }
+            if (p1 == null) { Path p = p1; p1 = p2; p2 = p; }
             if (p2 != null)
                 throw new RuntimeException("You have only 1 road left");
         }
@@ -395,24 +395,24 @@ System.out.println(player.color() + " plays road building and builds roads at " 
 System.out.println(player.color() + " plays invention and receives " + r1 + " and " + r2);
     }
 
-    void knight(Board.Cell cell, Player player, Player whoToRob) {
+    void knight(Hex hex, Player player, Player whoToRob) {
         player.developments().use(Development.KNIGHT);
 System.out.println(player.color() + " plays knight");
-        moveRobber(cell, player, whoToRob);
+        moveRobber(hex, player, whoToRob);
         player.increaseArmyStrength();
     }
 
 
-    int dfs(Player player, Board.Intersection i, Set<Board.Path> visited) {
+    int dfs(Player player, Xing i, Set<Path> visited) {
         int ans = 0;
-        for (Board.Path p : Board.adjacentPaths(i)) {
+        for (Path p : Board.adjacentPaths(i)) {
             if (visited.contains(p))
                 continue;
             if (board.roadAt(p) != player)
                 continue;
             visited.add(p);
-            Board.Intersection[] ends = Board.endpoints(p);
-            Board.Intersection otherEnd = ends[ends[0] == i ? 1 : 0];
+            Xing[] ends = Board.endpoints(p);
+            Xing otherEnd = ends[ends[0] == i ? 1 : 0];
             ans = Math.max(ans, 1 + dfs(player, otherEnd, visited));
             visited.remove(p);
         }
@@ -421,8 +421,8 @@ System.out.println(player.color() + " plays knight");
 
     int roadLength(Player player) {
         int ans = 0;
-        Set<Board.Path> visited = new HashSet<Board.Path>();
-        for (Board.Intersection start : Board.allIntersections())
+        Set<Path> visited = new HashSet<Path>();
+        for (Xing start : Board.allXings())
             ans = Math.max(ans, dfs(player, start, visited));
         return ans;
     }
@@ -469,9 +469,9 @@ System.out.println();
             int vp = player.developments().victoryPoint();
             if (vp > 0)
                 System.out.print(" (" + vp + " VP)");
-            if (largestArmy == player)
+            if (largestArmy == player && player.armyStrength() >= 3)
                 System.out.print(" (2 ARMY)");
-            if (longestRoad == player)
+            if (longestRoad == player && roadLength(player) >= 5)
                 System.out.print(" (2 ROAD)");
             System.out.println();
         }
@@ -486,7 +486,7 @@ System.out.println();
         for (int it = 0; it < 2; it++) {
             for (int i = it * (n - 1); 0 <= i && i < n; i += 1 - 2*it) {
                 Player player = players.get(i);
-                Pair<Board.Intersection, Board.Path> p = player.bot().placeFirstSettlements(it == 0);
+                Pair<Xing, Path> p = player.bot().placeFirstSettlements(it == 0);
                 if (!board.areAdjacent(p.first(), p.second()))
                     throw new RuntimeException("Cannot build a road not connected to a town");
                 if (!board.canBuildTownAt(p.first(), false, player))
@@ -494,7 +494,7 @@ System.out.println();
                 board.buildTown(p.first(), new Town(player, false));
                 board.buildRoad(p.second(), player);
                 if (it == 1) {
-                    for (Board.Cell c : Board.adjacentCells(p.first())) {
+                    for (Hex c : Board.adjacentHexes(p.first())) {
                         Resource r = board.resourceAt(c);
                         if (r != null)
                             player.cards().add(r, 1);
@@ -506,7 +506,7 @@ System.out.println();
 
     int points(Player player) {
         int points = 0;
-        for (Pair<Board.Intersection, Town> pair : board.allTowns())
+        for (Pair<Xing, Town> pair : board.allTowns())
             if (pair.second().player() == player)
                 points += pair.second().isCity() ? 2 : 1;
         if (longestRoad == player && roadLength(player) >= 5)

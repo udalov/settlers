@@ -24,7 +24,7 @@ public class SampleBot extends Bot {
         return null;
     }
 
-    public Pair<Board.Intersection, Board.Path> placeFirstSettlements(boolean first) {
+    public Pair<Xing, Path> placeFirstSettlements(boolean first) {
         throw new RuntimeException("THE CAKE IS A LIE");
     }
 

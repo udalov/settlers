@@ -15,10 +15,10 @@ public class ExampleBot extends Bot {
     }
 
     
-    Pair<Board.Cell, Player> rob() {
-        List<Board.Cell> cells = new ArrayList<Board.Cell>(Board.allCells());
-        Collections.shuffle(cells, rnd);
-        c: for (Board.Cell c : cells) {
+    Pair<Hex, Player> rob() {
+        List<Hex> hexes = new ArrayList<Hex>(Board.allHexes());
+        Collections.shuffle(hexes, rnd);
+        c: for (Hex c : hexes) {
             if (board.robber() == c)
                 continue;
             List<Town> ts = board.adjacentTowns(c); 
@@ -40,25 +40,25 @@ public class ExampleBot extends Bot {
         Player me = api.me();
         CardStack cards = api.cards();
         if (api.rollDice() == 7) {
-            Pair<Board.Cell, Player> rob = rob();
+            Pair<Hex, Player> rob = rob();
             api.moveRobber(rob.first(), rob.second());
         }
         if (api.developments().knight() > 0) {
-            Board.Cell robber = board.robber();
+            Hex robber = board.robber();
             boolean bad = false;
             for (Town ts : board.adjacentTowns(robber))
                 bad |= ts.player() == me;
             if (bad) {
-                Pair<Board.Cell, Player> rob = rob();
+                Pair<Hex, Player> rob = rob();
                 api.knight(rob.first(), rob.second());
             }
         }
         if (api.developments().monopoly() > 0) {
-            api.monopoly(cards.ore() >= 3 ? Resource.GRAIN : Resource.ORE);
+            api.monopoly(cards.ore() >= 3 && cards.grain() < 4 ? Resource.GRAIN : Resource.ORE);
         }
         while (me.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             boolean can = false;
-            for (Board.Intersection i : Board.allIntersections()) {
+            for (Xing i : Board.allXings()) {
                 Town t = board.townAt(i);
                 if (t == null || t.player() != me || t.isCity())
                     continue;
@@ -89,9 +89,9 @@ public class ExampleBot extends Bot {
         }
         if (api.developments().roadBuilding() > 0) {
             // TODO: the right behaviour
-            Board.Path[] roads = new Board.Path[2];
+            Path[] roads = new Path[2];
             int inp = 0;
-            for (Board.Path p : Board.allPaths()) {
+            for (Path p : Board.allPaths()) {
                 if (api.canBuildRoadAt(p)) {
                     roads[inp++] = p;
                     if (inp == 2)
@@ -103,7 +103,7 @@ public class ExampleBot extends Bot {
         }
         while (me.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
             boolean can = false;
-            for (Board.Intersection i : Board.allIntersections()) {
+            for (Xing i : Board.allXings()) {
                 if (api.canBuildTownAt(i)) {
                     api.buildSettlement(i);
                     can = true;
@@ -117,7 +117,7 @@ public class ExampleBot extends Bot {
         }
         while (me.roadsLeft() > 0 && api.getIfPossible("BL")) {
             boolean can = false;
-            for (Board.Path p : Board.allPaths()) {
+            for (Path p : Board.allPaths()) {
                 if (api.canBuildRoadAt(p)) {
                     api.buildRoad(p);
                     can = true;
@@ -148,23 +148,23 @@ public class ExampleBot extends Bot {
     public void tradeWithOtherPlayerOnHisTurn() {
     }
 
-    public Pair<Board.Intersection, Board.Path> placeFirstSettlements(boolean first) {
-        List<Board.Intersection> l = new ArrayList<Board.Intersection>();
-        for (Board.Intersection i : Board.allIntersections())
+    public Pair<Xing, Path> placeFirstSettlements(boolean first) {
+        List<Xing> l = new ArrayList<Xing>();
+        for (Xing i : Board.allXings())
             if (api.canBuildFirstTownsAt(i))
                 l.add(i);
 
-        Collections.sort(l, new Comparator<Board.Intersection>() {
-            private int sum(Board.Intersection a) {
+        Collections.sort(l, new Comparator<Xing>() {
+            private int sum(Xing a) {
                 int ans = 0;
-                for (Board.Cell c : Board.adjacentCells(a)) {
+                for (Hex c : Board.adjacentHexes(a)) {
                     int x = api.board().numberAt(c);
                     if (x != 0)
                         ans += 6 - Math.abs(x - 7);
                 }
                 return ans;
             }
-            public int compare(Board.Intersection a, Board.Intersection b) {
+            public int compare(Xing a, Xing b) {
                 int sa = sum(a), sb = sum(b);
                 if (sa < sb) return 1;
                 if (sa > sb) return -1;
@@ -176,8 +176,8 @@ public class ExampleBot extends Bot {
             }
         });
 
-        Board.Intersection i = l.get(0);
-        List<Board.Path> paths = Board.adjacentPaths(i);
+        Xing i = l.get(0);
+        List<Path> paths = Board.adjacentPaths(i);
         int pathno = rnd.nextInt(paths.size());
         return Pair.make(i, paths.get(pathno));
     }

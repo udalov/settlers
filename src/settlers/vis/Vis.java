@@ -32,17 +32,17 @@ public class Vis extends JPanel implements WindowListener {
 
     private final Game game;
     private final Board board;
-    private final Map<Board.Cell, Point> hex;
-    private final Map<Board.Path, Polygon> path;
+    private final Map<Hex, Point> hex;
+    private final Map<Path, Polygon> path;
 
     public Vis(Game game) {
         this.game = game;
         this.board = game.board();
-        this.hex = new HashMap<Board.Cell, Point>();
-        for (Board.Cell c : Board.allCells()) {
+        this.hex = new HashMap<Hex, Point>();
+        for (Hex c : Board.allHexes()) {
             hex.put(c, new Point(X0_POS + c.x() * HEX_SIZE, Y0_POS - c.y() * HEX_SIZE * 3 / 2));
         }
-        this.path = new HashMap<Board.Path, Polygon>();
+        this.path = new HashMap<Path, Polygon>();
         Board.allPaths();
     }
 
@@ -60,15 +60,15 @@ public class Vis extends JPanel implements WindowListener {
         return new Polygon(v[0], v[1], 6);
     }
 
-    Point intsCoords(Board.Intersection i) {
-        Point z = hex.get(i.cell());
+    Point intsCoords(Xing i) {
+        Point z = hex.get(i.hex());
         int[][] v = calcHexagonVertices(z.x, z.y);
         int d = i.direction();
         return new Point(v[0][d], v[1][d]);
     }
 
-    Point[] pathCoords(Board.Path p) {
-        Point z = hex.get(p.cell());
+    Point[] pathCoords(Path p) {
+        Point z = hex.get(p.hex());
         int[][] v = calcHexagonVertices(z.x, z.y);
         int d = p.direction(), nd = (d + 1) % 6;
         return new Point[]{
@@ -77,7 +77,7 @@ public class Vis extends JPanel implements WindowListener {
         };
     }
 
-    void drawCell(Graphics2D g, Board.Cell c) {
+    void drawHex(Graphics2D g, Hex c) {
         Point z = hex.get(c);
         Polygon p = createHexagon(z);
         Color color = resourceToColor(board.resourceAt(c));
@@ -95,7 +95,7 @@ public class Vis extends JPanel implements WindowListener {
         }
     }
 
-    void drawPath(Graphics2D g, Board.Path p) {
+    void drawPath(Graphics2D g, Path p) {
         Player pl = board.roadAt(p);
         if (pl == null) {
             g.setColor(Color.BLACK);
@@ -108,7 +108,7 @@ public class Vis extends JPanel implements WindowListener {
         g.drawLine(z[0].x, z[0].y, z[1].x, z[1].y);
     }
 
-    void drawIntersection(Graphics2D g, Board.Intersection i) {
+    void drawXing(Graphics2D g, Xing i) {
         Town t = board.townAt(i);
         if (t == null)
             return;
@@ -121,7 +121,7 @@ public class Vis extends JPanel implements WindowListener {
         }
     }
 
-    void drawPort(Graphics2D g, Board.Intersection i) {
+    void drawPort(Graphics2D g, Xing i) {
         Pair<Boolean, Resource> br = board.portAt(i);
         if (!br.first())
             return;
@@ -179,21 +179,21 @@ public class Vis extends JPanel implements WindowListener {
         BufferedImage bi = new BufferedImage(1002, 824, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D)bi.getGraphics();
 
-        for (Board.Cell c : Board.allCells()) {
-            drawCell(g, c);
+        for (Hex c : Board.allHexes()) {
+            drawHex(g, c);
         }
-        for (Board.Path p : Board.allPaths()) {
+        for (Path p : Board.allPaths()) {
             if (board.roadAt(p) == null)
                 drawPath(g, p);
         }
-        for (Board.Path p : Board.allPaths()) {
+        for (Path p : Board.allPaths()) {
             if (board.roadAt(p) != null)
                 drawPath(g, p);
         }
-        for (Board.Intersection i : Board.allIntersections()) {
-            drawIntersection(g, i);
+        for (Xing i : Board.allXings()) {
+            drawXing(g, i);
         }
-        for (Board.Intersection i : Board.allIntersections()) {
+        for (Xing i : Board.allXings()) {
             drawPort(g, i);
         }
 
