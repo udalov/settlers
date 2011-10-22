@@ -45,7 +45,7 @@ public class ExampleBot extends Bot {
         }
         if (api.developments().knight() > 0) {
             Hex robber = board.robber();
-            boolean bad = false;
+            boolean bad = api.largestArmy() != api.me();
             for (Town ts : board.adjacentTowns(robber))
                 bad |= ts.player() == me;
             if (bad) {
@@ -104,7 +104,7 @@ public class ExampleBot extends Bot {
         while (me.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
             boolean can = false;
             for (Xing i : Board.allXings()) {
-                if (api.canBuildTownAt(i)) {
+                if (api.canBuildTownAt(i, true)) {
                     api.buildSettlement(i);
                     can = true;
                     break;
@@ -115,16 +115,49 @@ public class ExampleBot extends Bot {
         while (api.developmentsLeft() > 0 && api.getIfPossible("WOG")) {
             api.drawDevelopment();
         }
-        while (me.roadsLeft() > 0 && api.getIfPossible("BL")) {
-            boolean can = false;
-            for (Path p : Board.allPaths()) {
-                if (api.canBuildRoadAt(p)) {
-                    api.buildRoad(p);
-                    can = true;
-                    break;
-                }
+        
+        boolean placeForTown = false;
+        for (Xing x : Board.allXings()) {
+            if (api.canBuildTownAt(x, true)) {
+                placeForTown = true;
+                break;
             }
-            if (!can) break;
+        }
+
+        if (!placeForTown) while (me.roadsLeft() > 0 && api.getIfPossible("BL")) {
+            List<Path> possible = new ArrayList<Path>();
+            for (Path p : Board.allPaths())
+                if (api.canBuildRoadAt(p))
+                    possible.add(p);
+            if (possible.isEmpty())
+                break;
+            Collections.sort(possible, new Comparator<Path>() {
+                int value(Path p) {
+                    int value = 0;
+                    Xing[] x = Board.endpoints(p);
+                    if (api.canBuildTownAt(x[0], false))
+                        value += 100;
+                    if (api.canBuildTownAt(x[1], false))
+                        value += 100;
+                    for (Xing z : x) {
+                        boolean me = false, enemy = false;
+                        for (Path q : Board.adjacentPaths(z)) {
+                            Player pl = board.roadAt(q);
+                            if (pl == api.me())
+                                me = true;
+                            else if (pl != null)
+                                enemy = true;
+                        }
+                        if (!me && enemy)
+                            value -= 50;
+                    }
+                    return value + api.roadLengthWith(api.me(), p);
+                }
+                public int compare(Path p1, Path p2) {
+                    return value(p2) - value(p1);
+                }
+            });
+            api.buildRoad(possible.get(0));
         }
     }
 
@@ -151,7 +184,7 @@ public class ExampleBot extends Bot {
     public Pair<Xing, Path> placeFirstSettlements(boolean first) {
         List<Xing> l = new ArrayList<Xing>();
         for (Xing i : Board.allXings())
-            if (api.canBuildFirstTownsAt(i))
+            if (api.canBuildTownAt(i, false))
                 l.add(i);
 
         Collections.sort(l, new Comparator<Xing>() {

@@ -33,13 +33,12 @@ public class Game {
         public DevelopmentStack developments() { return player(bot).developments(); }
 
         public int rollDice() { return game.rollDice(); }
+
         public void moveRobber(Hex c, Player whoToRob)
             { game.moveRobber(c, player(bot), whoToRob); }
 
-        public boolean canBuildFirstTownsAt(Xing i)
-            { return game.board.canBuildTownAt(i, false, player(bot)); }
-        public boolean canBuildTownAt(Xing i)
-            { return game.board.canBuildTownAt(i, true, player(bot)); }
+        public boolean canBuildTownAt(Xing i, boolean mustBeRoad)
+            { return game.board.canBuildTownAt(i, mustBeRoad, player(bot)); }
         public boolean canBuildRoadAt(Path p)
             { return game.board.canBuildRoadAt(p, player(bot)); }
 
@@ -78,6 +77,13 @@ public class Game {
             { game.invention(r1, r2, player(bot)); }
         public void knight(Hex hex, Player whoToRob)
             { game.knight(hex, player(bot), whoToRob); }
+
+        public Player largestArmy()
+            { return game.largestArmy; }
+        public int roadLength(Player player)
+            { return game.roadLength(player); }
+        public int roadLengthWith(Player player, Path p)
+            { return game.roadLengthWith(player, p); }
     }
 
     private final Random rnd = new Random(256);
@@ -403,27 +409,31 @@ System.out.println(player.color() + " plays knight");
     }
 
 
-    int dfs(Player player, Xing i, Set<Path> visited) {
+    int dfs(Player player, Xing i, Set<Path> visited, Path with) {
         int ans = 0;
         for (Path p : Board.adjacentPaths(i)) {
             if (visited.contains(p))
                 continue;
-            if (board.roadAt(p) != player)
+            if (board.roadAt(p) != player && p != with)
                 continue;
             visited.add(p);
             Xing[] ends = Board.endpoints(p);
             Xing otherEnd = ends[ends[0] == i ? 1 : 0];
-            ans = Math.max(ans, 1 + dfs(player, otherEnd, visited));
+            ans = Math.max(ans, 1 + dfs(player, otherEnd, visited, with));
             visited.remove(p);
         }
         return ans;
     }
 
     int roadLength(Player player) {
+        return roadLengthWith(player, null);
+    }
+
+    int roadLengthWith(Player player, Path p) {
         int ans = 0;
         Set<Path> visited = new HashSet<Path>();
         for (Xing start : Board.allXings())
-            ans = Math.max(ans, dfs(player, start, visited));
+            ans = Math.max(ans, dfs(player, start, visited, p));
         return ans;
     }
 

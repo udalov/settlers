@@ -11,6 +11,8 @@ import settlers.util.*;
 
 public class Vis extends JPanel implements WindowListener {
 
+    public static final int WIDTH = 850;
+    public static final int HEIGHT = 650;
     public static final int X0_POS = 200;
     public static final int Y0_POS = 500;
     public static final int HEX_SIZE = 54;
@@ -176,7 +178,7 @@ public class Vis extends JPanel implements WindowListener {
     }
 
     public void paint(Graphics gg) {
-        BufferedImage bi = new BufferedImage(1002, 824, BufferedImage.TYPE_INT_RGB);
+        BufferedImage bi = new BufferedImage(WIDTH + 2, HEIGHT + 2, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D)bi.getGraphics();
 
         for (Hex c : Board.allHexes()) {
@@ -197,7 +199,7 @@ public class Vis extends JPanel implements WindowListener {
             drawPort(g, i);
         }
 
-        gg.drawImage(bi, 1, 1, 1000, 800, null);
+        gg.drawImage(bi, 1, 1, WIDTH, HEIGHT, null);
     }
 
     public void windowClosing(WindowEvent e) { 

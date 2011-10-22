@@ -55,7 +55,7 @@ public class Main {
             Vis v = new Vis(game);
             jf.getContentPane().add(v);
             jf.addWindowListener(v);
-            jf.setSize(1002, 824);
+            jf.setSize(Vis.WIDTH + 2, Vis.HEIGHT + 24);
             jf.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
