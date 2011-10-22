@@ -3,9 +3,11 @@ package settlers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import settlers.bot.Bot;
 import settlers.util.Pair;
 import settlers.util.Util;
@@ -401,9 +403,28 @@ System.out.println(player.color() + " plays knight");
     }
 
 
+    int dfs(Player player, Board.Intersection i, Set<Board.Path> visited) {
+        int ans = 0;
+        for (Board.Path p : Board.adjacentPaths(i)) {
+            if (visited.contains(p))
+                continue;
+            if (board.roadAt(p) != player)
+                continue;
+            visited.add(p);
+            Board.Intersection[] ends = Board.endpoints(p);
+            Board.Intersection otherEnd = ends[ends[0] == i ? 1 : 0];
+            ans = Math.max(ans, 1 + dfs(player, otherEnd, visited));
+            visited.remove(p);
+        }
+        return ans;
+    }
+
     int roadLength(Player player) {
-        // TODO
-        return 1;
+        int ans = 0;
+        Set<Board.Path> visited = new HashSet<Board.Path>();
+        for (Board.Intersection start : Board.allIntersections())
+            ans = Math.max(ans, dfs(player, start, visited));
+        return ans;
     }
 
     void addPlayer(Player player) {
@@ -488,8 +509,8 @@ System.out.println();
         for (Pair<Board.Intersection, Town> pair : board.allTowns())
             if (pair.second().player() == player)
                 points += pair.second().isCity() ? 2 : 1;
-        // if (longestRoad == player)
-        //     points += 2;
+        if (longestRoad == player && roadLength(player) >= 5)
+            points += 2;
         if (largestArmy == player && player.armyStrength() >= 3)
             points += 2;
         points += player.developments().victoryPoint();
