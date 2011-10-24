@@ -27,7 +27,7 @@ public class Game {
         public Board board() { return game.board; }
         public List<Player> players() { return game.players(); }
         public int turnNumber() { return turnNumber; }
-        public int whichPlayerTurn() { return whichPlayerTurn; }
+        public Player whichPlayerTurn() { return whichPlayerTurn; }
 
         public CardStack cards() { return player(bot).cards(); }
         public DevelopmentStack developments() { return player(bot).developments(); }
@@ -93,7 +93,7 @@ public class Game {
 
     private int n;
     private int turnNumber;
-    private int whichPlayerTurn;
+    private Player whichPlayerTurn;
     private int diceRolled;
     private boolean robberMoved;
 
@@ -119,7 +119,6 @@ public class Game {
     public Board board() { return board; }
 
     int turnNumber() { return turnNumber; }
-    int whichPlayerTurn() { return whichPlayerTurn; }
 
 
     TradeOffer createTradeOffer(
@@ -135,7 +134,7 @@ public class Game {
         if (diceRolled != 0)
             throw new RuntimeException("Cannot roll the dice twice a turn");
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
-System.out.println("Dice rolled: " + diceRolled + " (" + players.get(whichPlayerTurn).color() + ")");
+System.out.println("Dice rolled: " + diceRolled + " (" + whichPlayerTurn.color() + ")");
         if (diceRolled == 7) {
             for (Player p : players) {
                 int were = p.cards().size();
@@ -446,19 +445,18 @@ System.out.println(player.color() + " plays knight");
         placeFirstSettlements();
 
         turnNumber = 0;
-        whichPlayerTurn = -1;
+        whichPlayerTurn = players.get(players.size() - 1);
 
         while (true) {
 System.out.println();
             turnNumber++;
-            whichPlayerTurn = (whichPlayerTurn + 1) % n;
+            whichPlayerTurn = players.get((index(whichPlayerTurn) + 1) % n);
             diceRolled = 0;
             robberMoved = false;
-            Player player = players.get(whichPlayerTurn);
 
-            player.bot().makeTurn();
+            whichPlayerTurn.bot().makeTurn();
 
-            player.developments().reenable();
+            whichPlayerTurn.developments().reenable();
             updateLongestRoad();
             updateLargestArmy();
 
@@ -528,25 +526,23 @@ System.out.println();
     }
 
     boolean playerHasWon() {
-        return points(players.get(whichPlayerTurn)) >= 10;
+        return points(whichPlayerTurn) >= 10;
     }
 
     void updateLongestRoad() {
-        Player player = players.get(whichPlayerTurn);
-        int z = roadLength(player);
-        for (Player rival : players)
-            if (rival != player && roadLength(rival) >= z)
+        int z = roadLength(whichPlayerTurn);
+        for (Player p : players)
+            if (p != whichPlayerTurn && roadLength(p) >= z)
                 return;
-        longestRoad = player;
+        longestRoad = whichPlayerTurn;
     }
 
     void updateLargestArmy() {
-        Player player = players.get(whichPlayerTurn);
-        int z = player.armyStrength();
+        int z = whichPlayerTurn.armyStrength();
         for (Player p : players)
-            if (p != player && p.armyStrength() >= z)
+            if (p != whichPlayerTurn && p.armyStrength() >= z)
                 return;
-        largestArmy = player;
+        largestArmy = whichPlayerTurn;
     }
 
     int index(Player player) {

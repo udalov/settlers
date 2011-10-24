@@ -91,20 +91,13 @@ public class Board {
                     break;
                 }
                 boolean ok = true;
-                for (int d = 0; d < 6; d++) {
-                    int x = hex.x() + DX[d];
-                    int y = hex.y() + DY[d];
-                    Hex c = hex(x, y);
-                    if (c == null || !numbers.containsKey(c))
-                        continue;
-                    if (numbers.get(c) == 6 || numbers.get(c) == 8) {
-                        ok = false;
-                        break;
-                    }
+                for (Hex c : adjacentHexes(hex))
+                    ok &= c == null || !numbers.containsKey(c) ||
+                          (numbers.get(c) != 6 && numbers.get(c) != 8);
+                if (ok) {
+                    numbers.put(hex, number);
+                    break;
                 }
-                if (!ok) continue;
-                numbers.put(hex, number);
-                break;
             }
         }
 
@@ -120,11 +113,11 @@ public class Board {
             int nextd = (d + 1) % 6;
             int prevd = (d + 5) % 6;
             for (int j = 0; j < 2; j++) {
-                coast.add(path(x, y, d));
+                coast.add(path(hex(x, y), d));
                 x += DX[nextd]; y += DY[nextd];
-                coast.add(path(x, y, prevd));
+                coast.add(path(hex(x, y), prevd));
             }
-            coast.add(path(x, y, d));
+            coast.add(path(hex(x, y), d));
             d = nextd;
         }
 
@@ -287,33 +280,33 @@ public class Board {
     private static Path[] paths = new Path[1024];
     private static Xing[] xings = new Xing[1024];
 
+    private static int enc(int x, int y) { return (x << 3) + y; }
+    private static int enc(int x, int y, int d) { return (d << 7) + enc(x, y); }
+
     static {
-        for (int y = 0; y <= 4; y++) {
-            for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2) {
-                hexes[(x << 3) + y] = new Hex(x, y);
-            }
-        }
+        for (int y = 0; y <= 4; y++)
+            for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2)
+                hexes[enc(x, y)] = new Hex(x, y);
+
+        for (int y = 0; y <= 4; y++)
+            for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2)
+                for (int d = 0; d < 3; d++)
+                    paths[enc(x, y, d)] = new Path(hexes[enc(x, y)], d);
 
         for (int y = 0; y <= 4; y++) {
             for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2) {
-                int e = (x << 3) + y;
-                Hex hex = hexes[e];
-                for (int d = 0; d < 3; d++) {
-                    paths[(d << 7) + e] = new Path(hex, d);
-                }
-            }
-        }
-
-        for (int y = 0; y <= 4; y++) {
-            for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2) {
-                int e = (x << 3) + y;
-                Hex hex = hexes[e];
-                if (x + y == 2 || y == 0) paths[(3 << 7) + e] = new Path(hex, 3);
-                    else paths[(3 << 7) + e] = paths[(0 << 7) + ((x - 1) << 3) + y - 1];
-                if (y == 0 || x - y == 6) paths[(4 << 7) + e] = new Path(hex, 4);
-                    else paths[(4 << 7) + e] = paths[(1 << 7) + ((x + 1) << 3) + y - 1];
-                if (x - y == 6 || x + y == 10) paths[(5 << 7) + e] = new Path(hex, 5);
-                    else paths[(5 << 7) + e] = paths[(2 << 7) + ((x + 2) << 3) + y];
+                if (x + y == 2 || y == 0)
+                    paths[enc(x, y, 3)] = new Path(hexes[enc(x, y)], 3);
+                else
+                    paths[enc(x, y, 3)] = paths[enc(x - 1, y - 1, 0)];
+                if (y == 0 || x - y == 6)
+                    paths[enc(x, y, 4)] = new Path(hexes[enc(x, y)], 4);
+                else
+                    paths[enc(x, y, 4)] = paths[enc(x + 1, y - 1, 1)];
+                if (x - y == 6 || x + y == 10)
+                    paths[enc(x, y, 5)] = new Path(hexes[enc(x, y)], 5);
+                else
+                    paths[enc(x, y, 5)] = paths[enc(x + 2, y, 2)];
             }
         }
         
@@ -322,58 +315,48 @@ public class Board {
                 if ((x + y) % 2 == 1)
                     continue;
                 for (int it = 0; it < 2; it++) {
-                    Hex c1, c2, c3;
+                    Hex[] c = new Hex[3];
                     if (it == 0) {
-                        c1 = hex(x + 1, y + 1);
-                        c2 = hex(x + 2, y);
-                        c3 = hex(x, y);
+                        c[0] = hex(x + 1, y + 1);
+                        c[1] = hex(x + 2, y);
+                        c[2] = hex(x, y);
                     } else {
-                        c1 = hex(x, y);
-                        c2 = hex(x + 2, y);
-                        c3 = hex(x + 1, y - 1);
+                        c[0] = hex(x, y);
+                        c[1] = hex(x + 2, y);
+                        c[2] = hex(x + 1, y - 1);
                     }
-                    Hex c = null;
-                    int d = -1;
-                    if (c1 != null) { c = c1; d = 4 + it; }
-                    if (c2 != null) { c = c2; d = 2 + it; }
-                    if (c3 != null) { c = c3; d = 0 + it; }
-                    if (c == null) continue;
-                    Xing i = new Xing(c, d);
-                    if (c1 != null) xings[((4 + it) << 7) + (c1.x() << 3) + c1.y()] = i;
-                    if (c2 != null) xings[((2 + it) << 7) + (c2.x() << 3) + c2.y()] = i;
-                    if (c3 != null) xings[((0 + it) << 7) + (c3.x() << 3) + c3.y()] = i;
+                    Xing z = null;
+                    for (int i = 0; i < 3; i++)
+                        if (c[i] != null)
+                            z = new Xing(c[i], 4 - 2*i + it);
+                    if (z == null) continue;
+                    for (int i = 0; i < 3; i++)
+                        if (c[i] != null)
+                            xings[enc(c[i].x(), c[i].y(), 4 - 2*i + it)] = z;
                 }
             }
         }
     }
 
     public static Hex hex(int x, int y) {
-        int ind = (x << 3) + y;
+        int ind = enc(x, y);
         if (ind < 0 || ind >= hexes.length || hexes[ind] == null)
             return null;
         return hexes[ind];
     }
 
     public static Path path(Hex hex, int direction) {
-        int ind = (direction << 7) + (hex.x() << 3) + hex.y();
+        int ind = enc(hex.x(), hex.y(), direction);
         if (ind < 0 || ind >= paths.length || paths[ind] == null)
             return null;
         return paths[ind];
     }
 
-    public static Path path(int x, int y, int direction) {
-        return path(hex(x, y), direction);
-    }
-
     public static Xing xing(Hex hex, int direction) {
-        int ind = (direction << 7) + (hex.x() << 3) + hex.y();
+        int ind = enc(hex.x(), hex.y(), direction);
         if (ind < 0 || ind >= xings.length || xings[ind] == null)
             return null;
         return xings[ind];
-    }
-
-    public static Xing xing(int x, int y, int direction) {
-        return xing(hex(x, y), direction);
     }
 
 
@@ -384,6 +367,16 @@ public class Board {
             for (int d = 0; d < 6; d++)
                 if (xing(hex, d) == a)
                     ans.add(hex);
+        return ans;
+    }
+
+    public static List<Hex> adjacentHexes(Hex c) {
+        List<Hex> ans = new ArrayList<Hex>(6);
+        for (int d = 0; d < 6; d++) {
+            Hex h = hex(c.x() + DX[d], c.y() + DY[d]);
+            if (h != null)
+                ans.add(h);
+        }
         return ans;
     }
 
