@@ -87,7 +87,7 @@ public class ExampleBot extends Bot {
             }
             api.invention(invent[0], invent[1]);
         }
-        if (api.developments().roadBuilding() > 0) {
+        if (api.developments().roadBuilding() > 0 && me.roadsLeft() > 0) {
             // TODO: the right behaviour
             Path[] roads = new Path[2];
             int inp = 0;
@@ -116,21 +116,20 @@ public class ExampleBot extends Bot {
             api.drawDevelopment();
         }
         
-        boolean placeForTown = false;
-        for (Xing x : Board.allXings()) {
-            if (api.canBuildTownAt(x, true)) {
-                placeForTown = true;
-                break;
-            }
-        }
+        wt: while (true) {
+            for (Xing x : Board.allXings())
+                if (api.canBuildTownAt(x, true))
+                    break wt;
 
-        if (!placeForTown) while (me.roadsLeft() > 0 && api.getIfPossible("BL")) {
+            if (me.roadsLeft() == 0 || !api.getIfPossible("BL"))
+                break wt;
+
             List<Path> possible = new ArrayList<Path>();
             for (Path p : Board.allPaths())
                 if (api.canBuildRoadAt(p))
                     possible.add(p);
             if (possible.isEmpty())
-                break;
+                break wt;
             Collections.sort(possible, new Comparator<Path>() {
                 int value(Path p) {
                     int value = 0;
@@ -166,7 +165,7 @@ public class ExampleBot extends Bot {
     }
 
     public TradeResult trade(TradeOffer offer) {
-        return offer.decline();
+        return api.declineOffer(offer);
     }
 
     public List<Resource> discardHalfOfTheCards() {

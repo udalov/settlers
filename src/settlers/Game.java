@@ -84,6 +84,15 @@ public class Game {
             { return game.roadLength(player); }
         public int roadLengthWith(Player player, Path p)
             { return game.roadLengthWith(player, p); }
+
+        public List<TradeResult> trade(String sell, String buy)
+            { return game.trade(new TradeOffer(player(bot), sell, buy)); }
+        public TradeResult acceptOffer(TradeOffer offer)
+            { return offer.accept(player(bot)); }
+        public TradeResult declineOffer(TradeOffer offer)
+            { return offer.decline(player(bot)); }
+        public TradeResult counterOffer(TradeOffer offer, String sell, String buy)
+            { return offer.counteroffer(player(bot), new TradeOffer(player(bot), sell, buy)); }
     }
 
     private final Random rnd = new Random(256);
@@ -121,14 +130,14 @@ public class Game {
     int turnNumber() { return turnNumber; }
 
 
-    TradeOffer createTradeOffer(
-        Bot bot,
-        Map<Resource, Integer> iWant,
-        Map<Resource, Integer> iGive
-    ) {
-        return new TradeOffer(player(bot), iWant, iGive);
-    }
 
+    List<TradeResult> trade(TradeOffer offer) {
+        List<TradeResult> ans = new ArrayList<TradeResult>();
+        for (Player p : players)
+            if (p != offer.trader())
+                ans.add(p.bot().trade(offer));
+        return ans;
+    }
 
     int rollDice() {
         if (diceRolled != 0)

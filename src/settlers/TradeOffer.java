@@ -7,30 +7,37 @@ import settlers.bot.Bot;
 public class TradeOffer {
     
     private final Player trader;
-    private final Map<Resource, Integer> iWant;
-    private final Map<Resource, Integer> iGive;
+    private final String sell;
+    private final String buy;
 
-    TradeOffer(
-        Player trader,
-        Map<Resource, Integer> iWant,
-        Map<Resource, Integer> iGive
-    ) {
+    TradeOffer(Player trader, String sell, String buy) {
         // TODO: check validity
         this.trader = trader;
-        this.iWant = new HashMap<Resource, Integer>(iWant);
-        this.iGive = new HashMap<Resource, Integer>(iGive);
+        this.sell = sell;
+        this.buy = buy;
     }
 
-    public TradeResult accept() {
-        return new TradeResult(TradeResult.ACCEPT, null);
+    public Player trader() { return trader; }
+    public String sell() { return sell; }
+    public String buy() { return buy; }
+
+    TradeResult accept(Player player) {
+        return new TradeResult(player, this, TradeResult.ACCEPT, null);
     }
 
-    public TradeResult decline() {
-        return new TradeResult(TradeResult.DECLINE, null);
+    TradeResult decline(Player player) {
+        return new TradeResult(player, this, TradeResult.DECLINE, null);
     }
 
-    public TradeResult counteroffer(TradeOffer offer) {
-        return new TradeResult(TradeResult.COUNTEROFFER, offer);
+    TradeResult counteroffer(Player player, TradeOffer counteroffer) {
+        return new TradeResult(player, this, TradeResult.COUNTEROFFER, counteroffer);
+    }
+
+    void complete(Player with) {
+        trader.cards().sub(sell);
+        trader.cards().add(buy);
+        with.cards().sub(buy);
+        with.cards().add(sell);
     }
 }
 
