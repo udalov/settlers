@@ -6,7 +6,7 @@ import settlers.util.*;
 
 public class ExampleBot extends Bot {
 
-    private Random rnd = api.rnd();
+    private final Random rnd = api.rnd();
     private final Board board;
     
     public ExampleBot(Game.API api) {

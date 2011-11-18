@@ -1,7 +1,6 @@
 package settlers;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,7 +105,7 @@ public class Board {
         return new Board(resources, numbers, ports2to1, ports3to1);
     }
 
-    static void generatePorts(Random rnd, Map<Path, Resource> ports2to1, List<Path> ports3to1) {
+    private static void generatePorts(Random rnd, Map<Path, Resource> ports2to1, List<Path> ports3to1) {
         List<Path> coast = new ArrayList<Path>();
         int d = 0, x = 8, y = 2;
         for (int i = 0; i < 6; i++) {
@@ -266,7 +265,7 @@ public class Board {
             new HashSet<Pair<Xing, Resource>>();
         for (Path p : ports2to1.keySet())
             for (Xing i : endpoints(p))
-                ans.add(Pair.make(i, ports2to1.get(i)));
+                ans.add(Pair.make(i, ports2to1.get(p)));
         for (Path p : ports3to1)
             for (Xing i : endpoints(p))
                 ans.add(Pair.make(i, (Resource)null));
@@ -276,9 +275,9 @@ public class Board {
 
 
 
-    private static Hex[] hexes = new Hex[128];
-    private static Path[] paths = new Path[1024];
-    private static Xing[] xings = new Xing[1024];
+    private static final Hex[] hexes = new Hex[128];
+    private static final Path[] paths = new Path[1024];
+    private static final Xing[] xings = new Xing[1024];
 
     private static int enc(int x, int y) { return (x << 3) + y; }
     private static int enc(int x, int y, int d) { return (d << 7) + enc(x, y); }

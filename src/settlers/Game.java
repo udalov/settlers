@@ -106,11 +106,11 @@ public class Game {
     private Player whichPlayerTurn;
     private int diceRolled;
     private boolean robberMoved;
-    private CardStack bank = new CardStack();
+    private final CardStack bank = new CardStack();
 
     private Player largestArmy;
     private Player longestRoad;
-    private List<Development> developments = new ArrayList<Development>();
+    private final List<Development> developments = new ArrayList<Development>();
 
     Game() {
         board = Board.create(rnd);
@@ -172,8 +172,8 @@ System.out.println();
                         continue;
                     if (board.robber() == hex)
                         continue;
-                    for (Xing ints : Board.adjacentXings(hex)) {
-                        Town town = board.townAt(ints);
+                    for (Xing x : Board.adjacentXings(hex)) {
+                        Town town = board.townAt(x);
                         if (town == null)
                             continue;
                         Resource res = board.resourceAt(hex);
@@ -189,7 +189,6 @@ System.out.println();
                 }
             }
         }
-System.out.println(bank);
 for (Player p : players) System.out.println(p.color() + ": " + p.cards() + " " + p.developments());
         return diceRolled;
     }
@@ -358,7 +357,7 @@ System.out.println(player.color() + " changes " + sell + " to " + buy);
                 if (x == 0)
                     continue;
                 int coeff = it == 0 ? 2 : 4;
-                if (hasPort3to1(player))
+                if (hasPort3to1(player) && coeff == 4)
                     coeff = 3;
                 int sub = Math.min(buy.length() - buyingIndex, x / coeff);
                 for (int i = 0; i < sub; i++)
@@ -531,7 +530,7 @@ System.out.println();
             for (int i = it * (n - 1); 0 <= i && i < n; i += 1 - 2*it) {
                 Player player = players.get(i);
                 Pair<Xing, Path> p = player.bot().placeFirstSettlements(it == 0);
-                if (!board.areAdjacent(p.first(), p.second()))
+                if (!Board.areAdjacent(p.first(), p.second()))
                     throw new RuntimeException("Cannot build a road not connected to a town");
                 if (!board.canBuildTownAt(p.first(), false, player))
                     throw new RuntimeException("Cannot build a town here");
@@ -586,13 +585,6 @@ System.out.println();
         if (ans < 0)
             throw new IllegalStateException("Internal: player not found");
         return ans;
-    }
-
-    int index(Bot bot) {
-        for (int i = 0; i < n; i++)
-            if (players.get(i).bot() == bot)
-                return i;
-        throw new IllegalStateException("Internal: bot not found");
     }
 
     Player player(Bot bot) {

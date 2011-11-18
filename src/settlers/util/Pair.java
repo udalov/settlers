@@ -18,5 +18,11 @@ public class Pair<T, U> {
         return new Pair<T, U>(first, second);
     }
 
+    public int hashCode() {
+        int h1 = first == null ? 0 : first.hashCode();
+        int h2 = second == null ? 0 : second.hashCode();
+        return h1 ^ (h2 << 1);
+    }
+
 }
 

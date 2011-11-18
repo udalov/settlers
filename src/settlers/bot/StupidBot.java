@@ -6,7 +6,7 @@ import settlers.util.*;
 
 public class StupidBot extends Bot {
 
-    private Random rnd = api.rnd();
+    private final Random rnd = api.rnd();
     private final Board board;
     
     public StupidBot(Game.API api) {
@@ -16,7 +16,7 @@ public class StupidBot extends Bot {
 
     public void makeTurn() {
         if (api.rollDice() == 7) {
-            List<Hex> hexes = Util.shuffle(board.allHexes());
+            List<Hex> hexes = Util.shuffle(Board.allHexes());
             h: for (Hex h : hexes) {
                 if (board.robber() == h)
                     continue;
@@ -48,7 +48,7 @@ public class StupidBot extends Bot {
             api.invention(Resource.BRICK, Resource.ORE);
         }
         if (api.me().settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
-            List<Xing> xings = Util.shuffle(board.allXings());
+            List<Xing> xings = Util.shuffle(Board.allXings());
             for (Xing x : xings) {
                 if (api.canBuildTownAt(x, true)) {
                     api.buildSettlement(x);
@@ -60,7 +60,7 @@ public class StupidBot extends Bot {
             api.drawDevelopment();
         }
         if (api.me().roadsLeft() > 0 && api.getIfPossible("BL")) {
-            List<Path> paths = Util.shuffle(board.allPaths());
+            List<Path> paths = Util.shuffle(Board.allPaths());
             for (Path p : paths) {
                 if (api.canBuildRoadAt(p)) {
                     api.buildRoad(p);
@@ -86,7 +86,7 @@ public class StupidBot extends Bot {
     }
 
     public Pair<Xing, Path> placeFirstSettlements(boolean first) {
-        List<Xing> xings = Util.shuffle(board.allXings());
+        List<Xing> xings = Util.shuffle(Board.allXings());
         for (Xing x : xings)
             if (api.canBuildTownAt(x, false))
                 for (Path p : Board.adjacentPaths(x))

@@ -13,17 +13,17 @@ public class Vis extends JPanel implements WindowListener {
 
     public static final int WIDTH = 850;
     public static final int HEIGHT = 650;
-    public static final int X0_POS = 200;
-    public static final int Y0_POS = 500;
-    public static final int HEX_SIZE = 54;
-    public static final int TOWN_RADIUS = 10;
-    public static final int PORT_DISTANCE = 8;
+    private static final int X0_POS = 200;
+    private static final int Y0_POS = 500;
+    private static final int HEX_SIZE = 54;
+    private static final int TOWN_RADIUS = 10;
+    private static final int PORT_DISTANCE = 8;
 
-    public static final int[] DX = new int[] {2, 0, -2, -2, 0, 2};
-    public static final int[] DY = new int[] {-1, -2, -1, 1, 2, 1};
+    private static final int[] DX = new int[] {2, 0, -2, -2, 0, 2};
+    private static final int[] DY = new int[] {-1, -2, -1, 1, 2, 1};
 
     // TODO: generate
-    public static final String[] PORTS = new String[] {
+    private static final String[] PORTS = new String[] {
         "820,821,730,731,640",
         "641,440,441,240,241",
         "242,131,132,021,022",
@@ -62,7 +62,7 @@ public class Vis extends JPanel implements WindowListener {
         return new Polygon(v[0], v[1], 6);
     }
 
-    Point intsCoords(Xing i) {
+    Point xingCoords(Xing i) {
         Point z = hex.get(i.hex());
         int[][] v = calcHexagonVertices(z.x, z.y);
         int d = i.direction();
@@ -115,7 +115,7 @@ public class Vis extends JPanel implements WindowListener {
         if (t == null)
             return;
         g.setColor(playerColorToColor(t.player().color()));
-        Point p = intsCoords(i);
+        Point p = xingCoords(i);
         if (t.isCity()) {
             g.fillRect(p.x - TOWN_RADIUS, p.y - TOWN_RADIUS, 2 * TOWN_RADIUS, 2 * TOWN_RADIUS);
         } else {
@@ -130,14 +130,14 @@ public class Vis extends JPanel implements WindowListener {
         Resource r = br.second();
         int d = -1;
         for (int j = 0; j < 6; j++) {
-            if (PORTS[j].indexOf("" + i.x() + i.y() + i.direction()) >= 0) {
+            if (PORTS[j].contains("" + i.x() + i.y() + i.direction())) {
                 d = j;
                 break;
             }
         }
         if (d < 0)
             throw new IllegalStateException("Internal: invalid port location");
-        Point p = intsCoords(i);
+        Point p = xingCoords(i);
         String str = resourceToPort(r);
         g.setFont(new Font("Tahoma", Font.BOLD, 10));
         Color c = r == null ? new Color(0x8888FF) : resourceToColor(r);
