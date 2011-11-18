@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import javax.swing.JFrame;
 import settlers.bot.Bot;
 import settlers.bot.ExampleBot;
+import settlers.bot.StupidBot;
 import settlers.vis.Vis;
 
 public class Main {
@@ -26,6 +27,8 @@ public class Main {
                         String bot = args[++i];
                         if ("Example".equals(bot)) {
                             bots[j] = new ExampleBot(api);
+                        } else if ("Stupid".equals(bot)) {
+                            bots[j] = new StupidBot(api);
                         } else {
                             int colon = bot.lastIndexOf(':');
                             File jar = new File(bot.substring(0, colon));
@@ -51,12 +54,14 @@ public class Main {
                 e.printStackTrace();
             }
 
-            JFrame jf = new JFrame();
-            Vis v = new Vis(game);
-            jf.getContentPane().add(v);
-            jf.addWindowListener(v);
-            jf.setSize(Vis.WIDTH + 2, Vis.HEIGHT + 24);
-            jf.setVisible(true);
+            if (vis) {
+                JFrame jf = new JFrame();
+                Vis v = new Vis(game);
+                jf.getContentPane().add(v);
+                jf.addWindowListener(v);
+                jf.setSize(Vis.WIDTH + 2, Vis.HEIGHT + 24);
+                jf.setVisible(true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

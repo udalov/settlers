@@ -1,8 +1,9 @@
 1. ensure all player actions happen on his turn
 2. check all arguments of API on null values
 3. check before every action if not 7 or robber is moved
-4. count the number of cards of each resource
+4. make allHexes, ... lazy modifiable
 5. measure time of execution of each of the Bot's method + introduce TL
 6. history of public events + API
 7. trade resources to players with corresponding ports
+8. make canBuildTownAt & canBuildRoadAt easy to use before the game
 
