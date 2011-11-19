@@ -29,8 +29,8 @@ public class TradeOffer {
         return new TradeResult(player, this, TradeResult.DECLINE, null);
     }
 
-    TradeResult counteroffer(Player player, TradeOffer counteroffer) {
-        return new TradeResult(player, this, TradeResult.COUNTEROFFER, counteroffer);
+    TradeResult counteroffer(TradeOffer counteroffer) {
+        return new TradeResult(counteroffer.trader, this, TradeResult.COUNTEROFFER, counteroffer);
     }
 
     void complete(Player with) {
