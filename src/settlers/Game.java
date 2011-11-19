@@ -20,9 +20,18 @@ public class Game {
 
         API() { game = Game.this; }
         void setBot(Bot bot) { this.bot = bot; }
-        void check() {
+
+        void checkTurn() {
             if (player(bot) != turn)
                 throw new RuntimeException("You cannot do anything not on your turn");
+        }
+        void checkRobber() {
+            if (diceRolled == 7 && !robberMoved)
+                throw new RuntimeException("You must move the robber right after rolling 7");
+        }
+        void check() {
+            checkTurn();
+            checkRobber();
         }
 
         public Game game() { return game; }
@@ -40,7 +49,7 @@ public class Game {
         public int rollDice() { check(); return game.rollDice(); }
 
         public void moveRobber(Hex c, Player whoToRob)
-            { check(); game.moveRobber(c, whoToRob); }
+            { checkTurn(); game.moveRobber(c, whoToRob); }
 
         public boolean canBuildTownAt(Xing i, boolean mustBeRoad)
             { return game.board.canBuildTownAt(i, mustBeRoad, me()); }
