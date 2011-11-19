@@ -166,10 +166,14 @@ System.out.println("Dice rolled: " + diceRolled + " (" + turn.color() + ")");
                 int were = p.cards().size();
                 if (were > 7) {
                     List<Resource> discard = p.bot().discardHalfOfTheCards();
+                    if (discard == null)
+                        throw new RuntimeException("You cannot discard null");
 System.out.print(p.color() + " discards: ");
 for (Resource r : discard) System.out.print(r.chr());
 System.out.println();
                     for (Resource r : discard) {
+                        if (r == null)
+                            throw new RuntimeException("You cannot discard null");
                         p.cards().sub(r, 1);
                         bank.add(r, 1);
                     }
@@ -207,6 +211,8 @@ for (Player p : players) System.out.println(p.color() + ": " + p.cards() + " " +
     }
 
     void moveRobber(Hex hex, Player whoToRob) {
+        if (hex == null)
+            throw new RuntimeException("You cannot move the robber to null");
         if (hex == board.robber())
             throw new RuntimeException("You cannot leave the robber at his current position");
         if (whoToRob == turn)
@@ -235,6 +241,8 @@ System.out.println(turn.color() + " moves robber to " + hex + " and robs " + who
     }
 
     void buildSettlement(Xing i) {
+        if (i == null)
+            throw new RuntimeException("You cannot build a settlement at null");
         if (turn.settlementsLeft() == 0)
             throw new RuntimeException("You do not have any settlements left");
         if (!turn.cards().areThere("BWGL"))
@@ -249,6 +257,8 @@ System.out.println(turn.color() + " builds a settlement at " + i);
     }
 
     void buildCity(Xing i) {
+        if (i == null)
+            throw new RuntimeException("You cannot build a town at null");
         if (turn.citiesLeft() == 0)
             throw new RuntimeException("You do not have any cities left");
         if (!turn.cards().areThere("OOOGG"))
@@ -267,6 +277,8 @@ System.out.println(turn.color() + " builds a city at " + i);
     }
 
     void buildRoad(Path p) {
+        if (p == null)
+            throw new RuntimeException("You cannot build a road at null");
         if (turn.roadsLeft() == 0)
             throw new RuntimeException("You do not have any roads left");
         if (!turn.cards().areThere("BL"))
@@ -292,17 +304,14 @@ System.out.println(turn.color() + " builds a road at " + p);
     }
 
     boolean hasPort3to1(Player player) {
-        for (Pair<Xing, Resource> p : board.allPorts()) {
-            if (p.second() == null) {
-                Town t = board.townAt(p.first());
-                if (t != null && t.player() == player)
-                    return true;
-            }
-        }
-        return false;
+        return hasPort(null, player);
     }
 
     boolean canChange(String sell, String buy, Player player) {
+        if (sell == null || buy == null || "".equals(sell) || "".equals(buy))
+            return false;
+        if (!Util.resourceString(sell) || !Util.resourceString(buy))
+            throw new RuntimeException("Invalid characters in change string");
         if (!bank.areThere(buy))
             return false;
         int res = 0;
@@ -344,6 +353,10 @@ System.out.println(turn.color() + " changes " + sell + " to " + buy);
     }
 
     boolean getIfPossible(String what) {
+        if (what == null || "".equals(what))
+            return true;
+        if (!Util.resourceString(what))
+            throw new RuntimeException("Invalid characters in resource string");
         Map<Resource, Integer> left = new HashMap<Resource, Integer>();
         String buy = "";
         for (Resource r : Resource.all()) {
@@ -400,6 +413,8 @@ System.out.println("(it's " + d + ")");
     }
 
     void monopoly(Resource r) {
+        if (r == null)
+            throw new RuntimeException("You cannot declare monopoly on null");
         turn.developments().use(Development.MONOPOLY);
 int sum = 0;
         for (Player p : players) {
@@ -436,6 +451,8 @@ System.out.println(turn.color() + " plays road building and builds roads at " + 
     }
 
     void invention(Resource r1, Resource r2) {
+        if (r1 == null || r2 == null)
+            throw new RuntimeException("You cannot use invention card on null");
         if (bank.howMany(r1) == 0 || bank.howMany(r2) == 0)
             throw new RuntimeException("You cannot use invention card on non-existing resources");
         turn.developments().use(Development.INVENTION);
@@ -475,6 +492,8 @@ System.out.println(turn.color() + " plays knight");
     }
 
     int roadLengthWith(Player player, Path p) {
+        if (player == null)
+            return 0;
         int ans = 0;
         Set<Path> visited = new HashSet<Path>();
         for (Xing start : Board.allXings())
@@ -541,10 +560,12 @@ System.out.println();
             for (int i = it * (n - 1); 0 <= i && i < n; i += 1 - 2*it) {
                 Player player = players.get(i);
                 Pair<Xing, Path> p = player.bot().placeFirstSettlements(it == 0);
+                if (p == null || p.first() == null || p.second() == null)
+                    throw new RuntimeException("You cannot build a first settlement at null");
                 if (!Board.areAdjacent(p.first(), p.second()))
-                    throw new RuntimeException("Cannot build a road not connected to a town");
+                    throw new RuntimeException("You cannot build a road not connected to a town");
                 if (!board.canBuildTownAt(p.first(), false, player))
-                    throw new RuntimeException("Cannot build a town here");
+                    throw new RuntimeException("You cannot build a town here");
                 board.buildTown(p.first(), new Town(player, false));
                 board.buildRoad(p.second(), player);
                 if (it == 1) {

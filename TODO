@@ -1,5 +1,5 @@
 1. make canBuildTownAt & canBuildRoadAt easy to use before the game
-2. check all arguments of API on null values
+2. maybe move all Board's public API to Game.API
 3. maybe make rob() Bot's method
 4. make allHexes, ... lazy modifiable
 5. measure time of execution of each of the Bot's method + introduce TL

@@ -3,6 +3,7 @@ package settlers;
 import java.util.HashMap;
 import java.util.Map;
 import settlers.bot.Bot;
+import settlers.util.Util;
 
 public class TradeOffer {
     
@@ -11,7 +12,12 @@ public class TradeOffer {
     private final String buy;
 
     TradeOffer(Player trader, String sell, String buy) {
-        // TODO: check validity
+        if (sell == null || buy == null || "".equals(sell) || "".equals(buy))
+            throw new RuntimeException("You cannot trade with nothing");
+        if (!Util.resourceString(sell) || !Util.resourceString(buy))
+            throw new RuntimeException("Invalid characters in trade offer");
+        if (!trader.cards().areThere(sell))
+            throw new RuntimeException("You cannot sell resources you do not have");
         this.trader = trader;
         this.sell = sell;
         this.buy = buy;
