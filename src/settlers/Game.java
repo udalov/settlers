@@ -120,6 +120,7 @@ public class Game {
     private int diceRolled;
     private boolean robberMoved;
     private final CardStack bank = new CardStack();
+    private final History history = new History();
 
     private Player largestArmy;
     private Player longestRoad;
