@@ -1,6 +1,7 @@
 package settlers.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 import java.util.List;
@@ -26,6 +27,13 @@ public class Util {
             return false;
         }
         return true;
+    }
+
+    public static String toResourceString(Collection<Resource> resources) {
+        StringBuilder sb = new StringBuilder();
+        for (Resource r : resources)
+            sb.append(r.chr());
+        return sb + "";
     }
 
     public static <T> List<T> shuffle(List<T> list, Random rnd) {
