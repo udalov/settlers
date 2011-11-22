@@ -5,7 +5,9 @@ public enum EventType {
     INITIAL_SETTLEMENT,
 
     ROLL_DICE,
+    ROBBER,
     RESOURCES,
+    DISCARD,
 
     ROAD,
     SETTLEMENT,
@@ -16,6 +18,9 @@ public enum EventType {
     INVENTION,
     MONOPOLY,
     ROAD_BUILDING,
+
+    LONGEST_ROAD,
+    LARGEST_ARMY,
 
     CHANGE,
     TRADE,

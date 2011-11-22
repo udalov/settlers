@@ -144,6 +144,7 @@ public class Game {
 
     List<Player> players() { return Collections.unmodifiableList(players); }
     public Board board() { return board; }
+    public History history() { return history; }
 
     int turnNumber() { return turnNumber; }
 
@@ -161,7 +162,7 @@ public class Game {
         if (diceRolled != 0)
             throw new RuntimeException("Cannot roll the dice twice a turn");
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
-System.out.println("Dice rolled: " + diceRolled + " (" + turn.color() + ")");
+        history.rollDice(diceRolled);
         if (diceRolled == 7) {
             for (Player p : players) {
                 int were = p.cards().size();
@@ -169,9 +170,7 @@ System.out.println("Dice rolled: " + diceRolled + " (" + turn.color() + ")");
                     List<Resource> discard = p.bot().discardHalfOfTheCards();
                     if (discard == null)
                         throw new RuntimeException("You cannot discard null");
-System.out.print(p.color() + " discards: ");
-for (Resource r : discard) System.out.print(r.chr());
-System.out.println();
+                    history.discard(p, discard);
                     for (Resource r : discard) {
                         if (r == null)
                             throw new RuntimeException("You cannot discard null");
@@ -184,6 +183,9 @@ System.out.println();
             }
         } else {
             int[] neededResCards = new int[Resource.all().length];
+            Map<Player, List<Resource>> gets = new HashMap<Player, List<Resource>>();
+            for (Player p : players)
+                gets.put(p, new ArrayList<Resource>());
             for (int step = 0; step < 2; step++) {
                 for (Hex hex : Board.allHexes()) {
                     if (board.numberAt(hex) != diceRolled)
@@ -201,13 +203,15 @@ System.out.println();
                             neededResCards[index] += q;
                         } else if (neededResCards[index] <= bank.howMany(res)) {
                             town.player().cards().add(res, q);
+                            gets.get(town.player()).add(res);
+                            if (q == 2)
+                                gets.get(town.player()).add(res);
                             bank.sub(res, q);
                         }
                     }
                 }
             }
         }
-for (Player p : players) System.out.println(p.color() + ": " + p.cards() + " " + p.developments());
         return diceRolled;
     }
 
@@ -229,7 +233,7 @@ for (Player p : players) System.out.println(p.color() + ": " + p.cards() + " " +
             throw new RuntimeException("You cannot rob a player not having a town near the robber");
         board.moveRobber(hex);
         robberMoved = true;
-if (whoToRob == null) System.out.println(turn.color() + " moves robber to " + hex + " and robs nobody");
+        history.robber(hex, whoToRob);
         if (whoToRob == null)
             return;
         if (whoToRob.cardsNumber() == 0)
@@ -238,43 +242,42 @@ if (whoToRob == null) System.out.println(turn.color() + " moves robber to " + he
         Resource r = list.get(rnd.nextInt(list.size()));
         whoToRob.cards().sub(r, 1);
         turn.cards().add(r, 1);
-System.out.println(turn.color() + " moves robber to " + hex + " and robs " + whoToRob.color());
     }
 
-    void buildSettlement(Xing i) {
-        if (i == null)
+    void buildSettlement(Xing x) {
+        if (x == null)
             throw new RuntimeException("You cannot build a settlement at null");
         if (turn.settlementsLeft() == 0)
             throw new RuntimeException("You do not have any settlements left");
         if (!turn.cards().areThere("BWGL"))
             throw new RuntimeException("Not enough resources to build a settlement");
-        if (!board.canBuildTownAt(i, true, turn))
+        if (!board.canBuildTownAt(x, true, turn))
             throw new RuntimeException("You cannot build a settlement here");
         turn.expendSettlement();
-        board.buildTown(i, new Town(turn, false));
+        board.buildTown(x, new Town(turn, false));
         turn.cards().sub("BWGL");
         bank.add("BWGL");
-System.out.println(turn.color() + " builds a settlement at " + i);
+        history.settlement(x);
     }
 
-    void buildCity(Xing i) {
-        if (i == null)
+    void buildCity(Xing x) {
+        if (x == null)
             throw new RuntimeException("You cannot build a town at null");
         if (turn.citiesLeft() == 0)
             throw new RuntimeException("You do not have any cities left");
         if (!turn.cards().areThere("OOOGG"))
             throw new RuntimeException("Not enough resources to build a city");
-        if (board.townAt(i) == null)
+        if (board.townAt(x) == null)
             throw new RuntimeException("You must first build a settlement to be able to upgrade it");
-        if (board.townAt(i).isCity())
+        if (board.townAt(x).isCity())
             throw new RuntimeException("You cannot build a city over an existing city");
-        if (board.townAt(i).player() != turn)
+        if (board.townAt(x).player() != turn)
             throw new RuntimeException("You cannot upgrade other player's settlement");
         turn.expendCity();
-        board.buildTown(i, new Town(turn, true));
+        board.buildTown(x, new Town(turn, true));
         turn.cards().sub("OOOGG");
         bank.add("OOOGG");
-System.out.println(turn.color() + " builds a city at " + i);
+        history.city(x);
     }
 
     void buildRoad(Path p) {
@@ -290,7 +293,7 @@ System.out.println(turn.color() + " builds a city at " + i);
         board.buildRoad(p, turn);
         turn.cards().sub("BL");
         bank.add("BL");
-System.out.println(turn.color() + " builds a road at " + p);
+        history.road(p);
     }
 
     boolean hasPort(Resource r, Player player) {
@@ -350,7 +353,7 @@ System.out.println(turn.color() + " builds a road at " + p);
         turn.cards().add(buy);
         bank.add(sell);
         bank.sub(buy);
-System.out.println(turn.color() + " changes " + sell + " to " + buy);
+        history.change(sell, buy);
     }
 
     boolean getIfPossible(String what) {
@@ -409,24 +412,23 @@ System.out.println(turn.color() + " changes " + sell + " to " + buy);
         turn.developments().add(d);
         turn.cards().sub("WOG");
         bank.add("WOG");
-System.out.println(turn.color() + " draws a development");
-System.out.println("(it's " + d + ")");
+        history.development();
     }
 
     void monopoly(Resource r) {
         if (r == null)
             throw new RuntimeException("You cannot declare monopoly on null");
         turn.developments().use(Development.MONOPOLY);
-int sum = 0;
+        int got = 0;
         for (Player p : players) {
             if (p == turn)
                 continue;
             int x = p.cards().howMany(r);
-sum += x;
+            got += x;
             turn.cards().add(r, x);
             p.cards().sub(r, x);
         }
-System.out.println(turn.color() + " declares monopoly and receives " + sum + " of " + r);
+        history.monopoly(r, got);
     }
 
     void roadBuilding(Path p1, Path p2) {
@@ -448,7 +450,7 @@ System.out.println(turn.color() + " declares monopoly and receives " + sum + " o
             turn.expendRoad();
             board.buildRoad(p2, turn);
         }
-System.out.println(turn.color() + " plays road building and builds roads at " + p1 + " and " + p2);
+        history.roadBuilding(p1, p2);
     }
 
     void invention(Resource r1, Resource r2) {
@@ -461,18 +463,19 @@ System.out.println(turn.color() + " plays road building and builds roads at " + 
         turn.cards().add(r2, 1);
         bank.sub(r1, 1);
         bank.sub(r2, 1);
-System.out.println(turn.color() + " plays invention and receives " + r1 + " and " + r2);
+        history.invention(r1, r2);
     }
 
     void knight(Hex hex, Player whoToRob) {
         turn.developments().use(Development.KNIGHT);
-System.out.println(turn.color() + " plays knight");
+        history.knight();
+        updateLargestArmy();
         moveRobber(hex, whoToRob);
         turn.increaseArmyStrength();
     }
 
 
-    int dfs(Player player, Xing i, Set<Path> visited, Path with) {
+    int dfsRoadLength(Player player, Xing i, Set<Path> visited, Path with) {
         int ans = 0;
         for (Path p : Board.adjacentPaths(i)) {
             if (visited.contains(p))
@@ -482,7 +485,7 @@ System.out.println(turn.color() + " plays knight");
             visited.add(p);
             Xing[] ends = Board.endpoints(p);
             Xing otherEnd = ends[ends[0] == i ? 1 : 0];
-            ans = Math.max(ans, 1 + dfs(player, otherEnd, visited, with));
+            ans = Math.max(ans, 1 + dfsRoadLength(player, otherEnd, visited, with));
             visited.remove(p);
         }
         return ans;
@@ -498,7 +501,7 @@ System.out.println(turn.color() + " plays knight");
         int ans = 0;
         Set<Path> visited = new HashSet<Path>();
         for (Xing start : Board.allXings())
-            ans = Math.max(ans, dfs(player, start, visited, p));
+            ans = Math.max(ans, dfsRoadLength(player, start, visited, p));
         return ans;
     }
 
@@ -514,17 +517,16 @@ System.out.println(turn.color() + " plays knight");
         turn = players.get(players.size() - 1);
 
         while (true) {
-System.out.println();
             turnNumber++;
             turn = players.get((index(turn) + 1) % n);
             diceRolled = 0;
             robberMoved = false;
+            history.nextTurn(turn);
 
             turn.bot().makeTurn();
 
             turn.developments().reenable();
             updateLongestRoad();
-            updateLargestArmy();
 
             if (playerHasWon()) break;
 
@@ -534,7 +536,9 @@ System.out.println();
                 throw new RuntimeException("You must move the robber if you rolled 7");
         }
 
-        // TODO: do not output VP for players who lost
+
+        history.victory(turn.developments().victoryPoint());
+        /*
         System.out.println();
         System.out.println("Game lasted " + turnNumber + " turns");
         System.out.println("Scores:");
@@ -549,6 +553,7 @@ System.out.println();
                 System.out.print(" (2 ROAD)");
             System.out.println();
         }
+        */
     }
 
     void init() {
@@ -567,6 +572,8 @@ System.out.println();
                     throw new RuntimeException("You cannot build a road not connected to a town");
                 if (!board.canBuildTownAt(p.first(), false, player))
                     throw new RuntimeException("You cannot build a town here");
+                history.initialSettlement(player, p.first());
+                history.initialRoad(player, p.second());
                 board.buildTown(p.first(), new Town(player, false));
                 board.buildRoad(p.second(), player);
                 if (it == 1) {
@@ -602,6 +609,8 @@ System.out.println();
         for (Player p : players)
             if (p != turn && roadLength(p) >= z)
                 return;
+        if (z >= 5 && longestRoad != turn)
+            history.longestRoad(z);
         longestRoad = turn;
     }
 
@@ -610,6 +619,8 @@ System.out.println();
         for (Player p : players)
             if (p != turn && p.armyStrength() >= z)
                 return;
+        if (z >= 3 && largestArmy != turn)
+            history.largestArmy(z);
         largestArmy = turn;
     }
 
