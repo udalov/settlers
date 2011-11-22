@@ -85,7 +85,7 @@ public class StupidBot extends Bot {
         return ans;
     }
 
-    public Pair<Xing, Path> placeFirstSettlements(boolean first) {
+    public Pair<Xing, Path> placeInitialSettlements(boolean first) {
         List<Xing> xings = Util.shuffle(Board.allXings(), rnd);
         for (Xing x : xings)
             if (api.canBuildTownAt(x, false))

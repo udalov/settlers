@@ -180,7 +180,7 @@ public class ExampleBot extends Bot {
     public void tradeWithOtherPlayerOnHisTurn() {
     }
 
-    public Pair<Xing, Path> placeFirstSettlements(boolean first) {
+    public Pair<Xing, Path> placeInitialSettlements(boolean first) {
         List<Xing> l = new ArrayList<Xing>();
         for (Xing i : Board.allXings())
             if (api.canBuildTownAt(i, false))

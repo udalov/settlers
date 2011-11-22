@@ -515,7 +515,7 @@ public class Game {
 
     void play() {
         init();
-        placeFirstSettlements();
+        placeInitialSettlements();
 
         turnNumber = 0;
         turn = players.get(players.size() - 1);
@@ -548,11 +548,11 @@ public class Game {
         Collections.shuffle(players, rnd);
     }
 
-    void placeFirstSettlements() {
+    void placeInitialSettlements() {
         for (int it = 0; it < 2; it++) {
             for (int i = it * (n - 1); 0 <= i && i < n; i += 1 - 2*it) {
                 Player player = players.get(i);
-                Pair<Xing, Path> p = player.bot().placeFirstSettlements(it == 0);
+                Pair<Xing, Path> p = player.bot().placeInitialSettlements(it == 0);
                 if (p == null || p.first() == null || p.second() == null)
                     throw new RuntimeException("You cannot build a first settlement at null");
                 if (!Board.areAdjacent(p.first(), p.second()))

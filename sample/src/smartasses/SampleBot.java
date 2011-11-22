@@ -17,14 +17,14 @@ public class SampleBot extends Bot {
     }
 
     public TradeResult trade(TradeOffer offer) {
-        return offer.decline();
+        return api.declineOffer(offer);
     }
 
     public List<Resource> discardHalfOfTheCards() {
         return null;
     }
 
-    public Pair<Xing, Path> placeFirstSettlements(boolean first) {
+    public Pair<Xing, Path> placeInitialSettlements(boolean first) {
         throw new RuntimeException("THE CAKE IS A LIE");
     }
 
