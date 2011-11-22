@@ -123,8 +123,19 @@ public class Main {
                             System.out.println("trade " + event.player().color() + " " + event.sell() + " " + event.buy());
                             break;
                         case VICTORY:
-                            System.out.println();
-                            System.out.println("victory " + event.number());
+                            System.out.println("victory");
+                            for (Player p : game.players()) {
+                                System.out.print(p.color());
+                                System.out.print(" " + game.points(p));
+                                int vp = p.developments().victoryPoint();
+                                if (vp > 0)
+                                    System.out.print(" " + vp + "VP");
+                                if (game.largestArmy() == p && p.armyStrength() >= 3)
+                                    System.out.print(" ARMY");
+                                if (game.longestRoad() == p && game.roadLength(p) >= 5)
+                                    System.out.print(" ROAD");
+                                System.out.println();
+                            }
                             break;
                     }
                 }

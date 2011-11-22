@@ -93,7 +93,9 @@ public class Game {
             { check(); game.knight(hex, whoToRob); }
 
         public Player largestArmy()
-            { return game.largestArmy; }
+            { return game.largestArmy(); }
+        public Player longestRoad()
+            { return game.longestRoad(); }
         public int roadLength(Player player)
             { return game.roadLength(player); }
         public int roadLengthWith(Player player, Path p)
@@ -145,6 +147,8 @@ public class Game {
     List<Player> players() { return Collections.unmodifiableList(players); }
     public Board board() { return board; }
     public History history() { return history; }
+    Player largestArmy() { return largestArmy; }
+    Player longestRoad() { return longestRoad; }
 
     int turnNumber() { return turnNumber; }
 
@@ -536,24 +540,7 @@ public class Game {
                 throw new RuntimeException("You must move the robber if you rolled 7");
         }
 
-
         history.victory(turn.developments().victoryPoint());
-        /*
-        System.out.println();
-        System.out.println("Game lasted " + turnNumber + " turns");
-        System.out.println("Scores:");
-        for (Player player : players) {
-            System.out.print(points(player) + " " + player.color() + " (" + player.bot() + ")");
-            int vp = player.developments().victoryPoint();
-            if (vp > 0)
-                System.out.print(" (" + vp + " VP)");
-            if (largestArmy == player && player.armyStrength() >= 3)
-                System.out.print(" (2 ARMY)");
-            if (longestRoad == player && roadLength(player) >= 5)
-                System.out.print(" (2 ROAD)");
-            System.out.println();
-        }
-        */
     }
 
     void init() {
