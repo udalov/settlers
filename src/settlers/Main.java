@@ -59,6 +59,10 @@ public class Main {
                 e.printStackTrace();
             }
 
+            for (Player p : game.players()) {
+                System.out.println(p.color() + " " + p.bot());
+            }
+
             List<Pair<Player, List<Event>>> history = game.history().getAll();
             for (Pair<Player, List<Event>> pair : history) {
                 Player player = pair.first();
