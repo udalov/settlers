@@ -46,5 +46,17 @@ public class Util {
         return shuffle(list, new Random());
     }
 
+    public static void checkBotName(String name) {
+        if (name == null)
+            throw new RuntimeException("Name of your bot cannot be null");
+        if ("".equals(name))
+            throw new RuntimeException("Name of your bot cannot be empty");
+        if (name.length() > 256)
+            throw new RuntimeException("Name of your bot cannot be that long");
+        for (char c : name.toCharArray())
+            if ((int)c < 32 || 126 < (int)c)
+                throw new RuntimeException("Name of your bot can contain only characters with ASCII codes from 32 to 126");
+    }
+
 }
 

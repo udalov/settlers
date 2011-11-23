@@ -1,6 +1,7 @@
 package settlers;
 
 import settlers.bot.Bot;
+import settlers.util.Util;
 
 public class Player {
     
@@ -28,6 +29,7 @@ public class Player {
         settlementsLeft = 5;
         citiesLeft = 4;
         roadsLeft = 15;
+        Util.checkBotName(bot.toString());
     }
 
     public Color color() { return color; }

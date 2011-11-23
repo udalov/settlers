@@ -125,8 +125,7 @@ public class Main {
                         case VICTORY:
                             System.out.println("victory");
                             for (Player p : game.players()) {
-                                System.out.print(p.color());
-                                System.out.print(" " + game.points(p));
+                                System.out.print(p.color() + " " + game.points(p));
                                 int vp = p.developments().victoryPoint();
                                 if (vp > 0)
                                     System.out.print(" " + vp + "VP");
