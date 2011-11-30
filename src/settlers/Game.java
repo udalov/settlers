@@ -202,7 +202,7 @@ public class Game {
                             continue;
                         Resource res = board.resourceAt(hex);
                         int q = town.isCity() ? 2 : 1;
-                        int index = res.index();
+                        int index = res.ordinal();
                         if (step == 0) {
                             neededResCards[index] += q;
                         } else if (neededResCards[index] <= bank.howMany(res)) {
