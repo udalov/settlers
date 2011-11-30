@@ -2,6 +2,7 @@ package settlers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -365,7 +366,7 @@ public class Game {
             return true;
         if (!Util.resourceString(what))
             throw new RuntimeException("Invalid characters in resource string");
-        Map<Resource, Integer> left = new HashMap<Resource, Integer>();
+        Map<Resource, Integer> left = new EnumMap<Resource, Integer>(Resource.class);
         String buy = "";
         for (Resource r : Resource.all()) {
             int needed = Util.numberOfOccurrences(r.chr(), what);

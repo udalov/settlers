@@ -1,7 +1,7 @@
 package settlers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import settlers.util.Util;
@@ -9,7 +9,7 @@ import settlers.util.Util;
 public class CardStack {
 
     private final Map<Resource, Integer> resources =
-        new HashMap<Resource, Integer>();
+        new EnumMap<Resource, Integer>(Resource.class);
 
     CardStack() {
         for (Resource r : Resource.all())
