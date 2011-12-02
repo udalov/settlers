@@ -12,8 +12,8 @@ import settlers.util.Pair;
 
 public class Board {
 
-    public static final int[] DX = {1, -1, -2, -1, 1, 2};
-    public static final int[] DY = {1, 1, 0, -1, -1, 0};
+    private static final int[] DX = {1, -1, -2, -1, 1, 2};
+    private static final int[] DY = {1, 1, 0, -1, -1, 0};
     
     private final Map<Hex, Resource> resources;
     private final Map<Hex, Integer> numbers;
