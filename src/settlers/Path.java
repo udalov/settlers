@@ -15,5 +15,16 @@ public class Path {
     public int x() { return hex.x(); }
     public int y() { return hex.y(); }
     public String toString() { return "["+hex.x()+","+hex.y()+","+direction+"]"; }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof Path))
+            return false;
+        Path p = (Path)o;
+        return hex.equals(p.hex) && direction == p.direction;
+    }
+
+    public int hashCode() {
+        return (hex.hashCode() << 3) + direction;
+    }
 }
 

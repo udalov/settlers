@@ -50,5 +50,14 @@ public class Player {
 
     void increaseArmyStrength() { armyStrength++; }
     
+    public boolean equals(Object o) {
+        if (!(o instanceof Player))
+            return false;
+        return color == ((Player)o).color;
+    }
+
+    public int hashCode() {
+        return color.ordinal();
+    }
 }
 

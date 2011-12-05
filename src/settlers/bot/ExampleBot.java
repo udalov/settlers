@@ -191,8 +191,7 @@ public class ExampleBot extends Bot {
                 int ans = 0;
                 for (Hex c : Board.adjacentHexes(a)) {
                     int x = api.board().numberAt(c);
-                    if (x != 0)
-                        ans += 6 - Math.abs(x - 7);
+                    ans += Math.max(6 - Math.abs(x - 7), 0);
                 }
                 return ans;
             }
