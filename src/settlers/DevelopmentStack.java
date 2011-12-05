@@ -1,14 +1,14 @@
 package settlers;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class DevelopmentStack {
 
     private final Map<Development, Integer> developments =
-        new HashMap<Development, Integer>();
+        new EnumMap<Development, Integer>(Development.class);
     private final Map<Development, Integer> disabled =
-        new HashMap<Development, Integer>();
+        new EnumMap<Development, Integer>(Development.class);
 
     DevelopmentStack() {
         for (Development d : Development.all()) {
