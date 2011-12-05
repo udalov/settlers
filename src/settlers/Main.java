@@ -17,9 +17,15 @@ public class Main {
     
     public static void main(String[] args) {
         try {
-            Game game = new Game();
             Bot[] bots = null;
             boolean vis = false;
+            long randSeed = 0;
+
+            for (int i = 0; i < args.length; i++)
+                if ("-seed".equals(args[i]))
+                    randSeed = Long.parseLong(args[++i]);
+
+            Game game = new Game(randSeed);
 
             for (int i = 0; i < args.length; i++) {
                 if ("-3".equals(args[i]) || "-4".equals(args[i])) {
@@ -44,6 +50,8 @@ public class Main {
                     }
                 } else if ("-vis".equals(args[i])) {
                     vis = true;
+                } else if ("-seed".equals(args[i])) {
+                    ++i;
                 } else {
                     throw new IllegalArgumentException("Unknown parameter: " + args[i]);
                 }

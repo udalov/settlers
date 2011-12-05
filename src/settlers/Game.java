@@ -112,7 +112,7 @@ public class Game {
             { check(); return offer.counteroffer(new TradeOffer(me(), sell, buy)); }
     }
 
-    private final Random rnd = new Random(256);
+    private final Random rnd;
     
     private final List<Player> players = new ArrayList<Player>();
     private final Board board;
@@ -129,7 +129,8 @@ public class Game {
     private Player longestRoad;
     private final List<Development> developments = new ArrayList<Development>();
 
-    Game() {
+    Game(long randSeed) {
+        rnd = randSeed == 0 ? new Random() : new Random(randSeed);
         board = Board.create(rnd);
         for (int i = 0; i < 14; i++)
             developments.add(Development.KNIGHT);
@@ -519,11 +520,10 @@ public class Game {
         placeInitialSettlements();
 
         turnNumber = 0;
-        turn = players.get(players.size() - 1);
 
         while (true) {
+            turn = players.get(turnNumber % n);
             turnNumber++;
-            turn = players.get((index(turn) + 1) % n);
             diceRolled = 0;
             robberMoved = false;
             history.nextTurn(turn);
@@ -610,13 +610,6 @@ public class Game {
         if (z >= 3 && largestArmy != turn)
             history.largestArmy(z);
         largestArmy = turn;
-    }
-
-    int index(Player player) {
-        int ans = players.indexOf(player);
-        if (ans < 0)
-            throw new IllegalStateException("Internal: player not found");
-        return ans;
     }
 
     Player player(Bot bot) {
