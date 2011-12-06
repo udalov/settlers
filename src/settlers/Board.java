@@ -387,6 +387,22 @@ public class Board {
         return ans;
     }
 
+    public static List<Path> adjacentPaths(Path p) {
+        List<Path> ans = new ArrayList<Path>(4);
+        Xing[] x = endpoints(p);
+        for (Path path : allPaths()) {
+            if (path == p)
+                continue;
+            Xing[] y = endpoints(path);
+            if (areAdjacent(x[0], y[0])
+             || areAdjacent(x[0], y[1])
+             || areAdjacent(x[1], y[0])
+             || areAdjacent(x[1], y[1]))
+                ans.add(path);
+        }
+        return ans;
+    }
+
     public static List<Xing> adjacentXings(Xing a) {
         List<Xing> ans = new ArrayList<Xing>(3);
         for (Xing b : allXings())
