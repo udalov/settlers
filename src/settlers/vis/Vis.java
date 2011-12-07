@@ -9,18 +9,23 @@ import javax.swing.*;
 import settlers.*;
 import settlers.util.*;
 
-public class Vis extends JPanel implements WindowListener {
+public class Vis extends JPanel implements WindowListener, MouseListener {
 
-    public static final int WIDTH = 850;
-    public static final int HEIGHT = 650;
-    private static final int X0_POS = 200;
-    private static final int Y0_POS = 500;
+    public static final int WIDTH = 1150;
+    public static final int HEIGHT = 750;
+    private static final int X0_POS = 350;
+    private static final int Y0_POS = 450;
     private static final int HEX_SIZE = 54;
     private static final int TOWN_RADIUS = 10;
     private static final int PORT_DISTANCE = 8;
 
     private static final int[] DX = new int[] {2, 0, -2, -2, 0, 2};
     private static final int[] DY = new int[] {-1, -2, -1, 1, 2, 1};
+
+    private static final int[] PLAYER_INFO_X = new int[] {20, 970, 20, 970};
+    private static final int[] PLAYER_INFO_Y = new int[] {20, 20, 520, 520};
+    private static final int PLAYER_INFO_WIDTH = 150;
+    private static final int PLAYER_INFO_HEIGHT = 220;
 
     // TODO: generate
     private static final String[] PORTS = new String[] {
@@ -177,9 +182,22 @@ public class Vis extends JPanel implements WindowListener {
         }
     }
 
+    void drawPlayerInfo(Graphics g, Player player, int x, int y) {
+        g.setColor(new Color(0x4444FF));
+        g.fillRect(x, y, PLAYER_INFO_WIDTH, PLAYER_INFO_HEIGHT);
+        g.setColor(new Color(0xCCCCFF));
+        g.fillRect(x + 2, y + 2, PLAYER_INFO_WIDTH - 4, PLAYER_INFO_HEIGHT - 4);
+        g.setColor(playerColorToColor(player.color()));
+        g.setFont(new Font("Tahoma", Font.BOLD, 20));
+        g.drawString(player + "", x + 4, y + 22);
+    }
+
     public void paint(Graphics gg) {
         BufferedImage bi = new BufferedImage(WIDTH + 2, HEIGHT + 2, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D)bi.getGraphics();
+
+        g.setColor(new Color(0xFFFF77));
+        g.fillRect(-10, -10, WIDTH + 100, HEIGHT + 100);
 
         for (Hex c : Board.allHexes()) {
             drawHex(g, c);
@@ -198,6 +216,11 @@ public class Vis extends JPanel implements WindowListener {
         for (Xing i : Board.allXings()) {
             drawPort(g, i);
         }
+        int playerIndex = 0;
+        for (Player p : game.players()) {
+            drawPlayerInfo(g, p, PLAYER_INFO_X[playerIndex], PLAYER_INFO_Y[playerIndex]);
+            playerIndex++;
+        }
 
         gg.drawImage(bi, 1, 1, WIDTH, HEIGHT, null);
     }
@@ -211,5 +234,11 @@ public class Vis extends JPanel implements WindowListener {
     public void windowClosed(WindowEvent e) { }
     public void windowIconified(WindowEvent e) { }
     public void windowDeiconified(WindowEvent e) { }
+
+    public void mouseExited(MouseEvent e) { }
+    public void mouseEntered(MouseEvent e) { }
+    public void mouseReleased(MouseEvent e) { }
+    public void mousePressed(MouseEvent e) { }
+    public void mouseClicked(MouseEvent e) { }
 }
 
