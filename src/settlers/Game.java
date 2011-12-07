@@ -147,7 +147,7 @@ public class Game {
             bank.add(r, 19);
     }
 
-    List<Player> players() { return Collections.unmodifiableList(players); }
+    public List<Player> players() { return Collections.unmodifiableList(players); }
     public Board board() { return board; }
     public History history() { return history; }
     Player largestArmy() { return largestArmy; }
