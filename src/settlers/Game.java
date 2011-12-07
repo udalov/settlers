@@ -39,6 +39,7 @@ public class Game {
         public Player me() { return player(bot); }
         public Random rnd() { return game.rnd; }
         public Board board() { return game.board; }
+        public History history() { return game.history; }
         public List<Player> players() { return game.players(); }
         public int turnNumber() { return turnNumber; }
         public Player turn() { return turn; }

@@ -1,6 +1,7 @@
 package settlers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import settlers.util.Pair;
 
@@ -24,6 +25,18 @@ public class History {
         List<Pair<Player, List<Event>>> ans = new ArrayList<Pair<Player, List<Event>>>(events.size());
         for (Pair<Player, List<Event>> pair : events)
             ans.add(new Pair<Player, List<Event>>(pair.first(), new ArrayList<Event>(pair.second())));
+        return ans;
+    }
+
+    public List<Pair<Player, List<Event>>> getAllSinceMyLastTurn() {
+        List<Pair<Player, List<Event>>> ans = new ArrayList<Pair<Player, List<Event>>>(events.size());
+        if (events.isEmpty())
+            return ans;
+        final Player me = events.get(events.size() - 1).first();
+        for (int i = events.size() - 2; i >= 0 && events.get(i).first() != me; i--)
+            ans.add(new Pair<Player, List<Event>>(events.get(i).first(),
+                new ArrayList<Event>(events.get(i).second())));
+        Collections.reverse(ans);
         return ans;
     }
 
