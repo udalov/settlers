@@ -18,11 +18,11 @@ public class DevelopmentStack {
     }
 
     public int howMany(Development d) {
-        return developments.get(d);
+        return d == null ? 0 : developments.get(d);
     }
 
     public int howManyDisabled(Development d) {
-        return disabled.get(d);
+        return d == null ? 0 : disabled.get(d);
     }
 
     public int size() {

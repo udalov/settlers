@@ -16,7 +16,7 @@ public class ResourceStack {
             resources.put(r, 0);
     }
 
-    public int howMany(Resource r) { return resources.get(r); }
+    public int howMany(Resource r) { return r == null ? 0 : resources.get(r); }
 
     public int size() {
         int ans = 0;
@@ -34,6 +34,8 @@ public class ResourceStack {
     }
 
     public boolean areThere(String needed) {
+        if (needed == null || "".equals(needed))
+            return true;
         for (Resource r : Resource.all()) {
             int x = Util.numberOfOccurrences(r.chr(), needed);
             if (resources.get(r) < x)
