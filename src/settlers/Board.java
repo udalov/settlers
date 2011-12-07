@@ -198,6 +198,8 @@ public class Board {
 
     public List<Town> adjacentTowns(Hex c) {
         List<Town> ans = new ArrayList<Town>();
+        if (c == null)
+            return ans;
         for (Xing i : adjacentXings(c)) {
             Town t = towns.get(i);
             if (t != null)
@@ -208,7 +210,7 @@ public class Board {
 
 
     boolean canBuildTownAt(Xing i, boolean mustBeRoad, Player player) {
-        if (towns.get(i) != null)
+        if (i == null || towns.get(i) != null)
             return false;
         for (Xing j : adjacentXings(i))
             if (towns.get(j) != null)
@@ -221,8 +223,8 @@ public class Board {
         return false;
     }
 
-    public boolean canBuildRoadAt(Path p, Player player) {
-        if (roads.get(p) != null)
+    boolean canBuildRoadAt(Path p, Player player) {
+        if (p == null || roads.get(p) != null)
             return false;
         for (Xing i : endpoints(p)) {
             Town t = towns.get(i);
@@ -368,6 +370,8 @@ public class Board {
     }
 
     public static Path path(Hex hex, int direction) {
+        if (hex == null)
+            return null;
         int ind = enc(hex.x(), hex.y(), direction);
         if (ind < 0 || ind >= paths.length || paths[ind] == null)
             return null;
@@ -375,6 +379,8 @@ public class Board {
     }
 
     public static Xing xing(Hex hex, int direction) {
+        if (hex == null)
+            return null;
         int ind = enc(hex.x(), hex.y(), direction);
         if (ind < 0 || ind >= xings.length || xings[ind] == null)
             return null;
@@ -399,6 +405,8 @@ public class Board {
 
     public static List<Hex> adjacentHexes(Xing a) {
         List<Hex> ans = new ArrayList<Hex>(3);
+        if (a == null)
+            return ans;
         for (Hex hex : allHexes())
             for (int d = 0; d < 6; d++)
                 if (xing(hex, d) == a)
@@ -408,6 +416,8 @@ public class Board {
 
     public static List<Hex> adjacentHexes(Hex c) {
         List<Hex> ans = new ArrayList<Hex>(6);
+        if (c == null)
+            return ans;
         for (int d = 0; d < 6; d++) {
             Hex h = hex(c.x() + DX[d], c.y() + DY[d]);
             if (h != null)
@@ -418,6 +428,8 @@ public class Board {
 
     public static List<Path> adjacentPaths(Xing a) {
         List<Path> ans = new ArrayList<Path>(3);
+        if (a == null)
+            return ans;
         for (Path path : allPaths())
             if (areAdjacent(a, path))
                 ans.add(path);
@@ -426,6 +438,8 @@ public class Board {
 
     public static List<Path> adjacentPaths(Path p) {
         List<Path> ans = new ArrayList<Path>(4);
+        if (p == null)
+            return ans;
         Xing[] x = endpoints(p);
         for (Path path : allPaths()) {
             if (path == p)
@@ -442,6 +456,8 @@ public class Board {
 
     public static List<Xing> adjacentXings(Xing a) {
         List<Xing> ans = new ArrayList<Xing>(3);
+        if (a == null)
+            return ans;
         for (Xing b : allXings())
             if (areAdjacent(a, b))
                 ans.add(b);
@@ -450,13 +466,15 @@ public class Board {
 
     public static List<Xing> adjacentXings(Hex c) {
         List<Xing> ans = new ArrayList<Xing>(6);
+        if (c == null)
+            return ans;
         for (int d = 0; d < 6; d++)
             ans.add(xing(c, d));
         return ans;
     }
 
     public static Xing[] endpoints(Path p) {
-        return new Xing[] {
+        return p == null ? new Xing[] {} : new Xing[] {
             xing(p.hex(), p.direction()),
             xing(p.hex(), (p.direction() + 1) % 6),
         };
@@ -475,6 +493,8 @@ public class Board {
     }
 
     public static boolean areAdjacent(Xing a, Path p) {
+        if (a == null || p == null)
+            return false;
         Xing[] ends = endpoints(p);
         return ends[0] == a || ends[1] == a;
     }
