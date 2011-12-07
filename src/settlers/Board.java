@@ -68,8 +68,10 @@ public class Board {
             resources.put(allHexes.get(i), allResources.get(i));
 
         List<Integer> allNumbers = new ArrayList<Integer>();
+        for (int i = 0; i < 4; i++)
+            allNumbers.add(6 + 2 * (i / 2));
         for (int i = 2; i <= 12; i++) {
-            if (i == 7)
+            if (6 <= i && i <= 8)
                 continue;
             allNumbers.add(i);
             if (i == 2 || i == 12)
@@ -278,6 +280,9 @@ public class Board {
     private static final Hex[] hexes = new Hex[128];
     private static final Path[] paths = new Path[1024];
     private static final Xing[] xings = new Xing[1024];
+    private static final List<Hex> allHexes = new ArrayList<Hex>();
+    private static final List<Path> allPaths = new ArrayList<Path>();
+    private static final List<Xing> allXings = new ArrayList<Xing>();
 
     private static int enc(int x, int y) { return (x << 3) + y; }
     private static int enc(int x, int y, int d) { return (d << 7) + enc(x, y); }
@@ -335,6 +340,24 @@ public class Board {
                 }
             }
         }
+
+        Set<Hex> allHexes = new HashSet<Hex>();
+        for (Hex h : hexes)
+            if (h != null)
+                allHexes.add(h);
+        Board.allHexes.addAll(allHexes);
+
+        Set<Path> allPaths = new HashSet<Path>();
+        for (Path p : paths)
+            if (p != null)
+                allPaths.add(p);
+        Board.allPaths.addAll(allPaths);
+
+        Set<Xing> allXings = new HashSet<Xing>();
+        for (Xing x : xings)
+            if (x != null)
+                allXings.add(x);
+        Board.allXings.addAll(allXings);
     }
 
     public static Hex hex(int x, int y) {
@@ -357,6 +380,20 @@ public class Board {
             return null;
         return xings[ind];
     }
+
+
+    public static List<Hex> allHexes() {
+        return new ArrayList<Hex>(allHexes);
+    }
+
+    public static List<Path> allPaths() {
+        return new ArrayList<Path>(allPaths);
+    }
+
+    public static List<Xing> allXings() {
+        return new ArrayList<Xing>(allXings);
+    }
+
 
 
 
@@ -445,44 +482,5 @@ public class Board {
     public static boolean areAdjacent(Path p, Xing a) {
         return areAdjacent(a, p);
     }
-
-
-
-    private static List<Hex> ALL_HEXES = null;
-    public static List<Hex> allHexes() {
-        if (ALL_HEXES != null)
-            return ALL_HEXES;
-        List<Hex> ans = new ArrayList<Hex>();
-        for (int y = 0; y <= 4; y++)
-            for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2)
-                ans.add(hex(x, y));
-        ALL_HEXES = Collections.unmodifiableList(ans);
-        return ALL_HEXES;
-    }
-
-    private static List<Path> ALL_PATHS = null;
-    public static List<Path> allPaths() {
-        if (ALL_PATHS != null)
-            return ALL_PATHS;
-        Set<Path> ans = new HashSet<Path>();
-        for (Hex c : allHexes())
-            for (int d = 0; d < 6; d++)
-                ans.add(path(c, d));
-        ALL_PATHS = Collections.unmodifiableList(new ArrayList<Path>(ans));
-        return ALL_PATHS;
-    }
-
-    private static List<Xing> ALL_XINGS = null;
-    public static List<Xing> allXings() {
-        if (ALL_XINGS != null)
-            return ALL_XINGS;
-        Set<Xing> ans = new HashSet<Xing>();
-        for (Hex c : allHexes())
-            for (int d = 0; d < 6; d++)
-                ans.add(xing(c, d));
-        ALL_XINGS = Collections.unmodifiableList(new ArrayList<Xing>(ans));
-        return ALL_XINGS;
-    }
-
 }
 
