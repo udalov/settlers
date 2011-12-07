@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 import settlers.util.Util;
 
-public class CardStack {
+public class ResourceStack {
 
     private final Map<Resource, Integer> resources =
         new EnumMap<Resource, Integer>(Resource.class);
 
-    CardStack() {
+    ResourceStack() {
         for (Resource r : Resource.all())
             resources.put(r, 0);
     }

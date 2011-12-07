@@ -43,9 +43,9 @@ public class Game {
         public int turnNumber() { return turnNumber; }
         public Player turn() { return turn; }
 
-        public CardStack cards() { return player(bot).cards(); }
+        public ResourceStack cards() { return player(bot).cards(); }
         public DevelopmentStack developments() { return player(bot).developments(); }
-        public CardStack bank() { return game.bank; }
+        public ResourceStack bank() { return game.bank; }
 
         public int rollDice() { check(); return game.rollDice(); }
 
@@ -122,7 +122,7 @@ public class Game {
     private Player turn;
     private int diceRolled;
     private boolean robberMoved;
-    private final CardStack bank = new CardStack();
+    private final ResourceStack bank = new ResourceStack();
     private final History history = new History();
 
     private Player largestArmy;
