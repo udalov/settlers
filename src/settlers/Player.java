@@ -59,5 +59,9 @@ public class Player {
     public int hashCode() {
         return color.ordinal();
     }
+
+    public String toString() {
+        return bot.toString();
+    }
 }
 
