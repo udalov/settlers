@@ -1,11 +1,9 @@
 1. make canBuildTownAt & canBuildRoadAt easy to use before the game
-2. maybe move all Board's public API to Game.API
+2. trade with other player on his turn
 3. maybe make rob() Bot's method
-4. make allHexes, ... lazy modifiable
+4. (low-pri) invention in case there're no cards in the bank
 5. measure time of execution of each of the Bot's methods + introduce TL
 6. history of public events API
 7. trade resources to players with corresponding ports
 8. trade offers must expire after any action of the player
-9. (low-pri) invention in case there're no cards in the bank
-10. trade with other player on his turn
 
