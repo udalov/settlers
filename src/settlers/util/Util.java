@@ -51,7 +51,7 @@ public class Util {
             throw new RuntimeException("Name of your bot cannot be null");
         if ("".equals(name))
             throw new RuntimeException("Name of your bot cannot be empty");
-        if (name.length() > 256)
+        if (name.length() > 64)
             throw new RuntimeException("Name of your bot cannot be that long");
         for (char c : name.toCharArray())
             if ((int)c < 32 || 126 < (int)c)
