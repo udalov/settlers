@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import settlers.*;
 
-public class Vis extends JFrame implements WindowListener, MouseListener {
+public class Vis extends JFrame implements WindowListener, MouseListener, ComponentListener {
     
     public Vis(Game game) {
         setLayout(null);
@@ -22,13 +22,20 @@ public class Vis extends JFrame implements WindowListener, MouseListener {
         getContentPane().add(b);
 
         BoardVis v = new BoardVis(game);
-        v.setSize(BoardVis.WIDTH + 2, BoardVis.HEIGHT + 2);
+        v.setSize(BoardVis.WIDTH, BoardVis.HEIGHT);
         getContentPane().add(v);
+
         addWindowListener(this);
         addMouseListener(this);
+        addComponentListener(this);
 
-        setSize(BoardVis.WIDTH + 2, BoardVis.HEIGHT + 24);
-        setMinimumSize(new Dimension(BoardVis.WIDTH + 2, BoardVis.HEIGHT + 24));
+        pack();
+        Insets insets = getInsets();
+
+        int width = BoardVis.WIDTH + insets.left + insets.right;
+        int height = BoardVis.HEIGHT + insets.top + insets.bottom + bar.getSize().height;
+        setSize(width, height);
+        setMinimumSize(new Dimension(width, height));
         setVisible(true);
     }
 
@@ -47,5 +54,11 @@ public class Vis extends JFrame implements WindowListener, MouseListener {
     public void mouseReleased(MouseEvent e) { }
     public void mousePressed(MouseEvent e) { }
     public void mouseClicked(MouseEvent e) { }
+
+    public void componentResized(ComponentEvent e) {
+    }
+    public void componentHidden(ComponentEvent e) { }
+    public void componentShown(ComponentEvent e) { }
+    public void componentMoved(ComponentEvent e) { }
 }
 

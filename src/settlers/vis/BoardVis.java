@@ -48,6 +48,9 @@ public class BoardVis extends JPanel {
         this.path = new HashMap<Path, Polygon>();
     }
 
+    private int width() { return getSize().width; }
+    private int height() { return getSize().height; }
+
     int[][] calcHexagonVertices(int x, int y) {
         int[][] ans = new int[2][6];
         for (int d = 0; d < 6; d++) {
@@ -199,15 +202,15 @@ public class BoardVis extends JPanel {
 
     public void paintComponent(Graphics gg) {
         super.paintComponent(gg);
-        BufferedImage bi = new BufferedImage(WIDTH + 2, HEIGHT + 2, BufferedImage.TYPE_INT_RGB);
+        BufferedImage bi = new BufferedImage(width(), height(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D)bi.getGraphics();
 
         g.setColor(new Color(0xFFFF77));
-        g.fillRect(-10, -10, WIDTH + 100, HEIGHT + 100);
+        g.fillRect(0, 0, width(), height());
 
         drawBoard(g);
 
-        gg.drawImage(bi, 1, 1, WIDTH, HEIGHT, null);
+        gg.drawImage(bi, 0, 0, width(), height(), null);
     }
 }
 
