@@ -12,7 +12,7 @@ import settlers.bot.ExampleBot;
 import settlers.bot.StupidBot;
 import settlers.util.Pair;
 import settlers.util.Util;
-import settlers.vis.BoardVis;
+import settlers.vis.Vis;
 
 public class Main {
     
@@ -158,17 +158,8 @@ public class Main {
 
             printHistory(game, System.out);
 
-            if (vis) {
-                JFrame jf = new JFrame();
-                BoardVis v = new BoardVis(game);
-                jf.getContentPane().add(v);
-                jf.addWindowListener(v);
-                jf.addMouseListener(v);
-
-                jf.setSize(BoardVis.WIDTH + 2, BoardVis.HEIGHT + 24);
-                jf.setMinimumSize(new java.awt.Dimension(BoardVis.WIDTH + 2, BoardVis.HEIGHT + 24));
-                jf.setVisible(true);
-            }
+            if (vis)
+                new Vis(game);
         } catch (Exception e) {
             e.printStackTrace();
         }

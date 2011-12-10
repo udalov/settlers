@@ -9,7 +9,7 @@ import javax.swing.*;
 import settlers.*;
 import settlers.util.*;
 
-public class BoardVis extends JPanel implements WindowListener, MouseListener {
+public class BoardVis extends JPanel {
 
     public static final int WIDTH = 1020;
     public static final int HEIGHT = 740;
@@ -46,10 +46,6 @@ public class BoardVis extends JPanel implements WindowListener, MouseListener {
             hex.put(c, new Point(X0_POS + c.x() * HEX_SIZE, Y0_POS - c.y() * HEX_SIZE * 3 / 2));
         }
         this.path = new HashMap<Path, Polygon>();
-
-        JButton b = new JButton("button");
-        add(b);
-        b.setBounds(100, 100, 200, 200);
     }
 
     int[][] calcHexagonVertices(int x, int y) {
@@ -155,7 +151,7 @@ public class BoardVis extends JPanel implements WindowListener, MouseListener {
     }
 
     String resourceToPort(Resource r) {
-        return r == null ? "3:1" : r.toString().substring(0, 1);
+        return r == null ? "3:1" : r.chr() + "";
     }
 
     Color resourceToColor(Resource r) {
@@ -202,6 +198,7 @@ public class BoardVis extends JPanel implements WindowListener, MouseListener {
     }
 
     public void paintComponent(Graphics gg) {
+        super.paintComponent(gg);
         BufferedImage bi = new BufferedImage(WIDTH + 2, HEIGHT + 2, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D)bi.getGraphics();
 
@@ -212,21 +209,5 @@ public class BoardVis extends JPanel implements WindowListener, MouseListener {
 
         gg.drawImage(bi, 1, 1, WIDTH, HEIGHT, null);
     }
-
-    public void windowClosing(WindowEvent e) { 
-        System.exit(0); 
-    }
-    public void windowActivated(WindowEvent e) { }
-    public void windowDeactivated(WindowEvent e) { }
-    public void windowOpened(WindowEvent e) { }
-    public void windowClosed(WindowEvent e) { }
-    public void windowIconified(WindowEvent e) { }
-    public void windowDeiconified(WindowEvent e) { }
-
-    public void mouseExited(MouseEvent e) { }
-    public void mouseEntered(MouseEvent e) { }
-    public void mouseReleased(MouseEvent e) { }
-    public void mousePressed(MouseEvent e) { }
-    public void mouseClicked(MouseEvent e) { }
 }
 
