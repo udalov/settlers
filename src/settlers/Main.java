@@ -1,6 +1,7 @@
 package settlers;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.lang.reflect.Constructor;
@@ -11,11 +12,95 @@ import settlers.bot.ExampleBot;
 import settlers.bot.StupidBot;
 import settlers.util.Pair;
 import settlers.util.Util;
-import settlers.vis.Vis;
+import settlers.vis.BoardVis;
 
 public class Main {
     
-    public static void main(String[] args) {
+    void printHistory(Game game, PrintStream out) {
+        List<Pair<Player, List<Event>>> history = game.history().getAll();
+        for (Pair<Player, List<Event>> pair : history) {
+            Player player = pair.first();
+            List<Event> events = pair.second();
+            if (player != null) {
+                out.println("- " + player.color());
+            }
+            for (Event event : events) {
+                switch (event.type()) {
+                    case INITIAL_ROAD:
+                        out.println(event.player().color() + " road " + event.path());
+                        break;
+                    case INITIAL_SETTLEMENT:
+                        out.println(event.player().color() + " settlement " + event.xing());
+                        break;
+                    case ROLL_DICE:
+                        out.println("roll " + event.number());
+                        break;
+                    case ROBBER:
+                        out.println("robber " + event.hex() + " " + (event.player() == null ? "nobody" : event.player().color()));
+                        break;
+                    case RESOURCES:
+                        // TODO?
+                        break;
+                    case DISCARD:
+                        out.println("discard " + event.player().color() + " " + Util.toResourceString(event.resources()));
+                        break;
+                    case ROAD:
+                        out.println("road " + event.path());
+                        break;
+                    case SETTLEMENT:
+                        out.println("settlement " + event.xing());
+                        break;
+                    case CITY:
+                        out.println("city " + event.xing());
+                        break;
+                    case DEVELOPMENT:
+                        out.println("development");
+                        break;
+                    case KNIGHT:
+                        out.println("knight");
+                        break;
+                    case INVENTION:
+                        out.println("invention " + event.resource() + " " + event.resource2());
+                        break;
+                    case MONOPOLY:
+                        out.println("monopoly " + event.resource() + " " + event.number());
+                        break;
+                    case ROAD_BUILDING:
+                        out.println("roadbuilding " + event.path() + " " + event.path2());
+                        break;
+                    case LONGEST_ROAD:
+                        out.println("longestroad " + event.number());
+                        break;
+                    case LARGEST_ARMY:
+                        out.println("largestarmy " + event.number());
+                        break;
+                    case CHANGE:
+                        out.println("change " + event.sell() + " " + event.buy());
+                        break;
+                    case TRADE:
+                        out.println("trade " + event.player().color() + " " + event.sell() + " " + event.buy());
+                        break;
+                    case VICTORY:
+                        out.println("victory");
+                        for (Player p : game.players()) {
+                            out.print(p.color() + " " + game.points(p));
+                            int vp = p.developments().victoryPoint();
+                            if (vp > 0)
+                                out.print(" " + vp + "VP");
+                            if (game.largestArmy() == p && p.armyStrength() >= 3)
+                                out.print(" ARMY");
+                            if (game.longestRoad() == p && game.roadLength(p) >= 5)
+                                out.print(" ROAD");
+                            out.println();
+                        }
+                        break;
+                }
+            }
+        }
+        out.println(history.size() - 1 + " turns");
+    }
+
+    void run(String[] args) {
         try {
             Bot[] bots = null;
             boolean vis = false;
@@ -71,101 +156,26 @@ public class Main {
                 System.out.println(p.color() + " " + p.bot());
             }
 
-            List<Pair<Player, List<Event>>> history = game.history().getAll();
-            for (Pair<Player, List<Event>> pair : history) {
-                Player player = pair.first();
-                List<Event> events = pair.second();
-                if (player != null) {
-                    System.out.println("- " + player.color());
-                }
-                for (Event event : events) {
-                    switch (event.type()) {
-                        case INITIAL_ROAD:
-                            System.out.println(event.player().color() + " road " + event.path());
-                            break;
-                        case INITIAL_SETTLEMENT:
-                            System.out.println(event.player().color() + " settlement " + event.xing());
-                            break;
-                        case ROLL_DICE:
-                            System.out.println("roll " + event.number());
-                            break;
-                        case ROBBER:
-                            System.out.println("robber " + event.hex() + " " + (event.player() == null ? "nobody" : event.player().color()));
-                            break;
-                        case RESOURCES:
-                            // TODO?
-                            break;
-                        case DISCARD:
-                            System.out.println("discard " + event.player().color() + " " + Util.toResourceString(event.resources()));
-                            break;
-                        case ROAD:
-                            System.out.println("road " + event.path());
-                            break;
-                        case SETTLEMENT:
-                            System.out.println("settlement " + event.xing());
-                            break;
-                        case CITY:
-                            System.out.println("city " + event.xing());
-                            break;
-                        case DEVELOPMENT:
-                            System.out.println("development");
-                            break;
-                        case KNIGHT:
-                            System.out.println("knight");
-                            break;
-                        case INVENTION:
-                            System.out.println("invention " + event.resource() + " " + event.resource2());
-                            break;
-                        case MONOPOLY:
-                            System.out.println("monopoly " + event.resource() + " " + event.number());
-                            break;
-                        case ROAD_BUILDING:
-                            System.out.println("roadbuilding " + event.path() + " " + event.path2());
-                            break;
-                        case LONGEST_ROAD:
-                            System.out.println("longestroad " + event.number());
-                            break;
-                        case LARGEST_ARMY:
-                            System.out.println("largestarmy " + event.number());
-                            break;
-                        case CHANGE:
-                            System.out.println("change " + event.sell() + " " + event.buy());
-                            break;
-                        case TRADE:
-                            System.out.println("trade " + event.player().color() + " " + event.sell() + " " + event.buy());
-                            break;
-                        case VICTORY:
-                            System.out.println("victory");
-                            for (Player p : game.players()) {
-                                System.out.print(p.color() + " " + game.points(p));
-                                int vp = p.developments().victoryPoint();
-                                if (vp > 0)
-                                    System.out.print(" " + vp + "VP");
-                                if (game.largestArmy() == p && p.armyStrength() >= 3)
-                                    System.out.print(" ARMY");
-                                if (game.longestRoad() == p && game.roadLength(p) >= 5)
-                                    System.out.print(" ROAD");
-                                System.out.println();
-                            }
-                            break;
-                    }
-                }
-            }
-            System.out.println(history.size() - 1 + " turns");
+            printHistory(game, System.out);
 
             if (vis) {
                 JFrame jf = new JFrame();
-                Vis v = new Vis(game);
+                BoardVis v = new BoardVis(game);
                 jf.getContentPane().add(v);
                 jf.addWindowListener(v);
                 jf.addMouseListener(v);
 
-                jf.setSize(Vis.WIDTH + 2, Vis.HEIGHT + 24);
+                jf.setSize(BoardVis.WIDTH + 2, BoardVis.HEIGHT + 24);
+                jf.setMinimumSize(new java.awt.Dimension(BoardVis.WIDTH + 2, BoardVis.HEIGHT + 24));
                 jf.setVisible(true);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        new Main().run(args);
     }
 
 }

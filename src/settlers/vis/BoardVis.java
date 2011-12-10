@@ -9,10 +9,10 @@ import javax.swing.*;
 import settlers.*;
 import settlers.util.*;
 
-public class Vis extends JPanel implements WindowListener, MouseListener {
+public class BoardVis extends JPanel implements WindowListener, MouseListener {
 
-    public static final int WIDTH = 1150;
-    public static final int HEIGHT = 750;
+    public static final int WIDTH = 1020;
+    public static final int HEIGHT = 740;
     private static final int X0_POS = 350;
     private static final int Y0_POS = 450;
     private static final int HEX_SIZE = 54;
@@ -21,11 +21,6 @@ public class Vis extends JPanel implements WindowListener, MouseListener {
 
     private static final int[] DX = new int[] {2, 0, -2, -2, 0, 2};
     private static final int[] DY = new int[] {-1, -2, -1, 1, 2, 1};
-
-    private static final int[] PLAYER_INFO_X = new int[] {20, 970, 20, 970};
-    private static final int[] PLAYER_INFO_Y = new int[] {20, 20, 520, 520};
-    private static final int PLAYER_INFO_WIDTH = 150;
-    private static final int PLAYER_INFO_HEIGHT = 220;
 
     // TODO: generate
     private static final String[] PORTS = new String[] {
@@ -42,7 +37,8 @@ public class Vis extends JPanel implements WindowListener, MouseListener {
     private final Map<Hex, Point> hex;
     private final Map<Path, Polygon> path;
 
-    public Vis(Game game) {
+    public BoardVis(Game game) {
+        super(null);
         this.game = game;
         this.board = game.board();
         this.hex = new HashMap<Hex, Point>();
@@ -50,7 +46,10 @@ public class Vis extends JPanel implements WindowListener, MouseListener {
             hex.put(c, new Point(X0_POS + c.x() * HEX_SIZE, Y0_POS - c.y() * HEX_SIZE * 3 / 2));
         }
         this.path = new HashMap<Path, Polygon>();
-        Board.allPaths();
+
+        JButton b = new JButton("button");
+        add(b);
+        b.setBounds(100, 100, 200, 200);
     }
 
     int[][] calcHexagonVertices(int x, int y) {
@@ -182,23 +181,7 @@ public class Vis extends JPanel implements WindowListener, MouseListener {
         }
     }
 
-    void drawPlayerInfo(Graphics g, Player player, int x, int y) {
-        g.setColor(new Color(0x4444FF));
-        g.fillRect(x, y, PLAYER_INFO_WIDTH, PLAYER_INFO_HEIGHT);
-        g.setColor(new Color(0xCCCCFF));
-        g.fillRect(x + 2, y + 2, PLAYER_INFO_WIDTH - 4, PLAYER_INFO_HEIGHT - 4);
-        g.setColor(playerColorToColor(player.color()));
-        g.setFont(new Font("Tahoma", Font.BOLD, 20));
-        g.drawString(player + "", x + 4, y + 22);
-    }
-
-    public void paint(Graphics gg) {
-        BufferedImage bi = new BufferedImage(WIDTH + 2, HEIGHT + 2, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = (Graphics2D)bi.getGraphics();
-
-        g.setColor(new Color(0xFFFF77));
-        g.fillRect(-10, -10, WIDTH + 100, HEIGHT + 100);
-
+    void drawBoard(Graphics2D g) {
         for (Hex c : Board.allHexes()) {
             drawHex(g, c);
         }
@@ -216,11 +199,16 @@ public class Vis extends JPanel implements WindowListener, MouseListener {
         for (Xing i : Board.allXings()) {
             drawPort(g, i);
         }
-        int playerIndex = 0;
-        for (Player p : game.players()) {
-            drawPlayerInfo(g, p, PLAYER_INFO_X[playerIndex], PLAYER_INFO_Y[playerIndex]);
-            playerIndex++;
-        }
+    }
+
+    public void paintComponent(Graphics gg) {
+        BufferedImage bi = new BufferedImage(WIDTH + 2, HEIGHT + 2, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = (Graphics2D)bi.getGraphics();
+
+        g.setColor(new Color(0xFFFF77));
+        g.fillRect(-10, -10, WIDTH + 100, HEIGHT + 100);
+
+        drawBoard(g);
 
         gg.drawImage(bi, 1, 1, WIDTH, HEIGHT, null);
     }
