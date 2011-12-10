@@ -11,10 +11,6 @@ import settlers.util.*;
 
 public class BoardVis extends JPanel {
 
-    public static final int WIDTH = 1020;
-    public static final int HEIGHT = 740;
-    private static final int X0_POS = 350;
-    private static final int Y0_POS = 450;
     private static final int HEX_SIZE = 54;
     private static final int TOWN_RADIUS = 10;
     private static final int PORT_DISTANCE = 8;
@@ -42,14 +38,19 @@ public class BoardVis extends JPanel {
         this.game = game;
         this.board = game.board();
         this.hex = new HashMap<Hex, Point>();
-        for (Hex c : Board.allHexes()) {
-            hex.put(c, new Point(X0_POS + c.x() * HEX_SIZE, Y0_POS - c.y() * HEX_SIZE * 3 / 2));
-        }
         this.path = new HashMap<Path, Polygon>();
     }
 
     private int width() { return getSize().width; }
     private int height() { return getSize().height; }
+
+    void recalcHexes() {
+        final int width = width();
+        final int height = height();
+        for (Hex c : Board.allHexes()) {
+            hex.put(c, new Point((c.x() - 4) * HEX_SIZE + width / 2, height / 2 - (c.y() - 1) * HEX_SIZE * 3 / 2));
+        }
+    }
 
     int[][] calcHexagonVertices(int x, int y) {
         int[][] ans = new int[2][6];
@@ -208,6 +209,7 @@ public class BoardVis extends JPanel {
         g.setColor(new Color(0xFFFF77));
         g.fillRect(0, 0, width(), height());
 
+        recalcHexes();
         drawBoard(g);
 
         gg.drawImage(bi, 0, 0, width(), height(), null);

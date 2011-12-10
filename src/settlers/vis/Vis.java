@@ -7,35 +7,42 @@ import settlers.*;
 
 public class Vis extends JFrame implements WindowListener, MouseListener, ComponentListener {
     
+    public static final int BOARD_WIDTH = 1020;
+    public static final int BOARD_HEIGHT = 740;
+
+    private final BoardVis board;
+    private final JMenuBar menuBar;
+
     public Vis(Game game) {
         setLayout(null);
 
-        JMenuBar bar = new JMenuBar();
+        menuBar = new JMenuBar();
         JMenu menu = new JMenu("testmenu");
         JMenuItem item = new JMenuItem("testitem");
         menu.add(item);
-        bar.add(menu);
-        setJMenuBar(bar);
+        menuBar.add(menu);
+        setJMenuBar(menuBar);
 
         JButton b = new JButton("testbutton");
         b.setBounds(100, 100, 100, 40);
         getContentPane().add(b);
 
-        BoardVis v = new BoardVis(game);
-        v.setSize(BoardVis.WIDTH, BoardVis.HEIGHT);
-        getContentPane().add(v);
+        board = new BoardVis(game);
+        board.setSize(BOARD_WIDTH, BOARD_HEIGHT);
+        getContentPane().add(board);
 
         addWindowListener(this);
         addMouseListener(this);
         addComponentListener(this);
 
         pack();
-        Insets insets = getInsets();
 
-        int width = BoardVis.WIDTH + insets.left + insets.right;
-        int height = BoardVis.HEIGHT + insets.top + insets.bottom + bar.getSize().height;
+        Insets insets = getInsets();
+        int width = BOARD_WIDTH + insets.left + insets.right;
+        int height = BOARD_HEIGHT + insets.top + insets.bottom + menuBar.getSize().height;
         setSize(width, height);
         setMinimumSize(new Dimension(width, height));
+
         setVisible(true);
     }
 
@@ -56,6 +63,11 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     public void mouseClicked(MouseEvent e) { }
 
     public void componentResized(ComponentEvent e) {
+        Insets insets = getInsets();
+        board.setSize(
+            getSize().width - insets.left - insets.right,
+            getSize().height - insets.top - insets.bottom - menuBar.getSize().height
+        );
     }
     public void componentHidden(ComponentEvent e) { }
     public void componentShown(ComponentEvent e) { }
