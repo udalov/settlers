@@ -12,23 +12,19 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
 
     private final BoardVis board;
     private final JMenuBar menuBar;
+    private final JButton nextActionButton;
 
     public Vis(Game game) {
         setLayout(null);
 
         menuBar = new JMenuBar();
-        JMenu menu = new JMenu("testmenu");
-        JMenuItem item = new JMenuItem("testitem");
-        menu.add(item);
-        menuBar.add(menu);
+        buildMenu();
         setJMenuBar(menuBar);
 
-        JButton b = new JButton("testbutton");
-        b.setBounds(100, 100, 100, 40);
-        getContentPane().add(b);
+        nextActionButton = new JButton("Next action");
+        getContentPane().add(nextActionButton);
 
         board = new BoardVis(game);
-        board.setSize(BOARD_WIDTH, BOARD_HEIGHT);
         getContentPane().add(board);
 
         addWindowListener(this);
@@ -44,6 +40,30 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         setMinimumSize(new Dimension(width, height));
 
         setVisible(true);
+    }
+
+    void buildMenu() {
+        final JMenu game = new JMenu("Game");
+
+        final JMenuItem gameNew = new JMenuItem("New...");
+        final JMenuItem gameQuit = new JMenuItem("Quit");
+
+        final ActionListener listener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Object o = e.getSource();
+                if (o == gameNew) {
+                } else if (o == gameQuit) {
+                    System.exit(0);
+                }
+            }
+        };
+
+        gameNew.addActionListener(listener);
+        gameQuit.addActionListener(listener);
+        game.add(gameNew);
+        game.addSeparator();
+        game.add(gameQuit);
+        menuBar.add(game);
     }
 
     public void windowClosing(WindowEvent e) { 
@@ -63,10 +83,19 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     public void mouseClicked(MouseEvent e) { }
 
     public void componentResized(ComponentEvent e) {
-        Insets insets = getInsets();
+        final int width = getSize().width;
+        final int height = getSize().height;
+        final Insets insets = getInsets();
+
+        final int nextActionWidth = 100;
+        final int nextActionHeight = 40;
+
+        nextActionButton.setLocation(width / 2 - nextActionWidth / 2, height - 200);
+        nextActionButton.setSize(nextActionWidth, nextActionHeight);
+
         board.setSize(
-            getSize().width - insets.left - insets.right,
-            getSize().height - insets.top - insets.bottom - menuBar.getSize().height
+            width - insets.left - insets.right,
+            height - insets.top - insets.bottom - menuBar.getSize().height
         );
     }
     public void componentHidden(ComponentEvent e) { }
