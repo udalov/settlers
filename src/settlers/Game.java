@@ -117,10 +117,9 @@ public class Game {
         private final Game game;
         GameThread() {
             game = Game.this;
-            game.init();
+            game.visual = true;
         }
         public void run() {
-            game.eventHappened();
             game.play();
         }
         public void next() {
@@ -174,18 +173,17 @@ public class Game {
 
     int turnNumber() { return turnNumber; }
 
-    void setVisual(boolean visual) { this.visual = visual; }
 
 
     void eventHappened() {
-        if (visual) {
-            try {
-                synchronized(this) {
-                    wait();
-                }
-            } catch (InterruptedException ie) {
-                // do nothing
+        if (!visual)
+            return;
+        try {
+            synchronized(this) {
+                wait();
             }
+        } catch (InterruptedException ie) {
+            // do nothing
         }
     }
 
@@ -583,6 +581,7 @@ public class Game {
         n = players.size();
         Collections.shuffle(players, rnd);
         turnNumber = -1;
+        eventHappened();
     }
 
     void placeInitialSettlements() {

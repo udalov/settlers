@@ -18,6 +18,9 @@ public class BoardVis extends JPanel {
     private static final int[] DX = new int[] {2, 0, -2, -2, 0, 2};
     private static final int[] DY = new int[] {-1, -2, -1, 1, 2, 1};
 
+    private static final int PLAYER_INFO_WIDTH = 160;
+    private static final int PLAYER_INFO_HEIGHT = 220;
+
     // TODO: generate
     private static final String[] PORTS = new String[] {
         "820,821,730,731,640",
@@ -112,6 +115,7 @@ public class BoardVis extends JPanel {
         }
         Point[] z = pathCoords(p);
         g.drawLine(z[0].x, z[0].y, z[1].x, z[1].y);
+        g.setStroke(new BasicStroke(1));
     }
 
     void drawXing(Graphics2D g, Xing i) {
@@ -201,6 +205,41 @@ public class BoardVis extends JPanel {
         }
     }
 
+    void drawPlayerInfo(Graphics g, Player player, int x, int y) {
+        final int arc = 16;
+        final int captionFont = 16;
+        final int font = 12;
+        final int caption = captionFont + 6;
+
+        g.setColor(new Color(0xAAAAFF));
+        g.fillRoundRect(x - 2, y - 2, PLAYER_INFO_WIDTH + 4, PLAYER_INFO_HEIGHT + 4, arc, arc);
+        g.setColor(playerColorToColor(player.color()));
+        g.fillRoundRect(x, y, PLAYER_INFO_WIDTH, caption + 24, arc, arc);
+        g.setColor(new Color(0xFFFFEE));
+        g.fillRect(x, y + caption, PLAYER_INFO_WIDTH, 50);
+        g.fillRoundRect(x, y + caption, PLAYER_INFO_WIDTH, PLAYER_INFO_HEIGHT - caption, arc, arc);
+        g.setColor(new Color(0xAAAAFF));
+        g.drawLine(x, y + caption, x + PLAYER_INFO_WIDTH, y + caption);
+
+        g.setFont(new Font("Tahoma", Font.BOLD, captionFont));
+        g.setColor(new Color(0x444444));
+        g.drawString(player + "", x + 4, y + captionFont + 2);
+        y += caption;
+
+        g.setFont(new Font("Tahoma", Font.PLAIN, font));
+        g.drawString("Resources: " + player.cardsNumber(), x + 4, y + font + 4);
+    }
+
+    void drawPlayersInfo(Graphics g) {
+        final int[] playerInfoX = new int[]
+            {20, width() - PLAYER_INFO_WIDTH - 20, width() - PLAYER_INFO_WIDTH - 20, 20};
+        final int[] playerInfoY = new int[]
+            {20, 20, height() - PLAYER_INFO_HEIGHT - 20, height() - PLAYER_INFO_HEIGHT - 20};
+        for (int i = 0; i < game.players().size(); i++) {
+            drawPlayerInfo(g, game.players().get(i), playerInfoX[i], playerInfoY[i]);
+        }
+    }
+
     static String eventDescription(Player player, settlers.Event event) {
         String color = player == null ? null : player.color() + "";
         switch (event.type()) {
@@ -243,7 +282,7 @@ public class BoardVis extends JPanel {
             case TRADE:
                 return color + " sells " + event.sell() + " to " + event.player().color() + " and buys " + event.buy();
             case VICTORY:
-                return color + " wins! " + (event.number() == 0 ? "" : "(" + event.number() + " VP)");
+                return color + " wins!" + (event.number() == 0 ? "" : " (" + event.number() + " VP)");
             default:
                 return "";
         }
@@ -270,6 +309,7 @@ public class BoardVis extends JPanel {
 
         recalcHexes();
         drawBoard(g);
+        drawPlayersInfo(g);
         drawLastHistoryEvent(g);
 
         gg.drawImage(bi, 0, 0, width(), height(), null);
