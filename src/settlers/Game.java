@@ -528,7 +528,7 @@ public class Game {
         return ans;
     }
 
-    int roadLength(Player player) {
+    public int roadLength(Player player) {
         return roadLengthWith(player, null);
     }
 
@@ -611,7 +611,7 @@ public class Game {
         turnNumber = 0;
     }
 
-    int points(Player player) {
+    public int points(Player player) {
         int points = 0;
         for (Pair<Xing, Town> pair : board.allTowns())
             if (pair.second().player() == player)
