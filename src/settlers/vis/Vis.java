@@ -11,13 +11,14 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     public static final int BOARD_HEIGHT = 740;
 
     private final Game game;
-    private final Game.GameThread thread;
+    private final Game.Runner thread;
 
     private final BoardVis boardVis;
     private final JMenuBar menuBar = new JMenuBar();
     private final JButton nextActionButton = new JButton("Next action");
+    private final JButton nextTurnButton = new JButton("Skip building phase");
 
-    public Vis(Game game, Game.GameThread thread) {
+    public Vis(Game game, Game.Runner thread) {
         setLayout(null);
 
         this.game = game;
@@ -27,10 +28,11 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         setJMenuBar(menuBar);
 
         buildButtons();
-        getContentPane().add(nextActionButton);
+        add(nextActionButton);
+        add(nextTurnButton);
 
         boardVis = new BoardVis(game);
-        getContentPane().add(boardVis);
+        add(boardVis);
 
         addWindowListener(this);
         addMouseListener(this);
@@ -74,18 +76,25 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
 
     void buildButtons() {
         final ActionListener listener = new ActionListener() {
+            private void nextAction() {
+                thread.next();
+                // TODO: invent something different
+                try { Thread.sleep(90); } catch (InterruptedException ie) { }
+                synchronized(game) { }
+                repaint();
+            }
+
             public void actionPerformed(ActionEvent e) {
                 Object o = e.getSource();
                 if (o == nextActionButton) {
-                    thread.next();
-                    // TODO: invent something different
-                    try { Thread.sleep(90); } catch (InterruptedException ie) { }
-                    synchronized(game) { }
-                    repaint();
+                    nextAction();
+                } else if (o == nextTurnButton) {
+                    nextAction();
                 }
             }
         };
         nextActionButton.addActionListener(listener);
+        nextTurnButton.addActionListener(listener);
     }
 
     public void windowClosing(WindowEvent e) { 
@@ -109,11 +118,15 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         final int height = getSize().height;
         final Insets insets = getInsets();
 
-        final int nextActionWidth = 100;
+        final int nextActionWidth = 200;
         final int nextActionHeight = 40;
+        final int nextTurnWidth = 200;
+        final int nextTurnHeight = 40;
 
         nextActionButton.setLocation(width / 2 - nextActionWidth / 2, height - 200);
         nextActionButton.setSize(nextActionWidth, nextActionHeight);
+        nextTurnButton.setLocation(width / 2 - nextTurnWidth / 2, height - 180 + nextActionHeight);
+        nextTurnButton.setSize(nextTurnWidth, nextTurnHeight);
 
         boardVis.setSize(
             width - insets.left - insets.right,

@@ -113,9 +113,9 @@ public class Game {
             { check(); return offer.counteroffer(new TradeOffer(me(), sell, buy)); }
     }
 
-    public class GameThread implements Runnable {
+    public class Runner implements Runnable {
         private final Game game;
-        GameThread() {
+        Runner() {
             game = Game.this;
             game.visual = true;
         }

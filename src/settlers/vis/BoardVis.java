@@ -208,7 +208,7 @@ public class BoardVis extends JPanel {
     void drawPlayerInfo(Graphics g, Player player, int x, int y) {
         final int arc = 16;
         final int captionFont = 16;
-        final int font = 12;
+        final int line = 14;
         final int caption = captionFont + 6;
 
         g.setColor(new Color(0xAAAAFF));
@@ -226,12 +226,12 @@ public class BoardVis extends JPanel {
         g.drawString(player + "", x + 4, y + captionFont + 2);
         y += caption;
 
-        g.setFont(new Font("Tahoma", Font.PLAIN, font));
-        g.drawString("Resources: " + player.cardsNumber(), x + 4, y + font + 4);
-        g.drawString("Development cards: " + player.developmentsNumber(), x + 4, y + 2 * font + 4);
-        g.drawString("Road length: " + game.roadLength(player), x + 4, y + 3 * font + 4);
-        g.drawString("Army size: " + player.armyStrength(), x + 4, y + 4 * font + 4);
-        g.drawString("Points: " + game.points(player), x + 4, y + 5 * font + 4);
+        g.setFont(new Font("Tahoma", Font.PLAIN, line - 2));
+        g.drawString("Resources: " + player.cardsNumber(), x + 4, y + line + 4);
+        g.drawString("Development cards: " + player.developmentsNumber(), x + 4, y + 2*line + 4);
+        g.drawString("Road length: " + game.roadLength(player), x + 4, y + 3*line + 4);
+        g.drawString("Army size: " + player.armyStrength(), x + 4, y + 4*line + 4);
+        g.drawString("Points: " + game.points(player), x + 4, y + 5*line + 4);
     }
 
     void drawPlayersInfo(Graphics g) {
