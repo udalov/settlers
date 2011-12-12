@@ -26,9 +26,9 @@ public class Player {
     Player(Bot bot, Color color) {
         this.bot = bot;
         this.color = color;
-        settlementsLeft = 5;
+        settlementsLeft = 5 - 2;
         citiesLeft = 4;
-        roadsLeft = 15;
+        roadsLeft = 15 - 2;
         Util.checkBotName(bot.toString());
     }
 
