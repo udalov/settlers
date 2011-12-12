@@ -10,22 +10,27 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     public static final int BOARD_WIDTH = 1020;
     public static final int BOARD_HEIGHT = 740;
 
-    private final BoardVis board;
-    private final JMenuBar menuBar;
-    private final JButton nextActionButton;
+    private final Game game;
+    private final Game.GameThread thread;
 
-    public Vis(Game game) {
+    private final BoardVis boardVis;
+    private final JMenuBar menuBar = new JMenuBar();
+    private final JButton nextActionButton = new JButton("Next action");
+
+    public Vis(Game game, Game.GameThread thread) {
         setLayout(null);
 
-        menuBar = new JMenuBar();
+        this.game = game;
+        this.thread = thread;
+
         buildMenu();
         setJMenuBar(menuBar);
 
-        nextActionButton = new JButton("Next action");
+        buildButtons();
         getContentPane().add(nextActionButton);
 
-        board = new BoardVis(game);
-        getContentPane().add(board);
+        boardVis = new BoardVis(game);
+        getContentPane().add(boardVis);
 
         addWindowListener(this);
         addMouseListener(this);
@@ -33,9 +38,9 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
 
         pack();
 
-        Insets insets = getInsets();
-        int width = BOARD_WIDTH + insets.left + insets.right;
-        int height = BOARD_HEIGHT + insets.top + insets.bottom + menuBar.getSize().height;
+        final Insets insets = getInsets();
+        final int width = BOARD_WIDTH + insets.left + insets.right;
+        final int height = BOARD_HEIGHT + insets.top + insets.bottom + menuBar.getSize().height;
         setSize(width, height);
         setMinimumSize(new Dimension(width, height));
 
@@ -60,10 +65,23 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
 
         gameNew.addActionListener(listener);
         gameQuit.addActionListener(listener);
-        game.add(gameNew);
-        game.addSeparator();
+        // game.add(gameNew);
+        // game.addSeparator();
         game.add(gameQuit);
         menuBar.add(game);
+    }
+
+    void buildButtons() {
+        final ActionListener listener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Object o = e.getSource();
+                if (o == nextActionButton) {
+                    thread.next();
+                    repaint();
+                }
+            }
+        };
+        nextActionButton.addActionListener(listener);
     }
 
     public void windowClosing(WindowEvent e) { 
@@ -93,7 +111,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         nextActionButton.setLocation(width / 2 - nextActionWidth / 2, height - 200);
         nextActionButton.setSize(nextActionWidth, nextActionHeight);
 
-        board.setSize(
+        boardVis.setSize(
             width - insets.left - insets.right,
             height - insets.top - insets.bottom - menuBar.getSize().height
         );

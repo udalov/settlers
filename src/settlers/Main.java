@@ -25,7 +25,8 @@ public class Main {
             case ROLL_DICE:
                 out.println("roll " + event.number()); break;
             case ROBBER:
-                out.println("robber " + event.hex() + " " + (event.player() == null ? "nobody" : event.player().color())); break;
+                Player pl = event.player();
+                out.println("robber " + event.hex() + " " + (pl == null ? "nobody" : pl.color())); break;
             case RESOURCES:
                 // TODO?
                 break;
@@ -73,6 +74,10 @@ public class Main {
     }
 
     void printHistory(Game game, PrintStream out) {
+        for (Player p : game.players()) {
+            System.out.println(p.color() + " " + p.bot());
+        }
+
         List<Pair<Player, List<Event>>> history = game.history().getAll();
         for (Pair<Player, List<Event>> pair : history) {
             Player player = pair.first();
@@ -84,6 +89,7 @@ public class Main {
                 printEvent(event, game, out);
             }
         }
+
         out.println(history.size() - 1 + " turns");
     }
 
@@ -133,20 +139,16 @@ public class Main {
                 game.addPlayer(new Player(bots[i], Player.Color.values()[i]));
             }
 
-            try {
-                game.play();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (vis) {
+                new Vis(game, game.new GameThread());
+            } else {
+                try {
+                    game.play();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                printHistory(game, System.out);
             }
-
-            for (Player p : game.players()) {
-                System.out.println(p.color() + " " + p.bot());
-            }
-
-            printHistory(game, System.out);
-
-            if (vis)
-                new Vis(game);
         } catch (Exception e) {
             e.printStackTrace();
         }

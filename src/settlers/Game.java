@@ -113,8 +113,23 @@ public class Game {
             { check(); return offer.counteroffer(new TradeOffer(me(), sell, buy)); }
     }
 
+    public class GameThread {
+        private final Game game;
+        GameThread() {
+            game = Game.this;
+            game.init();
+        }
+        public void next() {
+            if (game.turnNumber == -1) {
+                placeInitialSettlements();
+            } else {
+                game.nextTurn();
+            }
+        }
+    }
+
     private final Random rnd;
-    
+
     private final List<Player> players = new ArrayList<Player>();
     private final Board board;
 
@@ -154,6 +169,7 @@ public class Game {
     Player longestRoad() { return longestRoad; }
 
     int turnNumber() { return turnNumber; }
+
 
 
 
@@ -516,38 +532,41 @@ public class Game {
         players.add(player);
     }
 
+    boolean nextTurn() {
+        turn = players.get(turnNumber++ % n);
+        diceRolled = 0;
+        robberMoved = false;
+        history.nextTurn(turn);
+
+        turn.bot().makeTurn();
+
+        turn.developments().reenable();
+        updateLongestRoad();
+
+        if (playerHasWon()) {
+            history.victory(turn.developments().victoryPoint());
+            return true;
+        }
+
+        if (diceRolled == 0)
+            throw new RuntimeException("You must roll the dice once a turn");
+        if (diceRolled == 7 && !robberMoved)
+            throw new RuntimeException("You must move the robber if you rolled 7");
+
+        return false;
+    }
+
     void play() {
         init();
         placeInitialSettlements();
 
-        turnNumber = 0;
-
-        while (true) {
-            turn = players.get(turnNumber % n);
-            turnNumber++;
-            diceRolled = 0;
-            robberMoved = false;
-            history.nextTurn(turn);
-
-            turn.bot().makeTurn();
-
-            turn.developments().reenable();
-            updateLongestRoad();
-
-            if (playerHasWon()) break;
-
-            if (diceRolled == 0)
-                throw new RuntimeException("You must roll the dice once a turn");
-            if (diceRolled == 7 && !robberMoved)
-                throw new RuntimeException("You must move the robber if you rolled 7");
-        }
-
-        history.victory(turn.developments().victoryPoint());
+        while (!nextTurn());
     }
 
     void init() {
         n = players.size();
         Collections.shuffle(players, rnd);
+        turnNumber = -1;
     }
 
     void placeInitialSettlements() {
@@ -574,6 +593,7 @@ public class Game {
                 }
             }
         }
+        turnNumber = 0;
     }
 
     int points(Player player) {
