@@ -201,6 +201,65 @@ public class BoardVis extends JPanel {
         }
     }
 
+    static String eventDescription(Player player, settlers.Event event) {
+        String color = player == null ? null : player.color() + "";
+        switch (event.type()) {
+            case INITIAL_ROAD:
+                return event.player().color() + " builds initial road";
+            case INITIAL_SETTLEMENT:
+                return event.player().color() + " builds initial settlement";
+            case ROLL_DICE:
+                return color + " rolls " + event.number();
+            case ROBBER:
+                Player pl = event.player();
+                return color + " moves the robber and robs " + (pl == null ? "nobody" : pl.color());
+            case RESOURCES:
+                // TODO?
+                return "";
+            case DISCARD:
+                return color + " discards " + Util.toResourceString(event.resources());
+            case ROAD:
+                return color + " builds a road";
+            case SETTLEMENT:
+                return color + " builds a settlement";
+            case CITY:
+                return color + " builds a city";
+            case DEVELOPMENT:
+                return color + " draws a development card";
+            case KNIGHT:
+                return color + " plays knight";
+            case INVENTION:
+                return color + " plays " + event.resource() + ", " + event.resource2() + " invention";
+            case MONOPOLY:
+                return color + " plays monopoly and receives " + event.number() + " of " + event.resource();
+            case ROAD_BUILDING:
+                return color + " plays road building";
+            case LONGEST_ROAD:
+                return color + " receives the longest road (" + event.number() + ")";
+            case LARGEST_ARMY:
+                return color + " receives the largest army (" + event.number() + ")";
+            case CHANGE:
+                return color + " changes " + event.sell() + " to " + event.buy();
+            case TRADE:
+                return color + " sells " + event.sell() + " to " + event.player().color() + " and buys " + event.buy();
+            case VICTORY:
+                return color + " wins! " + (event.number() == 0 ? "" : "(" + event.number() + " VP)");
+            default:
+                return "";
+        }
+    }
+
+    void drawLastHistoryEvent(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Tahoma", Font.BOLD, 24));
+        Pair<Player, settlers.Event> pair = game.history().getLastEvent();
+        String str = pair == null ? "" : eventDescription(pair.first(), pair.second());
+        g.drawString(str,
+            width() / 2 - g.getFontMetrics().stringWidth(str) / 2,
+            32
+        );
+    }
+
     public void paintComponent(Graphics gg) {
         super.paintComponent(gg);
         BufferedImage bi = new BufferedImage(width(), height(), BufferedImage.TYPE_INT_RGB);
@@ -211,6 +270,7 @@ public class BoardVis extends JPanel {
 
         recalcHexes();
         drawBoard(g);
+        drawLastHistoryEvent(g);
 
         gg.drawImage(bi, 0, 0, width(), height(), null);
     }

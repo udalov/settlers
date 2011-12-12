@@ -1,7 +1,7 @@
 1. make canBuildTownAt & canBuildRoadAt easy to use before the game
 2. trade with other player on his turn
 3. maybe make rob() Bot's method
-4. (low-pri) invention in case there're no cards in the bank
+4. (low-pri) invention in case there're no cards in the bank (+strings in UI)
 5. measure time of execution of each of the Bot's methods + introduce TL
 6. (hi-pri) trade offers must expire after any action of the player
 7. trade resources to players with corresponding ports

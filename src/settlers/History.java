@@ -20,13 +20,21 @@ public class History {
     }
 
     private void addEvent(Event e) {
-System.out.println(e.type());
         events.get(events.size() - 1).second().add(e);
         game.eventHappened();
     }
 
     private void addEvent(EventType type, Object... o) {
         addEvent(new Event(type, o));
+    }
+
+    public Pair<Player, Event> getLastEvent() {
+        if (events.isEmpty())
+            return null;
+        Pair<Player, List<Event>> pair = events.get(events.size() - 1);
+        if (pair.second().isEmpty())
+            return null;
+        return Pair.make(pair.first(), pair.second().get(pair.second().size() - 1));
     }
 
     public List<Pair<Player, List<Event>>> getAll() {
