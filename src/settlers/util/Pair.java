@@ -24,5 +24,14 @@ public class Pair<T, U> {
         return h1 ^ (h2 << 1);
     }
 
+    public boolean equals(Object o) {
+        if (!(o instanceof Pair))
+            return false;
+        Pair<?, ?> p = (Pair<?, ?>)o;
+        return
+            (first == null ? p.first == null : first.equals(p.first)) &&
+            (second == null ? p.second == null : second.equals(p.second));
+    }
+
 }
 
