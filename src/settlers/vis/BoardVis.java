@@ -228,6 +228,10 @@ public class BoardVis extends JPanel {
 
         g.setFont(new Font("Tahoma", Font.PLAIN, font));
         g.drawString("Resources: " + player.cardsNumber(), x + 4, y + font + 4);
+        g.drawString("Development cards: " + player.developmentsNumber(), x + 4, y + 2 * font + 4);
+        g.drawString("Road length: " + game.roadLength(player), x + 4, y + 3 * font + 4);
+        g.drawString("Army size: " + player.armyStrength(), x + 4, y + 4 * font + 4);
+        g.drawString("Points: " + game.points(player), x + 4, y + 5 * font + 4);
     }
 
     void drawPlayersInfo(Graphics g) {
