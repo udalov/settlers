@@ -140,6 +140,7 @@ public class Main {
             }
 
             if (vis) {
+                game.setVisual(true);
                 new Vis(game, game.new GameThread());
             } else {
                 try {

@@ -44,6 +44,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         setSize(width, height);
         setMinimumSize(new Dimension(width, height));
 
+        new Thread(thread).start();
         setVisible(true);
     }
 
@@ -77,6 +78,9 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
                 Object o = e.getSource();
                 if (o == nextActionButton) {
                     thread.next();
+                    // TODO: invent something different
+                    try { Thread.sleep(90); } catch (InterruptedException ie) { }
+                    synchronized(game) { }
                     repaint();
                 }
             }

@@ -113,17 +113,19 @@ public class Game {
             { check(); return offer.counteroffer(new TradeOffer(me(), sell, buy)); }
     }
 
-    public class GameThread {
+    public class GameThread implements Runnable {
         private final Game game;
         GameThread() {
             game = Game.this;
             game.init();
         }
+        public void run() {
+            game.eventHappened();
+            game.play();
+        }
         public void next() {
-            if (game.turnNumber == -1) {
-                placeInitialSettlements();
-            } else {
-                game.nextTurn();
+            synchronized(game) {
+                game.notifyAll();
             }
         }
     }
@@ -139,11 +141,13 @@ public class Game {
     private int diceRolled;
     private boolean robberMoved;
     private final ResourceStack bank = new ResourceStack();
-    private final History history = new History();
+    private final History history = new History(this);
 
     private Player largestArmy;
     private Player longestRoad;
     private final List<Development> developments = new ArrayList<Development>();
+
+    private boolean visual = false;
 
     Game(long randSeed) {
         rnd = randSeed == 0 ? new Random() : new Random(randSeed);
@@ -170,8 +174,20 @@ public class Game {
 
     int turnNumber() { return turnNumber; }
 
+    void setVisual(boolean visual) { this.visual = visual; }
 
 
+    void eventHappened() {
+        if (visual) {
+            try {
+                synchronized(this) {
+                    wait();
+                }
+            } catch (InterruptedException ie) {
+                // do nothing
+            }
+        }
+    }
 
     List<TradeResult> trade(TradeOffer offer) {
         List<TradeResult> ans = new ArrayList<TradeResult>();
@@ -580,10 +596,10 @@ public class Game {
                     throw new RuntimeException("You cannot build a road not connected to a town");
                 if (!board.canBuildTownAt(p.first(), false, player))
                     throw new RuntimeException("You cannot build a town here");
-                history.initialSettlement(player, p.first());
-                history.initialRoad(player, p.second());
                 board.buildTown(p.first(), new Town(player, false));
+                history.initialSettlement(player, p.first());
                 board.buildRoad(p.second(), player);
+                history.initialRoad(player, p.second());
                 if (it == 1) {
                     for (Hex c : Board.adjacentHexes(p.first())) {
                         Resource r = board.resourceAt(c);

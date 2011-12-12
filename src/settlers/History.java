@@ -8,17 +8,26 @@ import settlers.util.Pair;
 public class History {
     
     private final List<Pair<Player, List<Event>>> events = new ArrayList<Pair<Player, List<Event>>>();
+    private final Game game;
 
-    History() {
+    History(Game game) {
         nextTurn(null);
+        this.game = game;
     }
 
     void nextTurn(Player player) {
         events.add(new Pair<Player, List<Event>>(player, new ArrayList<Event>()));
     }
 
-    private void addEvent(Event e) { events.get(events.size() - 1).second().add(e); }
-    private void addEvent(EventType type, Object... o) { addEvent(new Event(type, o)); }
+    private void addEvent(Event e) {
+System.out.println(e.type());
+        events.get(events.size() - 1).second().add(e);
+        game.eventHappened();
+    }
+
+    private void addEvent(EventType type, Object... o) {
+        addEvent(new Event(type, o));
+    }
 
     public List<Pair<Player, List<Event>>> getAll() {
         List<Pair<Player, List<Event>>> ans = new ArrayList<Pair<Player, List<Event>>>(events.size());
