@@ -217,7 +217,7 @@ public class BoardVis extends JPanel {
                 // TODO?
                 return "";
             case DISCARD:
-                return color + " discards " + Util.toResourceString(event.resources());
+                return event.player().color() + " discards " + Util.toResourceString(event.resources());
             case ROAD:
                 return color + " builds a road";
             case SETTLEMENT:
