@@ -209,13 +209,13 @@ public class Game {
                     List<Resource> discard = p.bot().discardHalfOfTheCards();
                     if (discard == null)
                         throw new RuntimeException("You cannot discard null");
-                    history.discard(p, discard);
                     for (Resource r : discard) {
                         if (r == null)
                             throw new RuntimeException("You cannot discard null");
                         p.cards().sub(r, 1);
                         bank.add(r, 1);
                     }
+                    history.discard(p, discard);
                     if (p.cards().size() != (were + 1) / 2)
                         throw new RuntimeException("You must discard half of your cards");
                 }
@@ -272,15 +272,17 @@ public class Game {
             throw new RuntimeException("You cannot rob a player not having a town near the robber");
         board.moveRobber(hex);
         robberMoved = true;
-        history.robber(hex, whoToRob);
-        if (whoToRob == null)
+        if (whoToRob == null) {
+            history.robber(hex, whoToRob);
             return;
+        }
         if (whoToRob.cardsNumber() == 0)
             throw new RuntimeException("You cannot rob a player who has no cards");
         List<Resource> list = whoToRob.cards().list();
         Resource r = list.get(rnd.nextInt(list.size()));
         whoToRob.cards().sub(r, 1);
         turn.cards().add(r, 1);
+        history.robber(hex, whoToRob);
     }
 
     void buildSettlement(Xing x) {
