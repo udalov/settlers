@@ -47,6 +47,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         setMinimumSize(new Dimension(width, height));
 
         new Thread(thread).start();
+        nextTurnButton.setText("Skip building phase");
         setVisible(true);
     }
 
@@ -81,15 +82,21 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
                 // TODO: invent something different
                 try { Thread.sleep(90); } catch (InterruptedException ie) { }
                 synchronized(game) { }
-                repaint();
             }
 
             public void actionPerformed(ActionEvent e) {
                 Object o = e.getSource();
                 if (o == nextActionButton) {
                     nextAction();
+                    repaint();
                 } else if (o == nextTurnButton) {
-                    nextAction();
+                    int turn = game.history().size();
+                    do {
+                        nextAction();
+                    } while (game.history().size() == turn);
+                    if (turn == 1)
+                        nextTurnButton.setText("Next turn");
+                    repaint();
                 }
             }
         };

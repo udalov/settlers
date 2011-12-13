@@ -44,6 +44,7 @@ public class History {
         return ans;
     }
 
+    // TODO: test
     public List<Pair<Player, List<Event>>> getAllSinceMyLastTurn() {
         List<Pair<Player, List<Event>>> ans = new ArrayList<Pair<Player, List<Event>>>(events.size());
         if (events.isEmpty())
@@ -54,6 +55,10 @@ public class History {
                 new ArrayList<Event>(events.get(i).second())));
         Collections.reverse(ans);
         return ans;
+    }
+
+    public int size() {
+        return events.size();
     }
 
     void initialRoad(Player pl, Path p) { addEvent(EventType.INITIAL_ROAD, pl, p); }

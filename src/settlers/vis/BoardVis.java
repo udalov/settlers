@@ -19,7 +19,7 @@ public class BoardVis extends JPanel {
     private static final int[] DY = new int[] {-1, -2, -1, 1, 2, 1};
 
     private static final int PLAYER_INFO_WIDTH = 160;
-    private static final int PLAYER_INFO_HEIGHT = 220;
+    private static final int PLAYER_INFO_HEIGHT = 130;
 
     // TODO: generate
     private static final String[] PORTS = new String[] {
