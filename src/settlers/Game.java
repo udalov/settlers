@@ -149,6 +149,7 @@ public class Game {
     private final List<Development> developments = new ArrayList<Development>();
 
     private boolean visual = false;
+    private boolean finished = false;
 
     Game(long randSeed) {
         rnd = randSeed == 0 ? new Random() : new Random(randSeed);
@@ -174,6 +175,7 @@ public class Game {
     Player longestRoad() { return longestRoad; }
 
     int turnNumber() { return turnNumber; }
+    public boolean isFinished() { return finished; }
 
 
 
@@ -563,6 +565,7 @@ public class Game {
 
         if (playerHasWon()) {
             history.victory(turn.developments().victoryPoint());
+            finished = true;
             return true;
         }
 
