@@ -102,6 +102,8 @@ public class Game {
             { return game.roadLength(player); }
         public int roadLengthWith(Player player, Path p)
             { return game.roadLengthWith(player, p); }
+        public int points(Player player)
+            { return game.points(player); }
 
         public List<TradeResult> trade(String sell, String buy)
             { check(); return game.trade(new TradeOffer(me(), sell, buy)); }
@@ -611,7 +613,7 @@ public class Game {
         turnNumber = 0;
     }
 
-    public int points(Player player) {
+    int points(Player player, boolean includeVP) {
         int points = 0;
         for (Pair<Xing, Town> pair : board.allTowns())
             if (pair.second().player() == player)
@@ -620,12 +622,17 @@ public class Game {
             points += 2;
         if (largestArmy == player && player.armyStrength() >= 3)
             points += 2;
-        points += player.developments().victoryPoint();
+        if (includeVP)
+            points += player.developments().victoryPoint();
         return points;
     }
 
+    public int points(Player player) {
+        return points(player, false);
+    }
+
     boolean playerHasWon() {
-        return points(turn) >= 10;
+        return points(turn, true) >= 10;
     }
 
     void updateLongestRoad() {

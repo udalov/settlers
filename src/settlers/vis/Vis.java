@@ -16,7 +16,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     private final BoardVis boardVis;
     private final JMenuBar menuBar = new JMenuBar();
     private final JButton nextActionButton = new JButton("Next action");
-    private final JButton nextTurnButton = new JButton("Skip building phase");
+    private final JButton nextTurnButton = new JButton("Next turn");
 
     public Vis(Game game, Game.Runner thread) {
         setLayout(null);
@@ -28,11 +28,11 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         setJMenuBar(menuBar);
 
         buildButtons();
-        add(nextActionButton);
-        add(nextTurnButton);
+        getContentPane().add(nextActionButton);
+        getContentPane().add(nextTurnButton);
 
         boardVis = new BoardVis(game);
-        add(boardVis);
+        getContentPane().add(boardVis);
 
         addWindowListener(this);
         addMouseListener(this);
