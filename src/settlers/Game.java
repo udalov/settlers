@@ -171,8 +171,8 @@ public class Game {
     public List<Player> players() { return Collections.unmodifiableList(players); }
     public Board board() { return board; }
     public History history() { return history; }
-    Player largestArmy() { return largestArmy; }
-    Player longestRoad() { return longestRoad; }
+    public Player largestArmy() { return largestArmy; }
+    public Player longestRoad() { return longestRoad; }
 
     int turnNumber() { return turnNumber; }
     public boolean isFinished() { return finished; }

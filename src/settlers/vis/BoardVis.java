@@ -211,6 +211,11 @@ public class BoardVis extends JPanel {
         final int line = 14;
         final int caption = captionFont + 6;
 
+        final Color normalText = new Color(0x444444);
+        final Color manyResources = new Color(0xAA4444);
+        final Color longestRoad = new Color(0xFF4444);
+        final Color largestArmy = new Color(0xFF4444);
+
         g.setColor(new Color(0xAAAAFF));
         g.fillRoundRect(x - 2, y - 2, PLAYER_INFO_WIDTH + 4, PLAYER_INFO_HEIGHT + 4, arc, arc);
         g.setColor(playerColorToColor(player.color()));
@@ -222,15 +227,20 @@ public class BoardVis extends JPanel {
         g.drawLine(x, y + caption, x + PLAYER_INFO_WIDTH, y + caption);
 
         g.setFont(new Font("Tahoma", Font.BOLD, captionFont));
-        g.setColor(new Color(0x444444));
+        g.setColor(normalText);
         g.drawString(player + "", x + 4, y + captionFont + 2);
         y += caption;
 
         g.setFont(new Font("Tahoma", Font.PLAIN, line - 2));
+        g.setColor(player.cardsNumber() > 7 ? manyResources : normalText);
         g.drawString("Resources: " + player.cardsNumber(), x + 4, y + line + 4);
+        g.setColor(normalText);
         g.drawString("Development cards: " + player.developmentsNumber(), x + 4, y + 2*line + 4);
+        g.setColor(game.longestRoad() == player && game.roadLength(player) >= 5 ? longestRoad : normalText);
         g.drawString("Road length: " + game.roadLength(player), x + 4, y + 3*line + 4);
+        g.setColor(game.largestArmy() == player && player.armyStrength() >= 3 ? largestArmy : normalText);
         g.drawString("Army size: " + player.armyStrength(), x + 4, y + 4*line + 4);
+        g.setColor(normalText);
         g.drawString("Points: " + game.points(player), x + 4, y + 5*line + 4);
     }
 
