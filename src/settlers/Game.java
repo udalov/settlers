@@ -339,6 +339,7 @@ public class Game {
         turn.cards().sub("BL");
         bank.add("BL");
         history.road(p);
+        updateLongestRoad();
     }
 
     boolean hasPort(Resource r, Player player) {
@@ -496,6 +497,7 @@ public class Game {
             board.buildRoad(p2, turn);
         }
         history.roadBuilding(p1, p2);
+        updateLongestRoad();
     }
 
     void invention(Resource r1, Resource r2) {
@@ -513,8 +515,8 @@ public class Game {
 
     void knight(Hex hex, Player whoToRob) {
         turn.developments().use(Development.KNIGHT);
-        history.knight();
         updateLargestArmy();
+        history.knight();
         moveRobber(hex, whoToRob);
         turn.increaseArmyStrength();
     }
@@ -563,7 +565,6 @@ public class Game {
         turn.bot().makeTurn();
 
         turn.developments().reenable();
-        updateLongestRoad();
 
         if (playerHasWon()) {
             history.victory(turn.developments().victoryPoint());
