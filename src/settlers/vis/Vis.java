@@ -99,10 +99,10 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
                     do {
                         nextAction();
                     } while (game.history().size() == turn && !game.isFinished());
-                    if (turn == 1)
-                        nextTurnButton.setText("Next turn");
                 }
                 repaintVis();
+                if (game.history().size() == 2)
+                    nextTurnButton.setText("Next turn");
             }
         };
         nextActionButton.addActionListener(listener);
