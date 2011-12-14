@@ -242,6 +242,12 @@ public class BoardVis extends JPanel {
         g.drawString("Army size: " + player.armyStrength(), x + 4, y + 4*line + 4);
         g.setColor(normalText);
         g.drawString("Points: " + game.points(player), x + 4, y + 5*line + 4);
+
+        if (game.turn() == player) {
+            g.setFont(new Font("Tahoma", Font.BOLD, line - 2));
+            g.setColor(new Color(0x004400));
+            g.drawString("TURN", x + 4, y + 7*line + 4);
+        }
     }
 
     void drawPlayersInfo(Graphics g) {

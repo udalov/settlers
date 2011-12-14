@@ -11,12 +11,13 @@ public class History {
     private final Game game;
 
     History(Game game) {
-        nextTurn(null);
         this.game = game;
+        nextTurn(null);
     }
 
     void nextTurn(Player player) {
         events.add(new Pair<Player, List<Event>>(player, new ArrayList<Event>()));
+        game.eventHappened();
     }
 
     private void addEvent(Event e) {

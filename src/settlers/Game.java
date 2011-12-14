@@ -173,6 +173,7 @@ public class Game {
     public History history() { return history; }
     public Player largestArmy() { return largestArmy; }
     public Player longestRoad() { return longestRoad; }
+    public Player turn() { return turn; }
 
     int turnNumber() { return turnNumber; }
     public boolean isFinished() { return finished; }
