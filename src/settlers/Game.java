@@ -203,8 +203,8 @@ public class Game {
         if (diceRolled != 0)
             throw new RuntimeException("Cannot roll the dice twice a turn");
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
-        history.rollDice(diceRolled);
         if (diceRolled == 7) {
+            history.rollDice(diceRolled);
             for (Player p : players) {
                 int were = p.cards().size();
                 if (were > 7) {
@@ -252,6 +252,7 @@ public class Game {
                     }
                 }
             }
+            history.rollDice(diceRolled);
         }
         return diceRolled;
     }

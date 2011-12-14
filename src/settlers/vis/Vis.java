@@ -83,7 +83,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
 
             private void repaintVis() {
                 // TODO: invent something different
-                try { Thread.sleep(90); } catch (InterruptedException ie) { }
+                try { Thread.sleep(50); } catch (InterruptedException ie) { }
                 synchronized(game) { }
                 repaint();
             }

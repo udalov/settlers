@@ -235,7 +235,7 @@ public class BoardVis extends JPanel {
         g.setColor(player.cardsNumber() > 7 ? manyResources : normalText);
         g.drawString("Resources: " + player.cardsNumber(), x + 4, y + line + 4);
         g.setColor(normalText);
-        g.drawString("Development cards: " + player.developmentsNumber(), x + 4, y + 2*line + 4);
+        g.drawString("Developments: " + player.developmentsNumber(), x + 4, y + 2*line + 4);
         g.setColor(game.longestRoad() == player && game.roadLength(player) >= 5 ? longestRoad : normalText);
         g.drawString("Road length: " + game.roadLength(player), x + 4, y + 3*line + 4);
         g.setColor(game.largestArmy() == player && player.armyStrength() >= 3 ? largestArmy : normalText);
