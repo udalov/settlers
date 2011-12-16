@@ -36,8 +36,8 @@ public class ExampleBot extends Bot {
         if (api.developments().knight() > 0) {
             Hex robber = board.robber();
             boolean bad = api.largestArmy() != api.me();
-            for (Town ts : board.adjacentTowns(robber))
-                bad |= ts.player() == me;
+            for (Player p : api.robbable(robber))
+                bad |= p == me;
             if (bad) {
                 Pair<Hex, Player> rob = rob();
                 api.knight(rob.first(), rob.second());
