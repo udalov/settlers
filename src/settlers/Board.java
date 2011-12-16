@@ -20,9 +20,6 @@ public class Board {
     private final Map<Path, Resource> ports2to1;
     private final List<Path> ports3to1;
 
-    private final Map<Path, Player> roads;
-    private final Map<Xing, Town> towns;
-
 
     private Board(
         Map<Hex, Resource> resources,
@@ -34,8 +31,6 @@ public class Board {
         this.numbers = numbers;
         this.ports2to1 = ports2to1;
         this.ports3to1 = ports3to1;
-        this.roads = new HashMap<Path, Player>();
-        this.towns = new HashMap<Xing, Town>();
     }
 
     static Board create(Random rnd) {
@@ -166,14 +161,6 @@ public class Board {
         return i == null ? 0 : i;
     }
 
-    public Player roadAt(Path p) {
-        return roads.get(p);
-    }
-
-    public Town townAt(Xing i) {
-        return towns.get(i);
-    }
-
     public Pair<Boolean, Resource> portAt(Xing i) {
         for (Path p : ports2to1.keySet()) {
             Xing[] u = endpoints(p);
@@ -188,69 +175,9 @@ public class Board {
         return Pair.make(false, null);
     }
 
-    public List<Town> adjacentTowns(Hex c) {
-        List<Town> ans = new ArrayList<Town>();
-        if (c == null)
-            return ans;
-        for (Xing i : adjacentXings(c)) {
-            Town t = towns.get(i);
-            if (t != null)
-                ans.add(t);
-        }
-        return ans;
-    }
-
-
-    boolean canBuildTownAt(Xing i, boolean mustBeRoad, Player player) {
-        if (i == null || towns.get(i) != null)
-            return false;
-        for (Xing j : adjacentXings(i))
-            if (towns.get(j) != null)
-                return false;
-        if (!mustBeRoad)
-            return true;
-        for (Path p : adjacentPaths(i))
-            if (roads.get(p) == player)
-                return true;
-        return false;
-    }
-
-    boolean canBuildRoadAt(Path p, Player player) {
-        if (p == null || roads.get(p) != null)
-            return false;
-        for (Xing i : endpoints(p)) {
-            Town t = towns.get(i);
-            if (t != null && t.player() != player)
-                continue;
-            for (Path q : adjacentPaths(i)) {
-                if (q == p)
-                    continue;
-                if (roads.get(q) == player)
-                    return true;
-            }
-        }
-        return false;
-    }
 
 
 
-
-
-    void buildTown(Xing i, Town t) {
-        towns.put(i, t);
-    }
-
-    void buildRoad(Path p, Player pl) {
-        roads.put(p, pl);
-    }
-
-    Set<Pair<Xing, Town>> allTowns() {
-        Set<Pair<Xing, Town>> ans =
-            new HashSet<Pair<Xing, Town>>();
-        for (Xing i : towns.keySet())
-            ans.add(Pair.make(i, towns.get(i)));
-        return ans;
-    }
 
     Set<Pair<Xing, Resource>> allPorts() {
         Set<Pair<Xing, Resource>> ans =

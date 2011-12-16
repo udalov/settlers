@@ -47,6 +47,8 @@ public class Game {
         public ResourceStack cards() { return player(bot).cards(); }
         public DevelopmentStack developments() { return player(bot).developments(); }
         public ResourceStack bank() { return game.bank; }
+        public Player roadAt(Path p) { return game.roadAt(p); }
+        public Town townAt(Xing x) { return game.townAt(x); }
 
         public int rollDice() { check(); return game.rollDice(); }
 
@@ -58,9 +60,9 @@ public class Game {
             { checkTurn(); game.moveRobber(c, whoToRob); }
 
         public boolean canBuildTownAt(Xing i, boolean mustBeRoad)
-            { return game.board.canBuildTownAt(i, mustBeRoad, me()); }
+            { return game.canBuildTownAt(i, mustBeRoad, me()); }
         public boolean canBuildRoadAt(Path p)
-            { return game.board.canBuildRoadAt(p, me()); }
+            { return game.canBuildRoadAt(p, me()); }
 
         public void buildSettlement(Xing i)
             { check(); game.buildSettlement(i); }
@@ -150,6 +152,8 @@ public class Game {
     private Player longestRoad;
     private Hex robber;
     private final List<Development> developments = new ArrayList<Development>();
+    private final Map<Path, Player> roads = new HashMap<Path, Player>();
+    private final Map<Xing, Town> towns = new HashMap<Xing, Town>();
 
     private final History history = new History(this);
 
@@ -183,9 +187,13 @@ public class Game {
     public Player longestRoad() { return longestRoad; }
     public Player turn() { return turn; }
     public Hex robber() { return robber; }
+    public Player roadAt(Path p) { return roads.get(p); }
+    public Town townAt(Xing i) { return towns.get(i); }
 
     int turnNumber() { return turnNumber; }
     public boolean isFinished() { return finished; }
+
+
 
 
 
@@ -244,7 +252,7 @@ public class Game {
                     if (robber == hex)
                         continue;
                     for (Xing x : Board.adjacentXings(hex)) {
-                        Town town = board.townAt(x);
+                        Town town = townAt(x);
                         if (town == null)
                             continue;
                         Resource res = board.resourceAt(hex);
@@ -269,7 +277,7 @@ public class Game {
 
     List<Player> robbable(Hex hex) {
         Set<Player> ans = new HashSet<Player>();
-        for (Town t : board.adjacentTowns(hex)) {
+        for (Town t : adjacentTowns(hex)) {
             Player p = t.player();
             if (p != turn && p.cardsNumber() > 0)
                 ans.add(p);
@@ -312,10 +320,10 @@ public class Game {
             throw new RuntimeException("You do not have any settlements left");
         if (!turn.cards().areThere("BWGL"))
             throw new RuntimeException("Not enough resources to build a settlement");
-        if (!board.canBuildTownAt(x, true, turn))
+        if (!canBuildTownAt(x, true, turn))
             throw new RuntimeException("You cannot build a settlement here");
         turn.expendSettlement();
-        board.buildTown(x, new Town(turn, false));
+        towns.put(x, new Town(turn, false));
         turn.cards().sub("BWGL");
         bank.add("BWGL");
         history.settlement(x);
@@ -328,14 +336,14 @@ public class Game {
             throw new RuntimeException("You do not have any cities left");
         if (!turn.cards().areThere("OOOGG"))
             throw new RuntimeException("Not enough resources to build a city");
-        if (board.townAt(x) == null)
+        if (townAt(x) == null)
             throw new RuntimeException("You must first build a settlement to be able to upgrade it");
-        if (board.townAt(x).isCity())
+        if (townAt(x).isCity())
             throw new RuntimeException("You cannot build a city over an existing city");
-        if (board.townAt(x).player() != turn)
+        if (townAt(x).player() != turn)
             throw new RuntimeException("You cannot upgrade other player's settlement");
         turn.expendCity();
-        board.buildTown(x, new Town(turn, true));
+        towns.put(x, new Town(turn, true));
         turn.cards().sub("OOOGG");
         bank.add("OOOGG");
         history.city(x);
@@ -348,10 +356,10 @@ public class Game {
             throw new RuntimeException("You do not have any roads left");
         if (!turn.cards().areThere("BL"))
             throw new RuntimeException("Not enough resources to build a road");
-        if (!board.canBuildRoadAt(p, turn))
+        if (!canBuildRoadAt(p, turn))
             throw new RuntimeException("You cannot build a road here");
         turn.expendRoad();
-        board.buildRoad(p, turn);
+        roads.put(p, turn);
         turn.cards().sub("BL");
         bank.add("BL");
         history.road(p);
@@ -361,7 +369,7 @@ public class Game {
     boolean hasPort(Resource r, Player player) {
         for (Pair<Xing, Resource> p : board.allPorts()) {
             if (p.second() == r) {
-                Town t = board.townAt(p.first());
+                Town t = townAt(p.first());
                 if (t != null && t.player() == player)
                     return true;
             }
@@ -502,15 +510,15 @@ public class Game {
             if (p2 != null)
                 throw new RuntimeException("You have only 1 road left to use road building card");
         }
-        if (!board.canBuildRoadAt(p1, turn))
+        if (!canBuildRoadAt(p1, turn))
             throw new RuntimeException("You cannot build a road here");
         turn.expendRoad();
-        board.buildRoad(p1, turn);
+        roads.put(p1, turn);
         if (p2 != null) {
-            if (!board.canBuildRoadAt(p2, turn))
+            if (!canBuildRoadAt(p2, turn))
                 throw new RuntimeException("You cannot build a road here");
             turn.expendRoad();
-            board.buildRoad(p2, turn);
+            roads.put(p2, turn);
         }
         history.roadBuilding(p1, p2);
         updateLongestRoad();
@@ -538,12 +546,57 @@ public class Game {
     }
 
 
+    List<Town> adjacentTowns(Hex c) {
+        List<Town> ans = new ArrayList<Town>();
+        if (c == null)
+            return ans;
+        for (Xing i : Board.adjacentXings(c)) {
+            Town t = towns.get(i);
+            if (t != null)
+                ans.add(t);
+        }
+        return ans;
+    }
+
+    boolean canBuildTownAt(Xing i, boolean mustBeRoad, Player player) {
+        if (i == null || towns.get(i) != null)
+            return false;
+        for (Xing j : Board.adjacentXings(i))
+            if (towns.get(j) != null)
+                return false;
+        if (!mustBeRoad)
+            return true;
+        for (Path p : Board.adjacentPaths(i))
+            if (roads.get(p) == player)
+                return true;
+        return false;
+    }
+
+    boolean canBuildRoadAt(Path p, Player player) {
+        if (p == null || roads.get(p) != null)
+            return false;
+        for (Xing i : Board.endpoints(p)) {
+            Town t = towns.get(i);
+            if (t != null && t.player() != player)
+                continue;
+            for (Path q : Board.adjacentPaths(i)) {
+                if (q == p)
+                    continue;
+                if (roads.get(q) == player)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+
+
     int dfsRoadLength(Player player, Xing i, Set<Path> visited, Path with) {
         int ans = 0;
         for (Path p : Board.adjacentPaths(i)) {
             if (visited.contains(p))
                 continue;
-            if (board.roadAt(p) != player && p != with)
+            if (roadAt(p) != player && p != with)
                 continue;
             visited.add(p);
             Xing[] ends = Board.endpoints(p);
@@ -619,11 +672,11 @@ public class Game {
                     throw new RuntimeException("You cannot build a first settlement at null");
                 if (!Board.areAdjacent(p.first(), p.second()))
                     throw new RuntimeException("You cannot build a road not connected to a town");
-                if (!board.canBuildTownAt(p.first(), false, player))
+                if (!canBuildTownAt(p.first(), false, player))
                     throw new RuntimeException("You cannot build a town here");
-                board.buildTown(p.first(), new Town(player, false));
+                towns.put(p.first(), new Town(player, false));
                 history.initialSettlement(player, p.first());
-                board.buildRoad(p.second(), player);
+                roads.put(p.second(), player);
                 history.initialRoad(player, p.second());
                 if (it == 1) {
                     for (Hex c : Board.adjacentHexes(p.first())) {
@@ -639,9 +692,9 @@ public class Game {
 
     int points(Player player, boolean includeVP) {
         int points = 0;
-        for (Pair<Xing, Town> pair : board.allTowns())
-            if (pair.second().player() == player)
-                points += pair.second().isCity() ? 2 : 1;
+        for (Xing i : towns.keySet())
+            if (towns.get(i).player() == player)
+                points += towns.get(i).isCity() ? 2 : 1;
         if (longestRoad == player && roadLength(player) >= 5)
             points += 2;
         if (largestArmy == player && player.armyStrength() >= 3)

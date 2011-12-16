@@ -28,7 +28,7 @@ public class StupidBot extends Bot {
         }
         if (api.me().citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             for (Xing x : Board.allXings()) {
-                Town t = board.townAt(x);
+                Town t = api.townAt(x);
                 if (t == null || t.player() != api.me() || t.isCity())
                     continue;
                 api.buildCity(x);
@@ -84,7 +84,7 @@ public class StupidBot extends Bot {
         for (Xing x : xings)
             if (api.canBuildTownAt(x, false))
                 for (Path p : Board.adjacentPaths(x))
-                    if (board.roadAt(p) == null)
+                    if (api.roadAt(p) == null)
                         return Pair.make(x, p);
         return null;
     }

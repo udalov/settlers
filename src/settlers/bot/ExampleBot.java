@@ -48,7 +48,7 @@ public class ExampleBot extends Bot {
         while (me.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             boolean can = false;
             for (Xing i : Board.allXings()) {
-                Town t = board.townAt(i);
+                Town t = api.townAt(i);
                 if (t == null || t.player() != me || t.isCity())
                     continue;
                 api.buildCity(i);
@@ -130,7 +130,7 @@ public class ExampleBot extends Bot {
                     for (Xing z : x) {
                         boolean me = false, enemy = false;
                         for (Path q : Board.adjacentPaths(z)) {
-                            Player pl = board.roadAt(q);
+                            Player pl = api.roadAt(q);
                             if (pl == api.me())
                                 me = true;
                             else if (pl != null)

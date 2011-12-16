@@ -105,7 +105,7 @@ public class BoardVis extends JPanel {
     }
 
     void drawPath(Graphics2D g, Path p) {
-        Player pl = board.roadAt(p);
+        Player pl = game.roadAt(p);
         if (pl == null) {
             g.setColor(Color.BLACK);
             g.setStroke(new BasicStroke(1));
@@ -119,7 +119,7 @@ public class BoardVis extends JPanel {
     }
 
     void drawXing(Graphics2D g, Xing i) {
-        Town t = board.townAt(i);
+        Town t = game.townAt(i);
         if (t == null)
             return;
         g.setColor(playerColorToColor(t.player().color()));
@@ -190,11 +190,11 @@ public class BoardVis extends JPanel {
             drawHex(g, c);
         }
         for (Path p : Board.allPaths()) {
-            if (board.roadAt(p) == null)
+            if (game.roadAt(p) == null)
                 drawPath(g, p);
         }
         for (Path p : Board.allPaths()) {
-            if (board.roadAt(p) != null)
+            if (game.roadAt(p) != null)
                 drawPath(g, p);
         }
         for (Xing i : Board.allXings()) {
