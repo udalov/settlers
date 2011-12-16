@@ -46,6 +46,14 @@ public class Util {
         return shuffle(list, new Random());
     }
 
+    public static <T> List<T> filter(List<T> list, Filter<T> filter) {
+        List<T> ans = new ArrayList<T>();
+        for (T obj : list)
+            if (filter.filter(obj))
+                ans.add(obj);
+        return ans;
+    }
+
     public static void checkBotName(String name) {
         if (name == null)
             throw new RuntimeException("Name of your bot cannot be null");
