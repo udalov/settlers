@@ -21,7 +21,12 @@ public class ExampleBot extends Bot {
             if (api.robber() == c)
                 continue;
             List<Player> robbable = api.robbable(c);
-            return Pair.make(c, robbable.isEmpty() ? null : robbable.get(0));
+            for (Xing x : Board.adjacentXings(c))
+                if (api.townAt(x) != null && api.townAt(x).player() == api.me())
+                    continue c;
+            if (robbable.isEmpty())
+                return Pair.make(c, null);
+            return Pair.make(c, robbable.get(0));
         }
         return null;
     }
