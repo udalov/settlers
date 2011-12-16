@@ -277,8 +277,10 @@ public class Game {
 
     List<Player> robbable(Hex hex) {
         Set<Player> ans = new HashSet<Player>();
-        for (Town t : adjacentTowns(hex)) {
-            Player p = t.player();
+        for (Xing x : Board.adjacentXings(hex)) {
+            if (towns.get(x) == null)
+                continue;
+            Player p = towns.get(x).player();
             if (p != turn && p.cardsNumber() > 0)
                 ans.add(p);
         }
@@ -545,18 +547,6 @@ public class Game {
         turn.increaseArmyStrength();
     }
 
-
-    List<Town> adjacentTowns(Hex c) {
-        List<Town> ans = new ArrayList<Town>();
-        if (c == null)
-            return ans;
-        for (Xing i : Board.adjacentXings(c)) {
-            Town t = towns.get(i);
-            if (t != null)
-                ans.add(t);
-        }
-        return ans;
-    }
 
     boolean canBuildTownAt(Xing i, boolean mustBeRoad, Player player) {
         if (i == null || towns.get(i) != null)

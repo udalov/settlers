@@ -413,9 +413,5 @@ public class Board {
         Xing[] ends = endpoints(p);
         return ends[0] == a || ends[1] == a;
     }
-
-    public static boolean areAdjacent(Path p, Xing a) {
-        return areAdjacent(a, p);
-    }
 }
 
