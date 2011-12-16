@@ -50,6 +50,8 @@ public class Game {
 
         public int rollDice() { check(); return game.rollDice(); }
 
+        public List<Player> robbable(Hex c)
+            { return game.robbable(c); }
         public void moveRobber(Hex c, Player whoToRob)
             { checkTurn(); game.moveRobber(c, whoToRob); }
 
@@ -258,6 +260,16 @@ public class Game {
         return diceRolled;
     }
 
+    List<Player> robbable(Hex hex) {
+        Set<Player> ans = new HashSet<Player>();
+        for (Town t : board.adjacentTowns(hex)) {
+            Player p = t.player();
+            if (p != turn && p.cardsNumber() > 0)
+                ans.add(p);
+        }
+        return new ArrayList<Player>(ans);
+    }
+
     void moveRobber(Hex hex, Player whoToRob) {
         if (hex == null)
             throw new RuntimeException("You cannot move the robber to null");
@@ -265,14 +277,13 @@ public class Game {
             throw new RuntimeException("You cannot leave the robber at his current position");
         if (whoToRob == turn)
             throw new RuntimeException("You cannot rob yourself");
-        List<Town> ts = board.adjacentTowns(hex);
-        List<Player> okToRob = new ArrayList<Player>();
-        for (Town t : ts)
-            if (t.player().cardsNumber() > 0)
-                okToRob.add(t.player());
-        if (!okToRob.isEmpty() && whoToRob == null)
+        if (whoToRob != null && whoToRob.cardsNumber() == 0)
+            throw new RuntimeException("You cannot rob a player who has no cards");
+        List<Player> robbable = robbable(hex);
+        if (!robbable.isEmpty() && whoToRob == null)
             throw new RuntimeException("You must rob somebody");
-        if (!okToRob.isEmpty() && !okToRob.contains(whoToRob))
+        if ((robbable.isEmpty() && whoToRob != null) ||
+            (!robbable.isEmpty() && !robbable.contains(whoToRob)))
             throw new RuntimeException("You cannot rob a player not having a town near the robber");
         board.moveRobber(hex);
         robberMoved = true;
@@ -280,8 +291,6 @@ public class Game {
             history.robber(hex, whoToRob);
             return;
         }
-        if (whoToRob.cardsNumber() == 0)
-            throw new RuntimeException("You cannot rob a player who has no cards");
         List<Resource> list = whoToRob.cards().list();
         Resource r = list.get(rnd.nextInt(list.size()));
         whoToRob.cards().sub(r, 1);

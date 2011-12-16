@@ -6,30 +6,24 @@ import settlers.util.*;
 
 public class StupidBot extends Bot {
 
-    private final Random rnd = api.rnd();
+    private final Random rnd;
     private final Board board;
     
     public StupidBot(Game.API api) {
         super(api);
+        rnd = api.rnd();
         board = api.board();
     }
 
     public void makeTurn() {
         if (api.rollDice() == 7) {
             List<Hex> hexes = Util.shuffle(Board.allHexes(), rnd);
-            h: for (Hex h : hexes) {
+            for (Hex h : hexes) {
                 if (board.robber() == h)
                     continue;
-                List<Town> ts = board.adjacentTowns(h); 
-                for (Town t : ts)
-                    if (t.player() == api.me())
-                        continue h;
-                for (Town t : ts) {
-                    if (t.player().cardsNumber() > 0) {
-                        api.moveRobber(h, t.player());
-                        break h;
-                    }
-                }
+                List<Player> robbable = api.robbable(h);
+                api.moveRobber(h, robbable.isEmpty() ? null : robbable.get(0));
+                break;
             }
         }
         if (api.me().citiesLeft() > 0 && api.getIfPossible("OOOGG")) {

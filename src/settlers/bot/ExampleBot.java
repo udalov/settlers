@@ -6,11 +6,12 @@ import settlers.util.*;
 
 public class ExampleBot extends Bot {
 
-    private final Random rnd = api.rnd();
+    private final Random rnd;
     private final Board board;
     
     public ExampleBot(Game.API api) {
         super(api);
+        rnd = api.rnd();
         board = api.board();
     }
 
@@ -19,17 +20,8 @@ public class ExampleBot extends Bot {
         c: for (Hex c : Util.shuffle(Board.allHexes(), rnd)) {
             if (board.robber() == c)
                 continue;
-            List<Town> ts = board.adjacentTowns(c); 
-            if (ts.isEmpty())
-                continue;
-            for (Town t : ts)
-                if (t.player() == api.me())
-                    continue c;
-            Player rob = null;
-            for (Town t : ts)
-                if (t.player().cardsNumber() > 0)
-                    rob = t.player();
-            return Pair.make(c, rob);
+            List<Player> robbable = api.robbable(c);
+            return Pair.make(c, robbable.isEmpty() ? null : robbable.get(0));
         }
         return null;
     }
