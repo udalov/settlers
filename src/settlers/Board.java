@@ -179,18 +179,6 @@ public class Board {
 
 
 
-    Set<Pair<Xing, Resource>> allPorts() {
-        Set<Pair<Xing, Resource>> ans =
-            new HashSet<Pair<Xing, Resource>>();
-        for (Path p : ports2to1.keySet())
-            for (Xing i : endpoints(p))
-                ans.add(Pair.make(i, ports2to1.get(p)));
-        for (Path p : ports3to1)
-            for (Xing i : endpoints(p))
-                ans.add(Pair.make(i, (Resource)null));
-        return ans;
-    }
-
 
 
 

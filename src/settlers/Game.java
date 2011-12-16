@@ -369,12 +369,10 @@ public class Game {
     }
 
     boolean hasPort(Resource r, Player player) {
-        for (Pair<Xing, Resource> p : board.allPorts()) {
-            if (p.second() == r) {
-                Town t = townAt(p.first());
-                if (t != null && t.player() == player)
-                    return true;
-            }
+        for (Xing x : towns.keySet()) {
+            Pair<Boolean, Resource> port = board.portAt(x);
+            if (port.first() && port.second() == r && towns.get(x).player() == player)
+                return true;
         }
         return false;
     }
