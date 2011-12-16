@@ -17,11 +17,11 @@ public class Board {
     
     private final Map<Hex, Resource> resources;
     private final Map<Hex, Integer> numbers;
-    private final Map<Path, Player> roads;
-    private final Map<Xing, Town> towns;
     private final Map<Path, Resource> ports2to1;
     private final List<Path> ports3to1;
-    private Hex robber;
+
+    private final Map<Path, Player> roads;
+    private final Map<Xing, Town> towns;
 
 
     private Board(
@@ -32,14 +32,10 @@ public class Board {
     ) {
         this.resources = resources;
         this.numbers = numbers;
-        this.roads = new HashMap<Path, Player>();
-        this.towns = new HashMap<Xing, Town>();
         this.ports2to1 = ports2to1;
         this.ports3to1 = ports3to1;
-        robber = null;
-        for (Hex hex : resources.keySet())
-            if (resources.get(hex) == null)
-                robber = hex;
+        this.roads = new HashMap<Path, Player>();
+        this.towns = new HashMap<Xing, Town>();
     }
 
     static Board create(Random rnd) {
@@ -178,10 +174,6 @@ public class Board {
         return towns.get(i);
     }
 
-    public Hex robber() {
-        return robber;
-    }
-
     public Pair<Boolean, Resource> portAt(Xing i) {
         for (Path p : ports2to1.keySet()) {
             Xing[] u = endpoints(p);
@@ -250,10 +242,6 @@ public class Board {
 
     void buildRoad(Path p, Player pl) {
         roads.put(p, pl);
-    }
-
-    void moveRobber(Hex c) {
-        robber = c;
     }
 
     Set<Pair<Xing, Town>> allTowns() {

@@ -18,7 +18,7 @@ public class ExampleBot extends Bot {
     
     Pair<Hex, Player> rob() {
         c: for (Hex c : Util.shuffle(Board.allHexes(), rnd)) {
-            if (board.robber() == c)
+            if (api.robber() == c)
                 continue;
             List<Player> robbable = api.robbable(c);
             return Pair.make(c, robbable.isEmpty() ? null : robbable.get(0));
@@ -34,9 +34,8 @@ public class ExampleBot extends Bot {
             api.moveRobber(rob.first(), rob.second());
         }
         if (api.developments().knight() > 0) {
-            Hex robber = board.robber();
             boolean bad = api.largestArmy() != api.me();
-            for (Player p : api.robbable(robber))
+            for (Player p : api.robbable(api.robber()))
                 bad |= p == me;
             if (bad) {
                 Pair<Hex, Player> rob = rob();

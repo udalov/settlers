@@ -19,7 +19,7 @@ public class StupidBot extends Bot {
         if (api.rollDice() == 7) {
             List<Hex> hexes = Util.shuffle(Board.allHexes(), rnd);
             for (Hex h : hexes) {
-                if (board.robber() == h)
+                if (api.robber() == h)
                     continue;
                 List<Player> robbable = api.robbable(h);
                 api.moveRobber(h, robbable.isEmpty() ? null : robbable.get(0));

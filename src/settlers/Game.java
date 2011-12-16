@@ -50,6 +50,8 @@ public class Game {
 
         public int rollDice() { check(); return game.rollDice(); }
 
+        public Hex robber()
+            { return game.robber(); }
         public List<Player> robbable(Hex c)
             { return game.robbable(c); }
         public void moveRobber(Hex c, Player whoToRob)
@@ -137,18 +139,19 @@ public class Game {
 
     private final List<Player> players = new ArrayList<Player>();
     private final Board board;
-
     private int n;
+
     private int turnNumber;
     private Player turn;
     private int diceRolled;
     private boolean robberMoved;
     private final ResourceStack bank = new ResourceStack();
-    private final History history = new History(this);
-
     private Player largestArmy;
     private Player longestRoad;
+    private Hex robber;
     private final List<Development> developments = new ArrayList<Development>();
+
+    private final History history = new History(this);
 
     private boolean visual = false;
     private boolean finished = false;
@@ -156,6 +159,9 @@ public class Game {
     Game(long randSeed) {
         rnd = randSeed == 0 ? new Random() : new Random(randSeed);
         board = Board.create(rnd);
+        for (Hex hex : Board.allHexes())
+            if (board.numberAt(hex) == 0)
+                robber = hex;
         for (int i = 0; i < 14; i++)
             developments.add(Development.KNIGHT);
         for (int i = 0; i < 2; i++) {
@@ -176,6 +182,7 @@ public class Game {
     public Player largestArmy() { return largestArmy; }
     public Player longestRoad() { return longestRoad; }
     public Player turn() { return turn; }
+    public Hex robber() { return robber; }
 
     int turnNumber() { return turnNumber; }
     public boolean isFinished() { return finished; }
@@ -234,7 +241,7 @@ public class Game {
                 for (Hex hex : Board.allHexes()) {
                     if (board.numberAt(hex) != diceRolled)
                         continue;
-                    if (board.robber() == hex)
+                    if (robber == hex)
                         continue;
                     for (Xing x : Board.adjacentXings(hex)) {
                         Town town = board.townAt(x);
@@ -273,7 +280,7 @@ public class Game {
     void moveRobber(Hex hex, Player whoToRob) {
         if (hex == null)
             throw new RuntimeException("You cannot move the robber to null");
-        if (hex == board.robber())
+        if (hex == robber)
             throw new RuntimeException("You cannot leave the robber at his current position");
         if (whoToRob == turn)
             throw new RuntimeException("You cannot rob yourself");
@@ -285,7 +292,7 @@ public class Game {
         if ((robbable.isEmpty() && whoToRob != null) ||
             (!robbable.isEmpty() && !robbable.contains(whoToRob)))
             throw new RuntimeException("You cannot rob a player not having a town near the robber");
-        board.moveRobber(hex);
+        robber = hex;
         robberMoved = true;
         if (whoToRob == null) {
             history.robber(hex, whoToRob);
