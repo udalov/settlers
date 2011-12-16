@@ -16,9 +16,7 @@ public class ExampleBot extends Bot {
 
     
     Pair<Hex, Player> rob() {
-        List<Hex> hexes = new ArrayList<Hex>(Board.allHexes());
-        Collections.shuffle(hexes, rnd);
-        c: for (Hex c : hexes) {
+        c: for (Hex c : Util.shuffle(Board.allHexes(), rnd)) {
             if (board.robber() == c)
                 continue;
             List<Town> ts = board.adjacentTowns(c); 
@@ -169,8 +167,7 @@ public class ExampleBot extends Bot {
     }
 
     public List<Resource> discardHalfOfTheCards() {
-        List<Resource> cards = api.cards().list();
-        Collections.shuffle(cards, rnd);
+        List<Resource> cards = Util.shuffle(api.cards().list(), rnd);
         List<Resource> ans = new ArrayList<Resource>();
         for (int i = 0; i < cards.size() / 2; i++)
             ans.add(cards.get(i));
