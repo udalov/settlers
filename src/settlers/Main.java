@@ -75,7 +75,7 @@ public class Main {
 
     void printHistory(Game game, PrintStream out) {
         for (Player p : game.players()) {
-            System.out.println(p.color() + " " + p.bot());
+            out.println(p.color() + " " + p.bot());
         }
 
         List<Pair<Player, List<Event>>> history = game.history().getAll();
