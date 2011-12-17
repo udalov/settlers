@@ -39,9 +39,6 @@ public class Board {
         Map<Path, Resource> ports2to1 = new HashMap<Path, Resource>();
         List<Path> ports3to1 = new ArrayList<Path>();
 
-        List<Hex> allHexes = new ArrayList<Hex>(allHexes());
-        Collections.shuffle(allHexes, rnd);
-
         List<Resource> allResources = new ArrayList<Resource>();
         for (int i = 0; i < 4; i++) {
             allResources.add(Resource.WOOL);
@@ -55,43 +52,44 @@ public class Board {
         allResources.add(null); // desert
         Collections.shuffle(allResources, rnd);
 
-        for (int i = 0; i < allHexes.size(); i++)
+        for (int i = 0, n = allHexes.size(); i < n; i++)
             resources.put(allHexes.get(i), allResources.get(i));
 
-        List<Integer> allNumbers = new ArrayList<Integer>();
-        for (int i = 0; i < 4; i++)
-            allNumbers.add(6 + 2 * (i / 2));
-        for (int i = 2; i <= 12; i++) {
-            if (6 <= i && i <= 8)
-                continue;
-            allNumbers.add(i);
-            if (i == 2 || i == 12)
-                continue;
-            allNumbers.add(i);
+        final int[] allNumbers = new int[] {
+          5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11
+        };
+
+        final int[] startX = new int[] {0,2,6,8,6,2};
+        final int[] startY = new int[] {2,0,0,2,4,4};
+        int d = rnd.nextInt(6);
+        int x = startX[d];
+        int y = startY[d];
+        int p = 0;
+
+        for (int i = 0; i < 12; i++) {
+            Hex h = hex(x, y);
+            if (resources.get(h) != null)
+                numbers.put(h, allNumbers[p++]);
+            if (hex(x + DX[d], y + DY[d]) == null)
+                d = (d + 5) % 6;
+            x += DX[d];
+            y += DY[d];
+        }
+        x += (4 - x) / 2;
+        y += (2 - y) / 2;
+
+        for (int i = 0; i < 6; i++) {
+            Hex h = hex(x, y);
+            if (resources.get(h) != null)
+                numbers.put(h, allNumbers[p++]);
+            d = (d + 5) % 6;
+            x += DX[d];
+            y += DY[d];
         }
 
-        allHexes.remove(allResources.indexOf(null));
-
-        for (Integer number : allNumbers) {
-            while (true) {
-                int i = rnd.nextInt(allHexes.size());
-                Hex hex = allHexes.get(i);
-                if (numbers.containsKey(hex))
-                    continue;
-                if (number != 6 && number != 8) {
-                    numbers.put(hex, number);
-                    break;
-                }
-                boolean ok = true;
-                for (Hex c : adjacentHexes(hex))
-                    ok &= c == null || !numbers.containsKey(c) ||
-                          (numbers.get(c) != 6 && numbers.get(c) != 8);
-                if (ok) {
-                    numbers.put(hex, number);
-                    break;
-                }
-            }
-        }
+        Hex h = hex(4,2);
+        if (resources.get(h) != null)
+            numbers.put(h, allNumbers[p++]);
 
         generatePorts(rnd, ports2to1, ports3to1);
 

@@ -370,9 +370,11 @@ public class Game {
 
     boolean hasPort(Resource r, Player player) {
         for (Xing x : towns.keySet()) {
-            Pair<Boolean, Resource> port = board.portAt(x);
-            if (port.first() && port.second() == r && towns.get(x).player() == player)
-                return true;
+            if (towns.get(x).player() == player) {
+                Pair<Boolean, Resource> port = board.portAt(x);
+                if (port.first() && port.second() == r)
+                    return true;
+            }
         }
         return false;
     }
