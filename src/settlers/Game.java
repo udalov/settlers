@@ -121,20 +121,31 @@ public class Game {
             { check(); return offer.counteroffer(new TradeOffer(me(), sell, buy)); }
     }
 
-    public class Runner implements Runnable {
+    public class VisAPI {
         private final Game game;
-        Runner() {
+        VisAPI() {
             game = Game.this;
             game.visual = true;
         }
-        public void run() {
-            game.play();
-        }
+        public void play() { game.play(); }
         public void next() {
             synchronized(game) {
                 game.notifyAll();
             }
         }
+        public List<Player> players() { return game.players(); }
+        public Board board() { return game.board(); }
+        public History history() { return game.history(); }
+        public Player largestArmy() { return game.largestArmy(); }
+        public Player longestRoad() { return game.longestRoad(); }
+        public int roadLength(Player p) { return game.roadLength(p); }
+        public int points(Player p) { return game.points(p); }
+        public Player turn() { return game.turn(); }
+        public Hex robber() { return game.robber(); }
+        public Player roadAt(Path p) { return game.roadAt(p); }
+        public Town townAt(Xing i) { return game.townAt(i); }
+        public int turnNumber() { return game.turnNumber(); }
+        public boolean isFinished() { return game.isFinished(); }
     }
 
     private final Random rnd;
@@ -180,18 +191,18 @@ public class Game {
             bank.add(r, 19);
     }
 
-    public List<Player> players() { return Collections.unmodifiableList(players); }
-    public Board board() { return board; }
-    public History history() { return history; }
-    public Player largestArmy() { return largestArmy; }
-    public Player longestRoad() { return longestRoad; }
-    public Player turn() { return turn; }
-    public Hex robber() { return robber; }
-    public Player roadAt(Path p) { return roads.get(p); }
-    public Town townAt(Xing i) { return towns.get(i); }
+    List<Player> players() { return Collections.unmodifiableList(players); }
+    Board board() { return board; }
+    History history() { return history; }
+    Player largestArmy() { return largestArmy; }
+    Player longestRoad() { return longestRoad; }
+    Player turn() { return turn; }
+    Hex robber() { return robber; }
+    Player roadAt(Path p) { return roads.get(p); }
+    Town townAt(Xing i) { return towns.get(i); }
 
     int turnNumber() { return turnNumber; }
-    public boolean isFinished() { return finished; }
+    boolean isFinished() { return finished; }
 
 
 
@@ -597,7 +608,7 @@ public class Game {
         return ans;
     }
 
-    public int roadLength(Player player) {
+    int roadLength(Player player) {
         return roadLengthWith(player, null);
     }
 
@@ -694,7 +705,7 @@ public class Game {
         return points;
     }
 
-    public int points(Player player) {
+    int points(Player player) {
         return points(player, false);
     }
 

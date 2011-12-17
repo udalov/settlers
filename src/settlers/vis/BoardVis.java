@@ -32,14 +32,16 @@ public class BoardVis extends JPanel {
     };
 
     private final Game game;
+    private final Game.VisAPI api;
     private final Board board;
     private final Map<Hex, Point> hex;
     private final Map<Path, Polygon> path;
 
-    public BoardVis(Game game) {
+    public BoardVis(Game game, Game.VisAPI api) {
         super(null);
         this.game = game;
-        this.board = game.board();
+        this.api = api;
+        this.board = api.board();
         this.hex = new HashMap<Hex, Point>();
         this.path = new HashMap<Path, Polygon>();
     }
@@ -98,14 +100,14 @@ public class BoardVis extends JPanel {
             g.setFont(new Font("Tahoma",
                 number == 6 || number == 8 ? Font.BOLD : Font.PLAIN, 36));
             String str = number + "";
-            if (game.robber() == c)
+            if (api.robber() == c)
                 str = "[" + str + "]";
             g.drawString(str, z.x - g.getFontMetrics().stringWidth(str) / 2, z.y + 13);
         }
     }
 
     void drawPath(Graphics2D g, Path p) {
-        Player pl = game.roadAt(p);
+        Player pl = api.roadAt(p);
         if (pl == null) {
             g.setColor(Color.BLACK);
             g.setStroke(new BasicStroke(1));
@@ -119,7 +121,7 @@ public class BoardVis extends JPanel {
     }
 
     void drawXing(Graphics2D g, Xing i) {
-        Town t = game.townAt(i);
+        Town t = api.townAt(i);
         if (t == null)
             return;
         g.setColor(playerColorToColor(t.player().color()));
@@ -190,11 +192,11 @@ public class BoardVis extends JPanel {
             drawHex(g, c);
         }
         for (Path p : Board.allPaths()) {
-            if (game.roadAt(p) == null)
+            if (api.roadAt(p) == null)
                 drawPath(g, p);
         }
         for (Path p : Board.allPaths()) {
-            if (game.roadAt(p) != null)
+            if (api.roadAt(p) != null)
                 drawPath(g, p);
         }
         for (Xing i : Board.allXings()) {
@@ -236,14 +238,14 @@ public class BoardVis extends JPanel {
         g.drawString("Resources: " + player.cardsNumber(), x + 4, y + line + 4);
         g.setColor(normalText);
         g.drawString("Developments: " + player.developmentsNumber(), x + 4, y + 2*line + 4);
-        g.setColor(game.longestRoad() == player && game.roadLength(player) >= 5 ? longestRoad : normalText);
-        g.drawString("Road length: " + game.roadLength(player), x + 4, y + 3*line + 4);
-        g.setColor(game.largestArmy() == player && player.armyStrength() >= 3 ? largestArmy : normalText);
+        g.setColor(api.longestRoad() == player && api.roadLength(player) >= 5 ? longestRoad : normalText);
+        g.drawString("Road length: " + api.roadLength(player), x + 4, y + 3*line + 4);
+        g.setColor(api.largestArmy() == player && player.armyStrength() >= 3 ? largestArmy : normalText);
         g.drawString("Army size: " + player.armyStrength(), x + 4, y + 4*line + 4);
         g.setColor(normalText);
-        g.drawString("Points: " + game.points(player), x + 4, y + 5*line + 4);
+        g.drawString("Points: " + api.points(player), x + 4, y + 5*line + 4);
 
-        if (game.turn() == player) {
+        if (api.turn() == player) {
             g.setFont(new Font("Tahoma", Font.BOLD, line - 2));
             g.setColor(new Color(0x004400));
             g.drawString("TURN", x + 4, y + 7*line + 4);
@@ -255,8 +257,8 @@ public class BoardVis extends JPanel {
             {20, 20, width() - PLAYER_INFO_WIDTH - 20, width() - PLAYER_INFO_WIDTH - 20};
         final int[] playerInfoY = new int[]
             {height() - PLAYER_INFO_HEIGHT - 20, 20, 20, height() - PLAYER_INFO_HEIGHT - 20};
-        for (int i = 0; i < game.players().size(); i++) {
-            drawPlayerInfo(g, game.players().get(i), playerInfoX[i], playerInfoY[i]);
+        for (int i = 0; i < api.players().size(); i++) {
+            drawPlayerInfo(g, api.players().get(i), playerInfoX[i], playerInfoY[i]);
         }
     }
 
@@ -311,7 +313,7 @@ public class BoardVis extends JPanel {
     void drawLastHistoryEvent(Graphics g) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Tahoma", Font.BOLD, 24));
-        Pair<Player, settlers.Event> pair = game.history().getLastEvent();
+        Pair<Player, settlers.Event> pair = api.history().getLastEvent();
         String str = pair == null ? "" : eventDescription(pair.first(), pair.second());
         g.drawString(str,
             width() / 2 - g.getFontMetrics().stringWidth(str) / 2,

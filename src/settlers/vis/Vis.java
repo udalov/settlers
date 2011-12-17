@@ -11,18 +11,18 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     public static final int BOARD_HEIGHT = 740;
 
     private final Game game;
-    private final Game.Runner thread;
+    private final Game.VisAPI api;
 
     private final BoardVis boardVis;
     private final JMenuBar menuBar = new JMenuBar();
     private final JButton nextActionButton = new JButton("Next action");
     private final JButton nextTurnButton = new JButton("Next turn");
 
-    public Vis(Game game, Game.Runner thread) {
+    public Vis(Game game, Game.VisAPI api) {
         setLayout(null);
 
         this.game = game;
-        this.thread = thread;
+        this.api = api;
 
         buildMenu();
         setJMenuBar(menuBar);
@@ -31,7 +31,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         getContentPane().add(nextActionButton);
         getContentPane().add(nextTurnButton);
 
-        boardVis = new BoardVis(game);
+        boardVis = new BoardVis(game, api);
         getContentPane().add(boardVis);
 
         addWindowListener(this);
@@ -46,7 +46,11 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         setSize(width, height);
         setMinimumSize(new Dimension(width, height));
 
-        new Thread(thread).start();
+        new Thread(new Runnable() {
+            public void run() {
+                Vis.this.api.play();
+            }
+        }).start();
         nextTurnButton.setText("Skip building phase");
         setVisible(true);
     }
@@ -78,7 +82,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     void buildButtons() {
         final ActionListener listener = new ActionListener() {
             private void nextAction() {
-                thread.next();
+                api.next();
             }
 
             private void repaintVis() {
@@ -89,19 +93,19 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
             }
 
             public void actionPerformed(ActionEvent e) {
-                if (game.isFinished())
+                if (api.isFinished())
                     return;
                 Object o = e.getSource();
                 if (o == nextActionButton) {
                     nextAction();
                 } else if (o == nextTurnButton) {
-                    int turn = game.history().size();
+                    int turn = api.history().size();
                     do {
                         nextAction();
-                    } while (game.history().size() == turn && !game.isFinished());
+                    } while (api.history().size() == turn && !api.isFinished());
                 }
                 repaintVis();
-                if (game.history().size() == 2)
+                if (api.history().size() == 2)
                     nextTurnButton.setText("Next turn");
             }
         };

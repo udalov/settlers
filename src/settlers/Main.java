@@ -140,7 +140,7 @@ public class Main {
             }
 
             if (vis) {
-                new Vis(game, game.new Runner());
+                new Vis(game, game.new VisAPI());
             } else {
                 try {
                     game.play();
