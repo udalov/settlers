@@ -1,14 +1,13 @@
 package settlers;
 
-import java.util.Map;
-import java.util.HashMap;
-
 import java.io.File;
 import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JFrame;
 import settlers.bot.Bot;
 import settlers.bot.ExampleBot;
@@ -150,7 +149,12 @@ public class Main {
             }
 
             for (int i = 0; i < bots.length; i++) {
-                game.addPlayer(new Player(bots[i], i));
+                try {
+                    game.addPlayer(new Player(bots[i], i));
+                } catch (GameException e) {
+                    e.printStackTrace();
+                    return;
+                }
             }
 
             if (vis) {
@@ -159,9 +163,13 @@ public class Main {
                 game.play();
                 printHistory(game, System.out);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        catch (java.net.MalformedURLException e) { e.printStackTrace(); }
+        catch (ClassNotFoundException e) { e.printStackTrace(); }
+        catch (NoSuchMethodException e) { e.printStackTrace(); }
+        catch (InstantiationException e) { e.printStackTrace(); }
+        catch (IllegalAccessException e) { e.printStackTrace(); }
+        catch (java.lang.reflect.InvocationTargetException e) { e.printStackTrace(); }
     }
 
     public static void main(String[] args) {
