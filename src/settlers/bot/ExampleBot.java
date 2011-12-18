@@ -39,7 +39,7 @@ public class ExampleBot extends Bot {
             api.moveRobber(rob.first(), rob.second());
         }
         if (api.developments().knight() > 0) {
-            boolean bad = api.largestArmy() != api.me();
+            boolean bad = api.largestArmy() != me || me.armyStrength() < 3;
             for (Player p : api.robbable(api.robber()))
                 bad |= p == me;
             if (bad) {
