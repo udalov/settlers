@@ -253,10 +253,11 @@ public class BoardVis extends JPanel {
     }
 
     void drawPlayersInfo(Graphics g) {
+        final int indent = 20;
         final int[] playerInfoX = new int[]
-            {20, 20, width() - PLAYER_INFO_WIDTH - 20, width() - PLAYER_INFO_WIDTH - 20};
+            {indent, indent, width() - PLAYER_INFO_WIDTH - indent, width() - PLAYER_INFO_WIDTH - indent};
         final int[] playerInfoY = new int[]
-            {height() - PLAYER_INFO_HEIGHT - 20, 20, 20, height() - PLAYER_INFO_HEIGHT - 20};
+            {height() - PLAYER_INFO_HEIGHT - indent, indent, indent, height() - PLAYER_INFO_HEIGHT - indent};
         for (int i = 0; i < api.players().size(); i++) {
             drawPlayerInfo(g, api.players().get(i), playerInfoX[i], playerInfoY[i]);
         }
