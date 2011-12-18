@@ -81,7 +81,7 @@ public class History {
     void change(String sell, String buy) { addEvent(EventType.CHANGE, sell, buy); }
     void trade(Player pl, String sell, String buy) { addEvent(EventType.TRADE, pl, sell, buy); }
     void victory(int victoryPoints) { addEvent(EventType.VICTORY, victoryPoints); }
-    void exception(String className, String message) { addEvent(EventType.EXCEPTION, className, message); }
+    void exception(Exception exception) { addEvent(EventType.EXCEPTION, exception); }
 
 }
 

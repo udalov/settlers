@@ -307,7 +307,7 @@ public class BoardVis extends JPanel {
             case VICTORY:
                 return color + " wins!" + (event.number() == 0 ? "" : " (" + event.number() + " VP)");
             case EXCEPTION:
-                return color + " gets " + event.className();
+                return color + " throws " + event.exception().getClass().getName();
             default:
                 return "";
         }

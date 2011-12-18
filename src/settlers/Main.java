@@ -62,7 +62,9 @@ public class Main {
             case VICTORY:
                 return "victory";
             case EXCEPTION:
-                return "exception " + event.className() + " " + event.message();
+                Exception e = event.exception();
+                e.printStackTrace();
+                return "exception " + e.getClass().getName() + " " + e.getMessage();
             default:
                 return "";
         }

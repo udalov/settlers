@@ -141,21 +141,12 @@ public class Event {
         }
     }
 
-    public String className() {
+    public Exception exception() {
         switch (type) {
             case EXCEPTION:
-                return (String)args[0];
+                return (Exception)args[0];
             default:
-                throw noRecord("className");
-        }
-    }
-
-    public String message() {
-        switch (type) {
-            case EXCEPTION:
-                return (String)args[1];
-            default:
-                throw noRecord("message");
+                throw noRecord("exception");
         }
     }
 }

@@ -668,7 +668,7 @@ public class Game {
             placeInitialSettlements();
             while (!nextTurn());
         } catch (Exception e) {
-            history.exception(e.getClass().getName(), e.getMessage());
+            history.exception(e);
             finished = true;
         }
     }
