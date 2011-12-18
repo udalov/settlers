@@ -6,7 +6,6 @@
 6. (hi-pri) trade offers must expire after any action of the player
 7. trade resources to players with corresponding ports
 8. recalculation of the longest road after road-breaking
-9. (hi-pri) better representation of DevelopmentStack
+9. what if bot catches GameException?
 10. check trade thoroughly
-11. what if bot catches GameException?
 
