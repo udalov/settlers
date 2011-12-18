@@ -26,5 +26,6 @@ public enum EventType {
     TRADE,
 
     VICTORY,
+    EXCEPTION,
 }
 

@@ -13,11 +13,11 @@ public class TradeOffer {
 
     TradeOffer(Player trader, String sell, String buy) {
         if (sell == null || buy == null || "".equals(sell) || "".equals(buy))
-            throw new RuntimeException("You cannot trade with nothing");
+            throw new GameException("You cannot trade with nothing");
         if (!Util.resourceString(sell) || !Util.resourceString(buy))
-            throw new RuntimeException("Invalid characters in trade offer");
+            throw new GameException("Invalid characters in trade offer");
         if (!trader.cards().areThere(sell))
-            throw new RuntimeException("You cannot sell resources you do not have");
+            throw new GameException("You cannot sell resources you do not have");
         this.trader = trader;
         this.sell = sell;
         this.buy = buy;

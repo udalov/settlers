@@ -56,7 +56,7 @@ public class ResourceStack {
 
     void sub(Resource r, int x) {
         if (howMany(r) < x)
-            throw new RuntimeException("Not enough resources: " +
+            throw new GameException("Not enough resources: " +
                 (x - howMany(r)) + " more " + r + " needed!");
         resources.put(r, resources.get(r) - x);
     }

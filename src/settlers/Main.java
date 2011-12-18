@@ -61,6 +61,8 @@ public class Main {
                 return "trade " + index.get(event.player()) + " " + event.sell() + " " + event.buy();
             case VICTORY:
                 return "victory";
+            case EXCEPTION:
+                return "exception " + event.className() + " " + event.message();
             default:
                 return "";
         }
@@ -83,6 +85,8 @@ public class Main {
                 String s = eventString(event, index);
                 if (ind >= 0) s = ind + " " + s;
                 out.println(s);
+                if (event.type() == EventType.EXCEPTION)
+                    return;
             }
         }
 
@@ -150,11 +154,7 @@ public class Main {
             if (vis) {
                 new Vis(game, game.new VisAPI());
             } else {
-                try {
-                    game.play();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                game.play();
                 printHistory(game, System.out);
             }
         } catch (Exception e) {

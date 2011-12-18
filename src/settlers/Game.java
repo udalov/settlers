@@ -24,11 +24,11 @@ public class Game {
 
         void checkTurn() {
             if (player(bot) != turn)
-                throw new RuntimeException("You cannot do anything not on your turn");
+                throw new GameException("You cannot do anything not on your turn");
         }
         void checkRobber() {
             if (diceRolled == 7 && robberMoveStatus == 1)
-                throw new RuntimeException("You must move the robber right after rolling 7");
+                throw new GameException("You must move the robber right after rolling 7");
         }
         void check() {
             checkTurn();
@@ -60,9 +60,9 @@ public class Game {
         public void moveRobber(Hex c, Player whoToRob) {
             checkTurn();
             if (robberMoveStatus == 0)
-                throw new RuntimeException("You cannot move the robber after not rolling 7");
+                throw new GameException("You cannot move the robber after not rolling 7");
             if (robberMoveStatus == 2)
-                throw new RuntimeException("You cannot move the robber twice");
+                throw new GameException("You cannot move the robber twice");
             game.moveRobber(c, whoToRob);
         }
 
@@ -237,7 +237,7 @@ public class Game {
 
     int rollDice() {
         if (diceRolled != 0)
-            throw new RuntimeException("You cannot roll the dice twice a turn");
+            throw new GameException("You cannot roll the dice twice a turn");
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
         if (diceRolled == 7) {
             robberMoveStatus = 1;
@@ -247,16 +247,16 @@ public class Game {
                 if (were > 7) {
                     List<Resource> discard = p.bot().discardHalfOfTheCards();
                     if (discard == null)
-                        throw new RuntimeException("You cannot discard null");
+                        throw new GameException("You cannot discard null");
                     for (Resource r : discard) {
                         if (r == null)
-                            throw new RuntimeException("You cannot discard null");
+                            throw new GameException("You cannot discard null");
                         p.cards().sub(r, 1);
                         bank.add(r, 1);
                     }
                     history.discard(p, discard);
                     if (p.cards().size() != (were + 1) / 2)
-                        throw new RuntimeException("You must discard half of your cards");
+                        throw new GameException("You must discard half of your cards");
                 }
             }
         } else {
@@ -308,19 +308,19 @@ public class Game {
 
     void moveRobber(Hex hex, Player whoToRob) {
         if (hex == null)
-            throw new RuntimeException("You cannot move the robber to null");
+            throw new GameException("You cannot move the robber to null");
         if (hex == robber)
-            throw new RuntimeException("You cannot leave the robber at his current position");
+            throw new GameException("You cannot leave the robber at his current position");
         if (whoToRob == turn)
-            throw new RuntimeException("You cannot rob yourself");
+            throw new GameException("You cannot rob yourself");
         if (whoToRob != null && whoToRob.cardsNumber() == 0)
-            throw new RuntimeException("You cannot rob a player who has no cards");
+            throw new GameException("You cannot rob a player who has no cards");
         List<Player> robbable = robbable(hex);
         if (!robbable.isEmpty() && whoToRob == null)
-            throw new RuntimeException("You must rob somebody");
+            throw new GameException("You must rob somebody");
         if ((robbable.isEmpty() && whoToRob != null) ||
             (!robbable.isEmpty() && !robbable.contains(whoToRob)))
-            throw new RuntimeException("You cannot rob a player not having a town near the robber");
+            throw new GameException("You cannot rob a player not having a town near the robber");
         robber = hex;
         robberMoveStatus = 2;
         if (whoToRob == null) {
@@ -336,13 +336,13 @@ public class Game {
 
     void buildSettlement(Xing x) {
         if (x == null)
-            throw new RuntimeException("You cannot build a settlement at null");
+            throw new GameException("You cannot build a settlement at null");
         if (turn.settlementsLeft() == 0)
-            throw new RuntimeException("You do not have any settlements left");
+            throw new GameException("You do not have any settlements left");
         if (!turn.cards().areThere("BWGL"))
-            throw new RuntimeException("Not enough resources to build a settlement");
+            throw new GameException("Not enough resources to build a settlement");
         if (!canBuildTownAt(x, true, turn))
-            throw new RuntimeException("You cannot build a settlement here");
+            throw new GameException("You cannot build a settlement here");
         turn.expendSettlement();
         towns.put(x, new Town(turn, false));
         turn.cards().sub("BWGL");
@@ -352,17 +352,17 @@ public class Game {
 
     void buildCity(Xing x) {
         if (x == null)
-            throw new RuntimeException("You cannot build a town at null");
+            throw new GameException("You cannot build a town at null");
         if (turn.citiesLeft() == 0)
-            throw new RuntimeException("You do not have any cities left");
+            throw new GameException("You do not have any cities left");
         if (!turn.cards().areThere("OOOGG"))
-            throw new RuntimeException("Not enough resources to build a city");
+            throw new GameException("Not enough resources to build a city");
         if (townAt(x) == null)
-            throw new RuntimeException("You must first build a settlement to be able to upgrade it");
+            throw new GameException("You must first build a settlement to be able to upgrade it");
         if (townAt(x).isCity())
-            throw new RuntimeException("You cannot build a city over an existing city");
+            throw new GameException("You cannot build a city over an existing city");
         if (townAt(x).player() != turn)
-            throw new RuntimeException("You cannot upgrade other player's settlement");
+            throw new GameException("You cannot upgrade other player's settlement");
         turn.expendCity();
         towns.put(x, new Town(turn, true));
         turn.cards().sub("OOOGG");
@@ -372,13 +372,13 @@ public class Game {
 
     void buildRoad(Path p) {
         if (p == null)
-            throw new RuntimeException("You cannot build a road at null");
+            throw new GameException("You cannot build a road at null");
         if (turn.roadsLeft() == 0)
-            throw new RuntimeException("You do not have any roads left");
+            throw new GameException("You do not have any roads left");
         if (!turn.cards().areThere("BL"))
-            throw new RuntimeException("Not enough resources to build a road");
+            throw new GameException("Not enough resources to build a road");
         if (!canBuildRoadAt(p, turn))
-            throw new RuntimeException("You cannot build a road here");
+            throw new GameException("You cannot build a road here");
         turn.expendRoad();
         roads.put(p, turn);
         turn.cards().sub("BL");
@@ -406,7 +406,7 @@ public class Game {
         if (sell == null || buy == null || "".equals(sell) || "".equals(buy))
             return false;
         if (!Util.resourceString(sell) || !Util.resourceString(buy))
-            throw new RuntimeException("Invalid characters in change string");
+            throw new GameException("Invalid characters in change string");
         if (!bank.areThere(buy))
             return false;
         int res = 0;
@@ -439,7 +439,7 @@ public class Game {
 
     void change(String sell, String buy) {
         if (!canChange(sell, buy, turn))
-            throw new RuntimeException("You cannot change " + sell + " to " + buy);
+            throw new GameException("You cannot change " + sell + " to " + buy);
         turn.cards().sub(sell);
         turn.cards().add(buy);
         bank.add(sell);
@@ -451,7 +451,7 @@ public class Game {
         if (what == null || "".equals(what))
             return true;
         if (!Util.resourceString(what))
-            throw new RuntimeException("Invalid characters in resource string");
+            throw new GameException("Invalid characters in resource string");
         Map<Resource, Integer> left = new EnumMap<Resource, Integer>(Resource.class);
         String buy = "";
         for (Resource r : Resource.all()) {
@@ -496,9 +496,9 @@ public class Game {
 
     void drawDevelopment() {
         if (developments.isEmpty())
-            throw new RuntimeException("No more developments left in the game");
+            throw new GameException("No more developments left in the game");
         if (!turn.cards().areThere("WOG"))
-            throw new RuntimeException("Not enough resources to draw a development");
+            throw new GameException("Not enough resources to draw a development");
         Development d = developments.remove(developments.size() - 1);
         turn.developments().add(d);
         turn.cards().sub("WOG");
@@ -508,7 +508,7 @@ public class Game {
 
     void monopoly(Resource r) {
         if (r == null)
-            throw new RuntimeException("You cannot declare monopoly on null");
+            throw new GameException("You cannot declare monopoly on null");
         turn.developments().use(Development.MONOPOLY);
         int got = 0;
         for (Player p : players) {
@@ -525,19 +525,19 @@ public class Game {
     void roadBuilding(Path p1, Path p2) {
         turn.developments().use(Development.ROAD_BUILDING);
         if (turn.roadsLeft() == 0)
-            throw new RuntimeException("You do not have any roads left to use road building card");
+            throw new GameException("You do not have any roads left to use road building card");
         if (turn.roadsLeft() == 1) {
             if (p1 == null) { Path p = p1; p1 = p2; p2 = p; }
             if (p2 != null)
-                throw new RuntimeException("You have only 1 road left to use road building card");
+                throw new GameException("You have only 1 road left to use road building card");
         }
         if (!canBuildRoadAt(p1, turn))
-            throw new RuntimeException("You cannot build a road here");
+            throw new GameException("You cannot build a road here");
         turn.expendRoad();
         roads.put(p1, turn);
         if (p2 != null) {
             if (!canBuildRoadAt(p2, turn))
-                throw new RuntimeException("You cannot build a road here");
+                throw new GameException("You cannot build a road here");
             turn.expendRoad();
             roads.put(p2, turn);
         }
@@ -547,9 +547,9 @@ public class Game {
 
     void invention(Resource r1, Resource r2) {
         if (r1 == null || r2 == null)
-            throw new RuntimeException("You cannot use invention card on null");
+            throw new GameException("You cannot use invention card on null");
         if (bank.howMany(r1) == 0 || bank.howMany(r2) == 0)
-            throw new RuntimeException("You cannot use invention card on non-existing resources");
+            throw new GameException("You cannot use invention card on non-existing resources");
         turn.developments().use(Development.INVENTION);
         turn.cards().add(r1, 1);
         turn.cards().add(r2, 1);
@@ -651,9 +651,9 @@ public class Game {
         }
 
         if (diceRolled == 0)
-            throw new RuntimeException("You must roll the dice once a turn");
+            throw new GameException("You must roll the dice once a turn");
         if (diceRolled == 7 && robberMoveStatus == 1)
-            throw new RuntimeException("You must move the robber if you rolled 7");
+            throw new GameException("You must move the robber if you rolled 7");
 
         return false;
     }
@@ -664,9 +664,13 @@ public class Game {
         turnNumber = -1;
         eventHappened();
 
-        placeInitialSettlements();
-
-        while (!nextTurn());
+        try {
+            placeInitialSettlements();
+            while (!nextTurn());
+        } catch (Exception e) {
+            history.exception(e.getClass().getName(), e.getMessage());
+            finished = true;
+        }
     }
 
     void placeInitialSettlements() {
@@ -675,11 +679,11 @@ public class Game {
                 Player player = players.get(i);
                 Pair<Xing, Path> p = player.bot().placeInitialSettlements(it == 0);
                 if (p == null || p.first() == null || p.second() == null)
-                    throw new RuntimeException("You cannot build a first settlement at null");
+                    throw new GameException("You cannot build a first settlement at null");
                 if (!Board.areAdjacent(p.first(), p.second()))
-                    throw new RuntimeException("You cannot build a road not connected to a town");
+                    throw new GameException("You cannot build a road not connected to a town");
                 if (!canBuildTownAt(p.first(), false, player))
-                    throw new RuntimeException("You cannot build a town here");
+                    throw new GameException("You cannot build a town here");
                 towns.put(p.first(), new Town(player, false));
                 history.initialSettlement(player, p.first());
                 roads.put(p.second(), player);

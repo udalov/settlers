@@ -46,9 +46,9 @@ public class DevelopmentStack {
 
     void use(Development d) {
         if (developments.get(d) == 0 && disabled.get(d) > 0)
-            throw new RuntimeException("You cannot use " + d + " development at this moment!");
+            throw new GameException("You cannot use " + d + " development at this moment!");
         if (developments.get(d) == 0)
-            throw new RuntimeException("You don't have a " + d + " development!");
+            throw new GameException("You don't have a " + d + " development!");
         developments.put(d, developments.get(d) - 1);
         for (Development e : Development.all()) {
             disabled.put(e, developments.get(e) + disabled.get(e));

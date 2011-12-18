@@ -33,9 +33,9 @@ public class TradeResult {
 
     public void complete() {
         if (decision == DECLINE)
-            throw new RuntimeException("Cannot complete declined offer");
+            throw new GameException("Cannot complete declined offer");
         if (completed)
-            throw new RuntimeException("Cannot complete an offer twice");
+            throw new GameException("Cannot complete an offer twice");
         completed = true;
         if (decision == COUNTEROFFER)
             counteroffer.complete(player);

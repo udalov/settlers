@@ -15,7 +15,7 @@ public class Event {
     public EventType type() { return type; }
 
     private RuntimeException noRecord(String field) {
-        return new RuntimeException("Event " + type + " has no " + field + " record");
+        return new GameException("Event " + type + " has no " + field + " record");
     }
 
     public Player player() {
@@ -141,4 +141,21 @@ public class Event {
         }
     }
 
+    public String className() {
+        switch (type) {
+            case EXCEPTION:
+                return (String)args[0];
+            default:
+                throw noRecord("className");
+        }
+    }
+
+    public String message() {
+        switch (type) {
+            case EXCEPTION:
+                return (String)args[1];
+            default:
+                throw noRecord("message");
+        }
+    }
 }

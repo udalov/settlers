@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.List;
 import settlers.Resource;
+import settlers.GameException;
 
 public class Util {
     
@@ -56,14 +57,14 @@ public class Util {
 
     public static void checkBotName(String name) {
         if (name == null)
-            throw new RuntimeException("Name of your bot cannot be null");
+            throw new GameException("Name of your bot cannot be null");
         if ("".equals(name))
-            throw new RuntimeException("Name of your bot cannot be empty");
+            throw new GameException("Name of your bot cannot be empty");
         if (name.length() > 64)
-            throw new RuntimeException("Name of your bot cannot be that long");
+            throw new GameException("Name of your bot cannot be that long");
         for (char c : name.toCharArray())
             if ((int)c < 32 || 126 < (int)c)
-                throw new RuntimeException("Name of your bot can contain only characters with ASCII codes from 32 to 126");
+                throw new GameException("Name of your bot can contain only characters with ASCII codes from 32 to 126");
     }
 
 }

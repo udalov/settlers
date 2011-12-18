@@ -306,6 +306,8 @@ public class BoardVis extends JPanel {
                 return color + " sells " + event.sell() + " to " + event.player().color() + " and buys " + event.buy();
             case VICTORY:
                 return color + " wins!" + (event.number() == 0 ? "" : " (" + event.number() + " VP)");
+            case EXCEPTION:
+                return color + " gets " + event.className();
             default:
                 return "";
         }
