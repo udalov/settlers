@@ -71,7 +71,7 @@ public class Main {
         Map<Player, Integer> index = new HashMap<Player, Integer>();
         for (Player p : game.players()) {
             index.put(p, index.size());
-            out.println(p.color() + " " + p.bot());
+            out.println(p.bot());
         }
 
         List<Pair<Player, List<Event>>> history = game.history().getAll();
