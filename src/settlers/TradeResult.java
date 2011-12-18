@@ -28,8 +28,8 @@ public class TradeResult {
     public int decision() { return decision; }
     public TradeOffer counteroffer() { return counteroffer; }
 
-    public boolean accepted() { return decision == ACCEPT; }
-    public boolean declined() { return decision == DECLINE; }
+    public boolean isAccepted() { return decision == ACCEPT; }
+    public boolean isDeclined() { return decision == DECLINE; }
 
     public void complete() {
         if (decision == DECLINE)
