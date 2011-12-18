@@ -16,7 +16,5 @@ public abstract class Bot {
     public abstract TradeResult trade(TradeOffer offer);
     public abstract List<Resource> discardHalfOfTheCards();
     public abstract Pair<Xing, Path> placeInitialSettlements(boolean first);
-
-    public void tradeWithOtherPlayerOnHisTurn() { }
 }
 

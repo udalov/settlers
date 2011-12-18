@@ -170,9 +170,6 @@ public class ExampleBot extends Bot {
         return ans;
     }
 
-    public void tradeWithOtherPlayerOnHisTurn() {
-    }
-
     public Pair<Xing, Path> placeInitialSettlements(boolean first) {
         List<Xing> l = new ArrayList<Xing>();
         for (Xing i : Board.allXings())
