@@ -659,17 +659,14 @@ public class Game {
     }
 
     void play() {
-        init();
-        placeInitialSettlements();
-
-        while (!nextTurn());
-    }
-
-    void init() {
         n = players.size();
         Collections.shuffle(players, rnd);
         turnNumber = -1;
         eventHappened();
+
+        placeInitialSettlements();
+
+        while (!nextTurn());
     }
 
     void placeInitialSettlements() {
