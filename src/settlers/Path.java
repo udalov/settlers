@@ -14,7 +14,7 @@ public class Path {
     public int direction() { return direction; }
     public int x() { return hex.x(); }
     public int y() { return hex.y(); }
-    public String toString() { return "["+hex.x()+","+hex.y()+","+direction+"]"; }
+    public String toString() { return hex.x() + " " + hex.y() + " " + direction; }
 
     public boolean equals(Object o) {
         if (!(o instanceof Path))

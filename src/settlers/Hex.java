@@ -12,7 +12,7 @@ public class Hex {
 
     public int x() { return x; }
     public int y() { return y; }
-    public String toString() { return "("+x+","+y+")"; }
+    public String toString() { return x + " " + y; }
 
     public boolean equals(Object o) {
         if (!(o instanceof Hex))
