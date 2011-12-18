@@ -20,7 +20,7 @@ public class Util {
         return ans;
     }
 
-    public static boolean resourceString(String s) {
+    public static boolean isResourceString(String s) {
         i: for (int i = 0, n = s.length(); i < n; i++) {
             for (Resource r : Resource.all())
                 if (r.chr() == s.charAt(i))

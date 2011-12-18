@@ -405,7 +405,7 @@ public class Game {
     boolean canChange(String sell, String buy, Player player) {
         if (sell == null || buy == null || "".equals(sell) || "".equals(buy))
             return false;
-        if (!Util.resourceString(sell) || !Util.resourceString(buy))
+        if (!Util.isResourceString(sell) || !Util.isResourceString(buy))
             throw new GameException("Invalid characters in change string");
         if (!bank.areThere(buy))
             return false;
@@ -450,7 +450,7 @@ public class Game {
     boolean getIfPossible(String what) {
         if (what == null || "".equals(what))
             return true;
-        if (!Util.resourceString(what))
+        if (!Util.isResourceString(what))
             throw new GameException("Invalid characters in resource string");
         Map<Resource, Integer> left = new EnumMap<Resource, Integer>(Resource.class);
         String buy = "";

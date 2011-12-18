@@ -14,7 +14,7 @@ public class TradeOffer {
     TradeOffer(Player trader, String sell, String buy) {
         if (sell == null || buy == null || "".equals(sell) || "".equals(buy))
             throw new GameException("You cannot trade with nothing");
-        if (!Util.resourceString(sell) || !Util.resourceString(buy))
+        if (!Util.isResourceString(sell) || !Util.isResourceString(buy))
             throw new GameException("Invalid characters in trade offer");
         if (!trader.cards().areThere(sell))
             throw new GameException("You cannot sell resources you do not have");
