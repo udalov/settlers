@@ -3,14 +3,14 @@ package settlers;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class DevelopmentStack {
+public class DevelopmentDeck {
 
     private final Map<Development, Integer> developments =
         new EnumMap<Development, Integer>(Development.class);
     private final Map<Development, Integer> disabled =
         new EnumMap<Development, Integer>(Development.class);
 
-    DevelopmentStack() {
+    DevelopmentDeck() {
         for (Development d : Development.all()) {
             developments.put(d, 0);
             disabled.put(d, 0);

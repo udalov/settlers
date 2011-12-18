@@ -8,7 +8,7 @@ public class Player {
     private final Bot bot;
     private final int color;
     private final ResourceStack cards = new ResourceStack();
-    private final DevelopmentStack developments = new DevelopmentStack();
+    private final DevelopmentDeck developments = new DevelopmentDeck();
     
     Player(Bot bot, int color) {
         String name = bot.toString();
@@ -28,7 +28,7 @@ public class Player {
     public int color() { return color; }
     Bot bot() { return bot; }
     ResourceStack cards() { return cards; }
-    DevelopmentStack developments() { return developments; }
+    DevelopmentDeck developments() { return developments; }
 
     public int cardsNumber() { return cards.size(); }
     public int developmentsNumber() { return developments.size(); }

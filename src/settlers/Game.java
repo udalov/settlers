@@ -45,7 +45,7 @@ public class Game {
         public Player turn() { return turn; }
 
         public ResourceStack cards() { return player(bot).cards(); }
-        public DevelopmentStack developments() { return player(bot).developments(); }
+        public DevelopmentDeck developments() { return player(bot).developments(); }
         public ResourceStack bank() { return game.bank; }
 
         public Player roadAt(Path p) { return game.roadAt(p); }
