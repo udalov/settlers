@@ -8,4 +8,5 @@
 8. recalculation of the longest road after road-breaking
 9. (hi-pri) better representation of DevelopmentStack
 10. check trade thoroughly
+11. what if bot catches GameException?
 
