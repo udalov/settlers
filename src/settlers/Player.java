@@ -11,7 +11,7 @@ public class Player {
     private final DevelopmentStack developments = new DevelopmentStack();
     
     Player(Bot bot, int color) {
-        String name = bot + "";
+        String name = bot.toString();
         if (name == null)
             throw new GameException("Name of your bot cannot be null");
         if ("".equals(name))
@@ -34,9 +34,7 @@ public class Player {
     public int developmentsNumber() { return developments.size(); }
 
     public boolean equals(Object o) {
-        if (!(o instanceof Player))
-            return false;
-        return color == ((Player)o).color;
+        return o instanceof Player && color == ((Player)o).color;
     }
 
     public int hashCode() {

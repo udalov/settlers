@@ -43,10 +43,6 @@ public class Util {
         return l;
     }
 
-    public static <T> List<T> shuffle(List<T> list) {
-        return shuffle(list, new Random());
-    }
-
     public static <T> List<T> filter(List<T> list, Filter<T> filter) {
         List<T> ans = new ArrayList<T>();
         for (T obj : list)

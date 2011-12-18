@@ -7,8 +7,8 @@ import settlers.*;
 
 public class Vis extends JFrame implements WindowListener, MouseListener, ComponentListener {
     
-    public static final int BOARD_WIDTH = 1020;
-    public static final int BOARD_HEIGHT = 740;
+    private static final int BOARD_WIDTH = 1020;
+    private static final int BOARD_HEIGHT = 740;
 
     private final Game game;
     private final Game.VisAPI api;
@@ -87,7 +87,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
 
             private void repaintVis() {
                 // TODO: invent something different
-                try { Thread.sleep(50); } catch (InterruptedException ie) { }
+                try { Thread.sleep(50); } catch (InterruptedException ignored) { }
                 synchronized(game) { }
                 repaint();
             }

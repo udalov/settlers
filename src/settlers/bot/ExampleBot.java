@@ -7,12 +7,10 @@ import settlers.util.*;
 public class ExampleBot extends Bot {
 
     private final Random rnd;
-    private final Board board;
-    
+
     public ExampleBot(Game.API api) {
         super(api);
         rnd = api.rnd();
-        board = api.board();
     }
 
     
@@ -77,7 +75,7 @@ public class ExampleBot extends Bot {
                     invent[inp++] = r;
             if (inp < 2) {
                 invent[inp++] = Resource.GRAIN;
-                invent[inp++] = Resource.ORE;
+                invent[inp] = Resource.ORE;
             }
             api.invention(invent[0], invent[1]);
         }

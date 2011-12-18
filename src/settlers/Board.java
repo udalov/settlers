@@ -89,7 +89,7 @@ public class Board {
 
         Hex h = hex(4,2);
         if (resources.get(h) != null)
-            numbers.put(h, allNumbers[p++]);
+            numbers.put(h, allNumbers[p]);
 
         generatePorts(rnd, ports2to1, ports3to1);
 

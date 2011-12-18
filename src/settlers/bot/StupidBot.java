@@ -7,12 +7,10 @@ import settlers.util.*;
 public class StupidBot extends Bot {
 
     private final Random rnd;
-    private final Board board;
-    
+
     public StupidBot(Game.API api) {
         super(api);
         rnd = api.rnd();
-        board = api.board();
     }
 
     public void makeTurn() {
