@@ -553,8 +553,8 @@ public class Game {
     void knight(Hex hex, Player whoToRob) {
         turn.developments().use(Development.KNIGHT);
         turn.increaseArmyStrength();
-        updateLargestArmy();
         history.knight();
+        updateLargestArmy();
         moveRobber(hex, whoToRob);
     }
 
