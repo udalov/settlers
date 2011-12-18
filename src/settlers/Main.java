@@ -46,9 +46,9 @@ public class Main {
             case KNIGHT:
                 return "knight";
             case INVENTION:
-                return "invention " + event.resource() + " " + event.resource2();
+                return "invention " + event.resource().chr() + " " + event.resource2().chr();
             case MONOPOLY:
-                return "monopoly " + event.resource() + " " + event.number();
+                return "monopoly " + event.resource().chr() + " " + event.number();
             case ROAD_BUILDING:
                 return "roadbuilding " + event.path() + " " + event.path2();
             case LONGEST_ROAD:
