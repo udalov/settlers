@@ -40,13 +40,19 @@ public class DevelopmentStack {
     public int monopoly() { return howMany(Development.MONOPOLY); }
     public int victoryPoint() { return howMany(Development.VICTORY_POINT); }
 
+    public int allKnight() { return knight() + howManyDisabled(Development.KNIGHT); }
+    public int allRoadBuilding() { return roadBuilding() + howManyDisabled(Development.ROAD_BUILDING); }
+    public int allInvention() { return invention() + howManyDisabled(Development.INVENTION); }
+    public int allMonopoly() { return monopoly() + howManyDisabled(Development.MONOPOLY); }
+    public int allVictoryPoint() { return victoryPoint() + howManyDisabled(Development.VICTORY_POINT); }
+
     void add(Development d) {
         disabled.put(d, 1);
     }
 
     void use(Development d) {
         if (developments.get(d) == 0 && disabled.get(d) > 0)
-            throw new GameException("You cannot use " + d + " development at this moment!");
+            throw new GameException("You cannot use a " + d + " development at this moment!");
         if (developments.get(d) == 0)
             throw new GameException("You don't have a " + d + " development!");
         developments.put(d, developments.get(d) - 1);
