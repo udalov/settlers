@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 import settlers.util.Util;
 
-public class ResourceStack {
+public class ResourceDeck {
 
     private final Map<Resource, Integer> resources =
         new EnumMap<Resource, Integer>(Resource.class);
 
-    ResourceStack() {
+    ResourceDeck() {
         for (Resource r : Resource.all())
             resources.put(r, 0);
     }

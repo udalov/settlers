@@ -7,7 +7,7 @@ public class Player {
     
     private final Bot bot;
     private final int color;
-    private final ResourceStack cards = new ResourceStack();
+    private final ResourceDeck cards = new ResourceDeck();
     private final DevelopmentDeck developments = new DevelopmentDeck();
     
     Player(Bot bot, int color) {
@@ -27,7 +27,7 @@ public class Player {
 
     public int color() { return color; }
     Bot bot() { return bot; }
-    ResourceStack cards() { return cards; }
+    ResourceDeck cards() { return cards; }
     DevelopmentDeck developments() { return developments; }
 
     public int cardsNumber() { return cards.size(); }

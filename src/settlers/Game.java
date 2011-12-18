@@ -44,9 +44,9 @@ public class Game {
         public int turnNumber() { return turnNumber; }
         public Player turn() { return turn; }
 
-        public ResourceStack cards() { return player(bot).cards(); }
+        public ResourceDeck cards() { return player(bot).cards(); }
         public DevelopmentDeck developments() { return player(bot).developments(); }
-        public ResourceStack bank() { return game.bank; }
+        public ResourceDeck bank() { return game.bank; }
 
         public Player roadAt(Path p) { return game.roadAt(p); }
         public Town townAt(Xing x) { return game.townAt(x); }
@@ -179,7 +179,7 @@ public class Game {
     private Player turn;
     private int diceRolled;
     private int robberMoveStatus; // 0 -- robber needs not to be moved, 1 -- needs to be moved, 2 -- moved
-    private final ResourceStack bank = new ResourceStack();
+    private final ResourceDeck bank = new ResourceDeck();
     private Player largestArmy;
     private Player longestRoad;
     private Hex robber;

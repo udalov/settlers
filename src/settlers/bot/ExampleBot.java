@@ -31,7 +31,7 @@ public class ExampleBot extends Bot {
 
     public void makeTurn() {
         Player me = api.me();
-        ResourceStack cards = api.cards();
+        ResourceDeck cards = api.cards();
         if (api.rollDice() == 7) {
             Pair<Hex, Player> rob = rob();
             api.moveRobber(rob.first(), rob.second());
