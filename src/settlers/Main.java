@@ -150,7 +150,7 @@ public class Main {
             }
 
             for (int i = 0; i < bots.length; i++) {
-                game.addPlayer(new Player(bots[i], Player.Color.values()[i]));
+                game.addPlayer(new Player(bots[i], i));
             }
 
             if (vis) {

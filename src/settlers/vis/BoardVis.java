@@ -31,6 +31,15 @@ public class BoardVis extends JPanel {
         "605,600,715,710,825"
     };
 
+    private static final String[] playerColorName = new String[]
+    { "RED", "BLUE", "ORANGE", "WHITE" };
+    private static final Color[] playerColor = new Color[] {
+        new Color(0xFF0000),
+        new Color(0x0000FF),
+        new Color(0xFF9900),
+        new Color(0xFFFFFF)
+    };
+
     private final Game game;
     private final Game.VisAPI api;
     private final Board board;
@@ -112,7 +121,7 @@ public class BoardVis extends JPanel {
             g.setColor(Color.BLACK);
             g.setStroke(new BasicStroke(1));
         } else {
-            g.setColor(playerColorToColor(pl.color()));
+            g.setColor(playerColor[pl.color()]);
             g.setStroke(new BasicStroke(5));
         }
         Point[] z = pathCoords(p);
@@ -124,7 +133,7 @@ public class BoardVis extends JPanel {
         Town t = api.townAt(i);
         if (t == null)
             return;
-        g.setColor(playerColorToColor(t.player().color()));
+        g.setColor(playerColor[t.player().color()]);
         Point p = xingCoords(i);
         if (t.isCity()) {
             g.fillRect(p.x - TOWN_RADIUS, p.y - TOWN_RADIUS, 2 * TOWN_RADIUS, 2 * TOWN_RADIUS);
@@ -177,16 +186,6 @@ public class BoardVis extends JPanel {
         }
     }
 
-    Color playerColorToColor(Player.Color c) {
-        switch (c) {
-            case BLUE: return new Color(0x0000FF);
-            case WHITE: return new Color(0xFFFFFF);
-            case ORANGE: return new Color(0xFF9900);
-            case RED: return new Color(0xFF0000);
-            default: return Color.WHITE;
-        }
-    }
-
     void drawBoard(Graphics2D g) {
         for (Hex c : Board.allHexes()) {
             drawHex(g, c);
@@ -220,7 +219,7 @@ public class BoardVis extends JPanel {
 
         g.setColor(new Color(0xAAAAFF));
         g.fillRoundRect(x - 2, y - 2, PLAYER_INFO_WIDTH + 4, PLAYER_INFO_HEIGHT + 4, arc, arc);
-        g.setColor(playerColorToColor(player.color()));
+        g.setColor(playerColor[player.color()]);
         g.fillRoundRect(x, y, PLAYER_INFO_WIDTH, caption + 24, arc, arc);
         g.setColor(new Color(0xFFFFEE));
         g.fillRect(x, y + caption, PLAYER_INFO_WIDTH, 50);
@@ -264,22 +263,24 @@ public class BoardVis extends JPanel {
     }
 
     static String eventDescription(Player player, settlers.Event event) {
-        String color = player == null ? null : player.color() + "";
+        String color = player == null ? null : playerColorName[player.color()];
         switch (event.type()) {
             case INITIAL_ROAD:
-                return event.player().color() + " builds initial road";
+                return playerColorName[event.player().color()] + " builds initial road";
             case INITIAL_SETTLEMENT:
-                return event.player().color() + " builds initial settlement";
+                return playerColorName[event.player().color()] + " builds initial settlement";
             case ROLL_DICE:
                 return color + " rolls " + event.number();
             case ROBBER:
                 Player pl = event.player();
-                return color + " moves the robber and robs " + (pl == null ? "nobody" : pl.color());
+                return color + " moves the robber and robs " +
+                    (pl == null ? "nobody" : playerColorName[pl.color()]);
             case RESOURCES:
                 // TODO?
                 return "";
             case DISCARD:
-                return event.player().color() + " discards " + Util.toResourceString(event.resources());
+                return playerColorName[event.player().color()] + " discards " +
+                    Util.toResourceString(event.resources());
             case ROAD:
                 return color + " builds a road";
             case SETTLEMENT:
@@ -303,7 +304,8 @@ public class BoardVis extends JPanel {
             case CHANGE:
                 return color + " changes " + event.sell() + " to " + event.buy();
             case TRADE:
-                return color + " sells " + event.sell() + " to " + event.player().color() + " and buys " + event.buy();
+                return color + " sells " + event.sell() + " to " +
+                    playerColorName[event.player().color()] + " and buys " + event.buy();
             case VICTORY:
                 return color + " wins!" + (event.number() == 0 ? "" : " (" + event.number() + " VP)");
             case EXCEPTION:

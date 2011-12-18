@@ -5,15 +5,8 @@ import settlers.util.Util;
 
 public class Player {
     
-    public static enum Color {
-        RED,
-        BLUE,
-        ORANGE,
-        WHITE,
-    }
-
     private final Bot bot;
-    private final Color color;
+    private final int color;
 
     private final ResourceStack cards = new ResourceStack();
     private final DevelopmentStack developments = new DevelopmentStack();
@@ -23,7 +16,7 @@ public class Player {
     private int citiesLeft;
     private int roadsLeft;
 
-    Player(Bot bot, Color color) {
+    Player(Bot bot, int color) {
         this.bot = bot;
         this.color = color;
         settlementsLeft = 5 - 2;
@@ -32,7 +25,7 @@ public class Player {
         Util.checkBotName(bot.toString());
     }
 
-    public Color color() { return color; }
+    public int color() { return color; }
     Bot bot() { return bot; }
     ResourceStack cards() { return cards; }
     DevelopmentStack developments() { return developments; }
@@ -57,7 +50,7 @@ public class Player {
     }
 
     public int hashCode() {
-        return color.ordinal();
+        return color;
     }
 
     public String toString() {
