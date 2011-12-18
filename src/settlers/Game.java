@@ -119,7 +119,7 @@ public class Game {
         public Player longestRoad()
             { return game.longestRoad(); }
         public int armyStrength(Player player)
-            { return player.armyStrength(); }
+            { return game.armyStrength(player); }
         public int roadLength(Player player)
             { return game.roadLength(player); }
         public int roadLengthWith(Player player, Path p)
@@ -155,7 +155,7 @@ public class Game {
         public Player largestArmy() { return game.largestArmy(); }
         public Player longestRoad() { return game.longestRoad(); }
         public int roadLength(Player p) { return game.roadLength(p); }
-        public int armyStrength(Player p) { return p.armyStrength(); }
+        public int armyStrength(Player p) { return game.armyStrength(p); }
         public int points(Player p) { return game.points(p); }
         public Player turn() { return game.turn(); }
         public Hex robber() { return game.robber(); }
@@ -186,6 +186,7 @@ public class Game {
     private final List<Development> developments = new ArrayList<Development>();
     private final Map<Path, Player> roads = new HashMap<Path, Player>();
     private final Map<Xing, Town> towns = new HashMap<Xing, Town>();
+    private final Map<Player, Integer> armyStrength = new HashMap<Player, Integer>();
 
     private final History history = new History(this);
 
@@ -593,7 +594,8 @@ public class Game {
 
     void knight(Hex hex, Player whoToRob) {
         turn.developments().use(Development.KNIGHT);
-        turn.increaseArmyStrength();
+        Integer army = armyStrength.get(turn);
+        armyStrength.put(turn, army != null ? army + 1 : 1);
         history.knight();
         updateLargestArmy();
         moveRobber(hex, whoToRob);
@@ -661,6 +663,11 @@ public class Game {
         for (Xing start : Board.allXings())
             ans = Math.max(ans, dfsRoadLength(player, start, visited, p));
         return ans;
+    }
+
+    int armyStrength(Player player) {
+        Integer ans = armyStrength.get(player);
+        return ans == null ? 0 : ans;
     }
 
     void addPlayer(Player player) {
@@ -740,7 +747,7 @@ public class Game {
                 points += towns.get(i).isCity() ? 2 : 1;
         if (longestRoad == player && roadLength(player) >= 5)
             points += 2;
-        if (largestArmy == player && player.armyStrength() >= 3)
+        if (largestArmy == player && armyStrength(player) >= 3)
             points += 2;
         if (includeVP)
             points += player.developments().victoryPoint();
@@ -766,9 +773,9 @@ public class Game {
     }
 
     void updateLargestArmy() {
-        int z = turn.armyStrength();
+        int z = armyStrength(turn);
         for (Player p : players)
-            if (p != turn && p.armyStrength() >= z)
+            if (p != turn && armyStrength(p) >= z)
                 return;
         if (z >= 3 && largestArmy != turn)
             history.largestArmy(z);

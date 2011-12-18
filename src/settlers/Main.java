@@ -97,7 +97,7 @@ public class Main {
             int vp = p.developments().victoryPoint();
             if (vp > 0)
                 out.print(" " + vp + "VP");
-            if (game.largestArmy() == p && p.armyStrength() >= 3)
+            if (game.largestArmy() == p && game.armyStrength(p) >= 3)
                 out.print(" ARMY");
             if (game.longestRoad() == p && game.roadLength(p) >= 5)
                 out.print(" ROAD");
