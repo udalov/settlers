@@ -26,7 +26,7 @@ public class StupidBot extends Bot {
                 break;
             }
         }
-        if (api.me().citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
+        if (api.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             for (Xing x : Board.allXings()) {
                 Town t = api.townAt(x);
                 if (t == null || t.player() != api.me() || t.isCity())
@@ -41,7 +41,7 @@ public class StupidBot extends Bot {
         if (api.developments().invention() > 0) {
             api.invention(Resource.BRICK, Resource.ORE);
         }
-        if (api.me().settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
+        if (api.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
             List<Xing> xings = Util.shuffle(Board.allXings(), rnd);
             for (Xing x : xings) {
                 if (api.canBuildTownAt(x, true)) {
@@ -53,7 +53,7 @@ public class StupidBot extends Bot {
         while (api.developmentsLeft() > 0 && api.getIfPossible("WOG")) {
             api.drawDevelopment();
         }
-        if (api.me().roadsLeft() > 0 && api.getIfPossible("BL")) {
+        if (api.roadsLeft() > 0 && api.getIfPossible("BL")) {
             List<Path> paths = Util.shuffle(Board.allPaths(), rnd);
             for (Path p : paths) {
                 if (api.canBuildRoadAt(p)) {

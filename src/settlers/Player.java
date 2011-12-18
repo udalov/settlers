@@ -12,16 +12,9 @@ public class Player {
     private final DevelopmentStack developments = new DevelopmentStack();
     private int armyStrength;
     
-    private int settlementsLeft;
-    private int citiesLeft;
-    private int roadsLeft;
-
     Player(Bot bot, int color) {
         this.bot = bot;
         this.color = color;
-        settlementsLeft = 5 - 2;
-        citiesLeft = 4;
-        roadsLeft = 15 - 2;
         Util.checkBotName(bot.toString());
     }
 
@@ -29,17 +22,10 @@ public class Player {
     Bot bot() { return bot; }
     ResourceStack cards() { return cards; }
     DevelopmentStack developments() { return developments; }
+    int armyStrength() { return armyStrength; }
 
-    public int armyStrength() { return armyStrength; }
     public int cardsNumber() { return cards.size(); }
     public int developmentsNumber() { return developments.size(); }
-
-    public int settlementsLeft() { return settlementsLeft; }
-    public int citiesLeft() { return citiesLeft; }
-    public int roadsLeft() { return roadsLeft; }
-    void expendSettlement() { settlementsLeft--; }
-    void expendCity() { citiesLeft--; settlementsLeft++; }
-    void expendRoad() { roadsLeft--; }
 
     void increaseArmyStrength() { armyStrength++; }
     

@@ -239,8 +239,8 @@ public class BoardVis extends JPanel {
         g.drawString("Developments: " + player.developmentsNumber(), x + 4, y + 2*line + 4);
         g.setColor(api.longestRoad() == player && api.roadLength(player) >= 5 ? longestRoad : normalText);
         g.drawString("Road length: " + api.roadLength(player), x + 4, y + 3*line + 4);
-        g.setColor(api.largestArmy() == player && player.armyStrength() >= 3 ? largestArmy : normalText);
-        g.drawString("Army size: " + player.armyStrength(), x + 4, y + 4*line + 4);
+        g.setColor(api.largestArmy() == player && api.armyStrength(player) >= 3 ? largestArmy : normalText);
+        g.drawString("Army size: " + api.armyStrength(player), x + 4, y + 4*line + 4);
         g.setColor(normalText);
         g.drawString("Points: " + api.points(player), x + 4, y + 5*line + 4);
 

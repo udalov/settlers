@@ -39,7 +39,7 @@ public class ExampleBot extends Bot {
             api.moveRobber(rob.first(), rob.second());
         }
         if (api.developments().knight() > 0) {
-            boolean bad = api.largestArmy() != me || me.armyStrength() < 3;
+            boolean bad = api.largestArmy() != me || api.armyStrength(me) < 3;
             for (Player p : api.robbable(api.robber()))
                 bad |= p == me;
             if (bad) {
@@ -50,7 +50,7 @@ public class ExampleBot extends Bot {
         if (api.developments().monopoly() > 0) {
             api.monopoly(cards.ore() >= 3 && cards.grain() < 4 ? Resource.GRAIN : Resource.ORE);
         }
-        while (me.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
+        while (api.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             boolean can = false;
             for (Xing i : Board.allXings()) {
                 Town t = api.townAt(i);
@@ -81,7 +81,7 @@ public class ExampleBot extends Bot {
             }
             api.invention(invent[0], invent[1]);
         }
-        if (api.developments().roadBuilding() > 0 && me.roadsLeft() > 0) {
+        if (api.developments().roadBuilding() > 0 && api.roadsLeft() > 0) {
             // TODO: the right behaviour
             Path[] roads = new Path[2];
             int inp = 0;
@@ -92,10 +92,10 @@ public class ExampleBot extends Bot {
                         break;
                 }
             }
-            if ((inp == 2 && me.roadsLeft() >= 2) || (inp == 1 && me.roadsLeft() == 1))
+            if ((inp == 2 && api.roadsLeft() >= 2) || (inp == 1 && api.roadsLeft() == 1))
                 api.roadBuilding(roads[0], roads[1]);
         }
-        while (me.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
+        while (api.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
             boolean can = false;
             for (Xing i : Board.allXings()) {
                 if (api.canBuildTownAt(i, true)) {
@@ -115,7 +115,7 @@ public class ExampleBot extends Bot {
                 if (api.canBuildTownAt(x, true))
                     break wt;
 
-            if (me.roadsLeft() == 0 || !api.getIfPossible("BL"))
+            if (api.roadsLeft() == 0 || !api.getIfPossible("BL"))
                 break wt;
 
             List<Path> possible = new ArrayList<Path>();

@@ -71,6 +71,13 @@ public class Game {
         public boolean canBuildRoadAt(Path p)
             { return game.canBuildRoadAt(p, me()); }
 
+        public int settlementsLeft()
+            { return game.settlementsLeft(me()); }
+        public int citiesLeft()
+            { return game.citiesLeft(me()); }
+        public int roadsLeft()
+            { return game.roadsLeft(me()); }
+
         public void buildSettlement(Xing i)
             { check(); game.buildSettlement(i); }
         public void buildCity(Xing i)
@@ -111,6 +118,8 @@ public class Game {
             { return game.largestArmy(); }
         public Player longestRoad()
             { return game.longestRoad(); }
+        public int armyStrength(Player player)
+            { return player.armyStrength(); }
         public int roadLength(Player player)
             { return game.roadLength(player); }
         public int roadLengthWith(Player player, Path p)
@@ -146,6 +155,7 @@ public class Game {
         public Player largestArmy() { return game.largestArmy(); }
         public Player longestRoad() { return game.longestRoad(); }
         public int roadLength(Player p) { return game.roadLength(p); }
+        public int armyStrength(Player p) { return p.armyStrength(); }
         public int points(Player p) { return game.points(p); }
         public Player turn() { return game.turn(); }
         public Hex robber() { return game.robber(); }
@@ -154,6 +164,10 @@ public class Game {
         public int turnNumber() { return game.turnNumber(); }
         public boolean isFinished() { return game.isFinished(); }
     }
+
+    public static final int MAX_SETTLEMENTS = 5;
+    public static final int MAX_CITIES = 4;
+    public static final int MAX_ROADS = 15;
 
     private final Random rnd;
 
@@ -334,16 +348,39 @@ public class Game {
         history.robber(hex, whoToRob);
     }
 
+    int settlementsLeft(Player p) {
+        int placed = 0;
+        for (Town t : towns.values())
+            if (t.player() == p && !t.isCity())
+                placed++;
+        return MAX_SETTLEMENTS - placed;
+    }
+
+    int citiesLeft(Player p) {
+        int placed = 0;
+        for (Town t : towns.values())
+            if (t.player() == p && t.isCity())
+                placed++;
+        return MAX_CITIES - placed;
+    }
+
+    int roadsLeft(Player p) {
+        int placed = 0;
+        for (Player q : roads.values())
+            if (p == q)
+                placed++;
+        return MAX_ROADS - placed;
+    }
+
     void buildSettlement(Xing x) {
         if (x == null)
             throw new GameException("You cannot build a settlement at null");
-        if (turn.settlementsLeft() == 0)
+        if (settlementsLeft(turn) == 0)
             throw new GameException("You do not have any settlements left");
         if (!turn.cards().areThere("BWGL"))
             throw new GameException("Not enough resources to build a settlement");
         if (!canBuildTownAt(x, true, turn))
             throw new GameException("You cannot build a settlement here");
-        turn.expendSettlement();
         towns.put(x, new Town(turn, false));
         turn.cards().sub("BWGL");
         bank.add("BWGL");
@@ -353,7 +390,7 @@ public class Game {
     void buildCity(Xing x) {
         if (x == null)
             throw new GameException("You cannot build a town at null");
-        if (turn.citiesLeft() == 0)
+        if (citiesLeft(turn) == 0)
             throw new GameException("You do not have any cities left");
         if (!turn.cards().areThere("OOOGG"))
             throw new GameException("Not enough resources to build a city");
@@ -363,7 +400,6 @@ public class Game {
             throw new GameException("You cannot build a city over an existing city");
         if (townAt(x).player() != turn)
             throw new GameException("You cannot upgrade other player's settlement");
-        turn.expendCity();
         towns.put(x, new Town(turn, true));
         turn.cards().sub("OOOGG");
         bank.add("OOOGG");
@@ -373,13 +409,12 @@ public class Game {
     void buildRoad(Path p) {
         if (p == null)
             throw new GameException("You cannot build a road at null");
-        if (turn.roadsLeft() == 0)
+        if (roadsLeft(turn) == 0)
             throw new GameException("You do not have any roads left");
         if (!turn.cards().areThere("BL"))
             throw new GameException("Not enough resources to build a road");
         if (!canBuildRoadAt(p, turn))
             throw new GameException("You cannot build a road here");
-        turn.expendRoad();
         roads.put(p, turn);
         turn.cards().sub("BL");
         bank.add("BL");
@@ -524,21 +559,19 @@ public class Game {
 
     void roadBuilding(Path p1, Path p2) {
         turn.developments().use(Development.ROAD_BUILDING);
-        if (turn.roadsLeft() == 0)
+        if (roadsLeft(turn) == 0)
             throw new GameException("You do not have any roads left to use road building card");
-        if (turn.roadsLeft() == 1) {
+        if (roadsLeft(turn) == 1) {
             if (p1 == null) { Path p = p1; p1 = p2; p2 = p; }
             if (p2 != null)
                 throw new GameException("You have only 1 road left to use road building card");
         }
         if (!canBuildRoadAt(p1, turn))
             throw new GameException("You cannot build a road here");
-        turn.expendRoad();
         roads.put(p1, turn);
         if (p2 != null) {
             if (!canBuildRoadAt(p2, turn))
                 throw new GameException("You cannot build a road here");
-            turn.expendRoad();
             roads.put(p2, turn);
         }
         updateLongestRoad();
