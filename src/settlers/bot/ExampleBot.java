@@ -37,7 +37,6 @@ public class ExampleBot extends Bot {
         if (api.rollDice() == 7) {
             Pair<Hex, Player> rob = rob();
             api.moveRobber(rob.first(), rob.second());
-            api.moveRobber(rob.first(), rob.second());
         }
         if (api.developments().knight() > 0) {
             boolean bad = api.largestArmy() != me || me.armyStrength() < 3;
