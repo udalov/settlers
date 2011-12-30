@@ -23,7 +23,7 @@ public class Main {
             case INITIAL_ROAD:
                 return index.get(event.player()) + " road " + event.edge();
             case INITIAL_SETTLEMENT:
-                return index.get(event.player()) + " settlement " + event.xing();
+                return index.get(event.player()) + " settlement " + event.node();
             case ROLL_DICE:
                 return "roll " + event.number();
             case ROBBER:
@@ -37,9 +37,9 @@ public class Main {
             case ROAD:
                 return "road " + event.edge();
             case SETTLEMENT:
-                return "settlement " + event.xing();
+                return "settlement " + event.node();
             case CITY:
-                return "city " + event.xing();
+                return "city " + event.node();
             case DEVELOPMENT:
                 return "development";
             case KNIGHT:

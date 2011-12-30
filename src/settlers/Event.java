@@ -45,15 +45,15 @@ public class Event {
         }
     }
 
-    public Xing xing() {
+    public Node node() {
         switch (type) {
             case SETTLEMENT:
             case CITY:
-                return (Xing)args[0];
+                return (Node)args[0];
             case INITIAL_SETTLEMENT:
-                return (Xing)args[1];
+                return (Node)args[1];
             default:
-                throw noRecord("xing");
+                throw noRecord("node");
         }
     }
 

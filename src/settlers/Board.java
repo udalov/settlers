@@ -159,14 +159,14 @@ public class Board {
         return i == null ? 0 : i;
     }
 
-    public Pair<Boolean, Resource> portAt(Xing i) {
+    public Pair<Boolean, Resource> portAt(Node i) {
         for (Edge p : ports2to1.keySet()) {
-            Xing[] u = endpoints(p);
+            Node[] u = endpoints(p);
             if (u[0] == i || u[1] == i)
                 return Pair.make(true, ports2to1.get(p));
         }
         for (Edge p : ports3to1) {
-            Xing[] u = endpoints(p);
+            Node[] u = endpoints(p);
             if (u[0] == i || u[1] == i)
                 return Pair.make(true, null);
         }
@@ -182,10 +182,10 @@ public class Board {
 
     private static final Hex[] hexes = new Hex[128];
     private static final Edge[] edges = new Edge[1024];
-    private static final Xing[] xings = new Xing[1024];
+    private static final Node[] nodes = new Node[1024];
     private static final List<Hex> allHexes = new ArrayList<Hex>();
     private static final List<Edge> allEdges = new ArrayList<Edge>();
-    private static final List<Xing> allXings = new ArrayList<Xing>();
+    private static final List<Node> allNodes = new ArrayList<Node>();
 
     private static int enc(int x, int y) { return (x << 3) + y; }
     private static int enc(int x, int y, int d) { return (d << 7) + enc(x, y); }
@@ -232,14 +232,14 @@ public class Board {
                         c[1] = hex(x + 2, y);
                         c[2] = hex(x + 1, y - 1);
                     }
-                    Xing z = null;
+                    Node z = null;
                     for (int i = 0; i < 3; i++)
                         if (c[i] != null)
-                            z = new Xing(c[i], 4 - 2*i + it);
+                            z = new Node(c[i], 4 - 2*i + it);
                     if (z == null) continue;
                     for (int i = 0; i < 3; i++)
                         if (c[i] != null)
-                            xings[enc(c[i].x(), c[i].y(), 4 - 2*i + it)] = z;
+                            nodes[enc(c[i].x(), c[i].y(), 4 - 2*i + it)] = z;
                 }
             }
         }
@@ -256,11 +256,11 @@ public class Board {
                 allEdges.add(p);
         Board.allEdges.addAll(allEdges);
 
-        Set<Xing> allXings = new HashSet<Xing>();
-        for (Xing x : xings)
+        Set<Node> allNodes = new HashSet<Node>();
+        for (Node x : nodes)
             if (x != null)
-                allXings.add(x);
-        Board.allXings.addAll(allXings);
+                allNodes.add(x);
+        Board.allNodes.addAll(allNodes);
     }
 
     public static Hex hex(int x, int y) {
@@ -279,13 +279,13 @@ public class Board {
         return edges[ind];
     }
 
-    public static Xing xing(Hex hex, int direction) {
+    public static Node node(Hex hex, int direction) {
         if (hex == null)
             return null;
         int ind = enc(hex.x(), hex.y(), direction);
-        if (ind < 0 || ind >= xings.length || xings[ind] == null)
+        if (ind < 0 || ind >= nodes.length || nodes[ind] == null)
             return null;
-        return xings[ind];
+        return nodes[ind];
     }
 
 
@@ -297,20 +297,20 @@ public class Board {
         return new ArrayList<Edge>(allEdges);
     }
 
-    public static List<Xing> allXings() {
-        return new ArrayList<Xing>(allXings);
+    public static List<Node> allNodes() {
+        return new ArrayList<Node>(allNodes);
     }
 
 
 
 
-    public static List<Hex> adjacentHexes(Xing a) {
+    public static List<Hex> adjacentHexes(Node a) {
         List<Hex> ans = new ArrayList<Hex>(3);
         if (a == null)
             return ans;
         for (Hex hex : allHexes())
             for (int d = 0; d < 6; d++)
-                if (xing(hex, d) == a)
+                if (node(hex, d) == a)
                     ans.add(hex);
         return ans;
     }
@@ -327,7 +327,7 @@ public class Board {
         return ans;
     }
 
-    public static List<Edge> adjacentEdges(Xing a) {
+    public static List<Edge> adjacentEdges(Node a) {
         List<Edge> ans = new ArrayList<Edge>(3);
         if (a == null)
             return ans;
@@ -341,11 +341,11 @@ public class Board {
         List<Edge> ans = new ArrayList<Edge>(4);
         if (p == null)
             return ans;
-        Xing[] x = endpoints(p);
+        Node[] x = endpoints(p);
         for (Edge edge : allEdges()) {
             if (edge == p)
                 continue;
-            Xing[] y = endpoints(edge);
+            Node[] y = endpoints(edge);
             if (areAdjacent(x[0], y[0])
              || areAdjacent(x[0], y[1])
              || areAdjacent(x[1], y[0])
@@ -355,48 +355,48 @@ public class Board {
         return ans;
     }
 
-    public static List<Xing> adjacentXings(Xing a) {
-        List<Xing> ans = new ArrayList<Xing>(3);
+    public static List<Node> adjacentNodes(Node a) {
+        List<Node> ans = new ArrayList<Node>(3);
         if (a == null)
             return ans;
-        for (Xing b : allXings())
+        for (Node b : allNodes())
             if (areAdjacent(a, b))
                 ans.add(b);
         return ans;
     }
 
-    public static List<Xing> adjacentXings(Hex c) {
-        List<Xing> ans = new ArrayList<Xing>(6);
+    public static List<Node> adjacentNodes(Hex c) {
+        List<Node> ans = new ArrayList<Node>(6);
         if (c == null)
             return ans;
         for (int d = 0; d < 6; d++)
-            ans.add(xing(c, d));
+            ans.add(node(c, d));
         return ans;
     }
 
-    public static Xing[] endpoints(Edge p) {
-        return p == null ? new Xing[] {} : new Xing[] {
-            xing(p.hex(), p.direction()),
-            xing(p.hex(), (p.direction() + 1) % 6),
+    public static Node[] endpoints(Edge p) {
+        return p == null ? new Node[] {} : new Node[] {
+            node(p.hex(), p.direction()),
+            node(p.hex(), (p.direction() + 1) % 6),
         };
     }
 
-    public static boolean areAdjacent(Xing a, Xing b) {
+    public static boolean areAdjacent(Node a, Node b) {
         for (Hex c : allHexes()) {
             for (int d = 0; d < 6; d++) {
-                if (xing(c, d) == a && xing(c, (d + 1) % 6) == b)
+                if (node(c, d) == a && node(c, (d + 1) % 6) == b)
                     return true;
-                if (xing(c, d) == b && xing(c, (d + 1) % 6) == a)
+                if (node(c, d) == b && node(c, (d + 1) % 6) == a)
                     return true;
             }
         }
         return false;
     }
 
-    public static boolean areAdjacent(Xing a, Edge p) {
+    public static boolean areAdjacent(Node a, Edge p) {
         if (a == null || p == null)
             return false;
-        Xing[] ends = endpoints(p);
+        Node[] ends = endpoints(p);
         return ends[0] == a || ends[1] == a;
     }
 }

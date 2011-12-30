@@ -80,7 +80,7 @@ public class BoardVis extends JPanel {
         return new Polygon(v[0], v[1], 6);
     }
 
-    Point xingCoords(Xing i) {
+    Point nodeCoords(Node i) {
         Point z = hex.get(i.hex());
         int[][] v = calcHexagonVertices(z.x, z.y);
         int d = i.direction();
@@ -129,12 +129,12 @@ public class BoardVis extends JPanel {
         g.setStroke(new BasicStroke(1));
     }
 
-    void drawXing(Graphics2D g, Xing i) {
+    void drawNode(Graphics2D g, Node i) {
         Town t = api.townAt(i);
         if (t == null)
             return;
         g.setColor(playerColor[t.player().color()]);
-        Point p = xingCoords(i);
+        Point p = nodeCoords(i);
         if (t.isCity()) {
             g.fillRect(p.x - TOWN_RADIUS, p.y - TOWN_RADIUS, 2 * TOWN_RADIUS, 2 * TOWN_RADIUS);
         } else {
@@ -142,7 +142,7 @@ public class BoardVis extends JPanel {
         }
     }
 
-    void drawPort(Graphics2D g, Xing i) {
+    void drawPort(Graphics2D g, Node i) {
         Pair<Boolean, Resource> br = board.portAt(i);
         if (!br.first())
             return;
@@ -156,7 +156,7 @@ public class BoardVis extends JPanel {
         }
         if (d < 0)
             throw new IllegalStateException("Internal: invalid port location");
-        Point p = xingCoords(i);
+        Point p = nodeCoords(i);
         String str = resourceToPort(r);
         g.setFont(new Font("Tahoma", Font.BOLD, 10));
         Color c = r == null ? new Color(0x8888FF) : resourceToColor(r);
@@ -198,10 +198,10 @@ public class BoardVis extends JPanel {
             if (api.roadAt(p) != null)
                 drawEdge(g, p);
         }
-        for (Xing i : Board.allXings()) {
-            drawXing(g, i);
+        for (Node i : Board.allNodes()) {
+            drawNode(g, i);
         }
-        for (Xing i : Board.allXings()) {
+        for (Node i : Board.allNodes()) {
             drawPort(g, i);
         }
     }

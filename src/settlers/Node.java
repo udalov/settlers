@@ -1,11 +1,11 @@
 package settlers;
 
-public class Xing {
+public class Node {
 
     private final Hex hex;
     private final int direction;
 
-    Xing(Hex hex, int direction) {
+    Node(Hex hex, int direction) {
         this.hex = hex;
         this.direction = direction;
     }
@@ -17,9 +17,9 @@ public class Xing {
     public String toString() { return hex.x() + " " + hex.y() + " " + direction; }
 
     public boolean equals(Object o) {
-        if (!(o instanceof Xing))
+        if (!(o instanceof Node))
             return false;
-        Xing x = (Xing)o;
+        Node x = (Node)o;
         return hex.equals(x.hex) && direction == x.direction;
     }
 

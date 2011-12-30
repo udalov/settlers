@@ -19,7 +19,7 @@ public class ExampleBot extends Bot {
             if (api.robber() == c)
                 continue;
             List<Player> robbable = api.robbable(c);
-            for (Xing x : Board.adjacentXings(c))
+            for (Node x : Board.adjacentNodes(c))
                 if (api.townAt(x) != null && api.townAt(x).player() == api.me())
                     continue c;
             if (robbable.isEmpty())
@@ -50,7 +50,7 @@ public class ExampleBot extends Bot {
         }
         while (api.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             boolean can = false;
-            for (Xing i : Board.allXings()) {
+            for (Node i : Board.allNodes()) {
                 Town t = api.townAt(i);
                 if (t == null || t.player() != me || t.isCity())
                     continue;
@@ -95,7 +95,7 @@ public class ExampleBot extends Bot {
         }
         while (api.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
             boolean can = false;
-            for (Xing i : Board.allXings()) {
+            for (Node i : Board.allNodes()) {
                 if (api.canBuildTownAt(i, true)) {
                     api.buildSettlement(i);
                     can = true;
@@ -109,7 +109,7 @@ public class ExampleBot extends Bot {
         }
         
         wt: while (true) {
-            for (Xing x : Board.allXings())
+            for (Node x : Board.allNodes())
                 if (api.canBuildTownAt(x, true))
                     break wt;
 
@@ -125,12 +125,12 @@ public class ExampleBot extends Bot {
             Collections.sort(possible, new Comparator<Edge>() {
                 int value(Edge p) {
                     int value = 0;
-                    Xing[] x = Board.endpoints(p);
+                    Node[] x = Board.endpoints(p);
                     if (api.canBuildTownAt(x[0], false))
                         value += 100;
                     if (api.canBuildTownAt(x[1], false))
                         value += 100;
-                    for (Xing z : x) {
+                    for (Node z : x) {
                         boolean me = false, enemy = false;
                         for (Edge q : Board.adjacentEdges(z)) {
                             Player pl = api.roadAt(q);
@@ -168,14 +168,14 @@ public class ExampleBot extends Bot {
         return ans;
     }
 
-    public Pair<Xing, Edge> placeInitialSettlements(boolean first) {
-        List<Xing> l = new ArrayList<Xing>();
-        for (Xing i : Board.allXings())
+    public Pair<Node, Edge> placeInitialSettlements(boolean first) {
+        List<Node> l = new ArrayList<Node>();
+        for (Node i : Board.allNodes())
             if (api.canBuildTownAt(i, false))
                 l.add(i);
 
-        Collections.sort(l, new Comparator<Xing>() {
-            private int sum(Xing a) {
+        Collections.sort(l, new Comparator<Node>() {
+            private int sum(Node a) {
                 int ans = 0;
                 for (Hex c : Board.adjacentHexes(a)) {
                     int x = api.board().numberAt(c);
@@ -183,7 +183,7 @@ public class ExampleBot extends Bot {
                 }
                 return ans;
             }
-            public int compare(Xing a, Xing b) {
+            public int compare(Node a, Node b) {
                 int sa = sum(a), sb = sum(b);
                 if (sa < sb) return 1;
                 if (sa > sb) return -1;
@@ -195,7 +195,7 @@ public class ExampleBot extends Bot {
             }
         });
 
-        Xing i = l.get(0);
+        Node i = l.get(0);
         List<Edge> edges = Board.adjacentEdges(i);
         int edgeno = rnd.nextInt(edges.size());
         return Pair.make(i, edges.get(edgeno));

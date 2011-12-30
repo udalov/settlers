@@ -63,14 +63,14 @@ public class History {
     }
 
     void initialRoad(Player pl, Edge p) { addEvent(EventType.INITIAL_ROAD, pl, p); }
-    void initialSettlement(Player pl, Xing x) { addEvent(EventType.INITIAL_SETTLEMENT, pl, x); }
+    void initialSettlement(Player pl, Node x) { addEvent(EventType.INITIAL_SETTLEMENT, pl, x); }
     void rollDice(int n) { addEvent(EventType.ROLL_DICE, n); }
     void robber(Hex h, Player robbed) { addEvent(EventType.ROBBER, h, robbed); }
     void resources(Player pl, List<Resource> resources) { addEvent(EventType.RESOURCES, pl, resources); }
     void discard(Player pl, List<Resource> resources) { addEvent(EventType.DISCARD, pl, resources); }
     void road(Edge p) { addEvent(EventType.ROAD, p); }
-    void settlement(Xing x) { addEvent(EventType.SETTLEMENT, x); }
-    void city(Xing x) { addEvent(EventType.CITY, x); }
+    void settlement(Node x) { addEvent(EventType.SETTLEMENT, x); }
+    void city(Node x) { addEvent(EventType.CITY, x); }
     void development() { addEvent(EventType.DEVELOPMENT); }
     void knight() { addEvent(EventType.KNIGHT); }
     void invention(Resource r1, Resource r2) { addEvent(EventType.INVENTION, r1, r2); }

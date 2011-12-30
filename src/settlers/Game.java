@@ -49,7 +49,7 @@ public class Game {
         public ResourceDeck bank() { return game.bank; }
 
         public Player roadAt(Edge p) { return game.roadAt(p); }
-        public Town townAt(Xing x) { return game.townAt(x); }
+        public Town townAt(Node x) { return game.townAt(x); }
 
         public int rollDice() { check(); return game.rollDice(); }
 
@@ -66,7 +66,7 @@ public class Game {
             game.moveRobber(c, whoToRob);
         }
 
-        public boolean canBuildTownAt(Xing i, boolean mustBeRoad)
+        public boolean canBuildTownAt(Node i, boolean mustBeRoad)
             { return game.canBuildTownAt(i, mustBeRoad, me()); }
         public boolean canBuildRoadAt(Edge p)
             { return game.canBuildRoadAt(p, me()); }
@@ -78,9 +78,9 @@ public class Game {
         public int roadsLeft()
             { return game.roadsLeft(me()); }
 
-        public void buildSettlement(Xing i)
+        public void buildSettlement(Node i)
             { check(); game.buildSettlement(i); }
-        public void buildCity(Xing i)
+        public void buildCity(Node i)
             { check(); game.buildCity(i); }
         public void buildRoad(Edge p)
             { check(); game.buildRoad(p); }
@@ -160,7 +160,7 @@ public class Game {
         public Player turn() { return game.turn(); }
         public Hex robber() { return game.robber(); }
         public Player roadAt(Edge p) { return game.roadAt(p); }
-        public Town townAt(Xing i) { return game.townAt(i); }
+        public Town townAt(Node i) { return game.townAt(i); }
         public int turnNumber() { return game.turnNumber(); }
         public boolean isFinished() { return game.isFinished(); }
     }
@@ -185,7 +185,7 @@ public class Game {
     private Hex robber;
     private final List<Development> developments = new ArrayList<Development>();
     private final Map<Edge, Player> roads = new HashMap<Edge, Player>();
-    private final Map<Xing, Town> towns = new HashMap<Xing, Town>();
+    private final Map<Node, Town> towns = new HashMap<Node, Town>();
     private final Map<Player, Integer> armyStrength = new HashMap<Player, Integer>();
 
     private final History history = new History(this);
@@ -221,7 +221,7 @@ public class Game {
     Player turn() { return turn; }
     Hex robber() { return robber; }
     Player roadAt(Edge p) { return roads.get(p); }
-    Town townAt(Xing i) { return towns.get(i); }
+    Town townAt(Node i) { return towns.get(i); }
 
     int turnNumber() { return turnNumber; }
     boolean isFinished() { return finished; }
@@ -285,7 +285,7 @@ public class Game {
                         continue;
                     if (robber == hex)
                         continue;
-                    for (Xing x : Board.adjacentXings(hex)) {
+                    for (Node x : Board.adjacentNodes(hex)) {
                         Town town = townAt(x);
                         if (town == null)
                             continue;
@@ -311,7 +311,7 @@ public class Game {
 
     List<Player> robbable(Hex hex) {
         Set<Player> ans = new HashSet<Player>();
-        for (Xing x : Board.adjacentXings(hex)) {
+        for (Node x : Board.adjacentNodes(hex)) {
             if (towns.get(x) == null)
                 continue;
             Player p = towns.get(x).player();
@@ -373,7 +373,7 @@ public class Game {
         return MAX_ROADS - placed;
     }
 
-    void buildSettlement(Xing x) {
+    void buildSettlement(Node x) {
         if (x == null)
             throw new GameException("You cannot build a settlement at null");
         if (settlementsLeft(turn) == 0)
@@ -388,7 +388,7 @@ public class Game {
         history.settlement(x);
     }
 
-    void buildCity(Xing x) {
+    void buildCity(Node x) {
         if (x == null)
             throw new GameException("You cannot build a town at null");
         if (citiesLeft(turn) == 0)
@@ -424,7 +424,7 @@ public class Game {
     }
 
     boolean hasPort(Resource r, Player player) {
-        for (Xing x : towns.keySet()) {
+        for (Node x : towns.keySet()) {
             if (towns.get(x).player() == player) {
                 Pair<Boolean, Resource> port = board.portAt(x);
                 if (port.first() && port.second() == r)
@@ -602,10 +602,10 @@ public class Game {
     }
 
 
-    boolean canBuildTownAt(Xing i, boolean mustBeRoad, Player player) {
+    boolean canBuildTownAt(Node i, boolean mustBeRoad, Player player) {
         if (i == null || towns.get(i) != null)
             return false;
-        for (Xing j : Board.adjacentXings(i))
+        for (Node j : Board.adjacentNodes(i))
             if (towns.get(j) != null)
                 return false;
         if (!mustBeRoad)
@@ -619,7 +619,7 @@ public class Game {
     boolean canBuildRoadAt(Edge p, Player player) {
         if (p == null || roads.get(p) != null)
             return false;
-        for (Xing i : Board.endpoints(p)) {
+        for (Node i : Board.endpoints(p)) {
             Town t = towns.get(i);
             if (t != null && t.player() != player)
                 continue;
@@ -635,7 +635,7 @@ public class Game {
 
 
 
-    int dfsRoadLength(Player player, Xing i, Set<Edge> visited, Edge with) {
+    int dfsRoadLength(Player player, Node i, Set<Edge> visited, Edge with) {
         int ans = 0;
         for (Edge p : Board.adjacentEdges(i)) {
             if (visited.contains(p))
@@ -643,8 +643,8 @@ public class Game {
             if (roadAt(p) != player && p != with)
                 continue;
             visited.add(p);
-            Xing[] ends = Board.endpoints(p);
-            Xing otherEnd = ends[ends[0] == i ? 1 : 0];
+            Node[] ends = Board.endpoints(p);
+            Node otherEnd = ends[ends[0] == i ? 1 : 0];
             ans = Math.max(ans, 1 + dfsRoadLength(player, otherEnd, visited, with));
             visited.remove(p);
         }
@@ -660,7 +660,7 @@ public class Game {
             return 0;
         int ans = 0;
         Set<Edge> visited = new HashSet<Edge>();
-        for (Xing start : Board.allXings())
+        for (Node start : Board.allNodes())
             ans = Math.max(ans, dfsRoadLength(player, start, visited, p));
         return ans;
     }
@@ -717,7 +717,7 @@ public class Game {
         for (int it = 0; it < 2; it++) {
             for (int i = it * (n - 1); 0 <= i && i < n; i += 1 - 2*it) {
                 Player player = players.get(i);
-                Pair<Xing, Edge> p = player.bot().placeInitialSettlements(it == 0);
+                Pair<Node, Edge> p = player.bot().placeInitialSettlements(it == 0);
                 if (p == null || p.first() == null || p.second() == null)
                     throw new GameException("You cannot build a first settlement at null");
                 if (!Board.areAdjacent(p.first(), p.second()))
@@ -742,7 +742,7 @@ public class Game {
 
     int points(Player player, boolean includeVP) {
         int points = 0;
-        for (Xing i : towns.keySet())
+        for (Node i : towns.keySet())
             if (towns.get(i).player() == player)
                 points += towns.get(i).isCity() ? 2 : 1;
         if (longestRoad == player && roadLength(player) >= 5)
