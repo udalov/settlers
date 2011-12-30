@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.List;
 import settlers.Resource;
-import settlers.GameException;
 
 public class Util {
     
