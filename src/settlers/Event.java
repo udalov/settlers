@@ -33,15 +33,15 @@ public class Event {
         }
     }
 
-    public Path path() {
+    public Edge edge() {
         switch (type) {
             case ROAD:
             case ROAD_BUILDING:
-                return (Path)args[0];
+                return (Edge)args[0];
             case INITIAL_ROAD:
-                return (Path)args[1];
+                return (Edge)args[1];
             default:
-                throw noRecord("path");
+                throw noRecord("edge");
         }
     }
 
@@ -110,12 +110,12 @@ public class Event {
         }
     }
 
-    public Path path2() {
+    public Edge edge2() {
         switch (type) {
             case ROAD_BUILDING:
-                return (Path)args[1];
+                return (Edge)args[1];
             default:
-                throw noRecord("path2");
+                throw noRecord("edge2");
         }
     }
 

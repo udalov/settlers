@@ -81,9 +81,9 @@ public class ExampleBot extends Bot {
         }
         if (api.developments().roadBuilding() > 0 && api.roadsLeft() > 0) {
             // TODO: the right behaviour
-            Path[] roads = new Path[2];
+            Edge[] roads = new Edge[2];
             int inp = 0;
-            for (Path p : Board.allPaths()) {
+            for (Edge p : Board.allEdges()) {
                 if (api.canBuildRoadAt(p)) {
                     roads[inp++] = p;
                     if (inp == 2)
@@ -116,14 +116,14 @@ public class ExampleBot extends Bot {
             if (api.roadsLeft() == 0 || !api.getIfPossible("BL"))
                 break wt;
 
-            List<Path> possible = new ArrayList<Path>();
-            for (Path p : Board.allPaths())
+            List<Edge> possible = new ArrayList<Edge>();
+            for (Edge p : Board.allEdges())
                 if (api.canBuildRoadAt(p))
                     possible.add(p);
             if (possible.isEmpty())
                 break wt;
-            Collections.sort(possible, new Comparator<Path>() {
-                int value(Path p) {
+            Collections.sort(possible, new Comparator<Edge>() {
+                int value(Edge p) {
                     int value = 0;
                     Xing[] x = Board.endpoints(p);
                     if (api.canBuildTownAt(x[0], false))
@@ -132,7 +132,7 @@ public class ExampleBot extends Bot {
                         value += 100;
                     for (Xing z : x) {
                         boolean me = false, enemy = false;
-                        for (Path q : Board.adjacentPaths(z)) {
+                        for (Edge q : Board.adjacentEdges(z)) {
                             Player pl = api.roadAt(q);
                             if (pl == api.me())
                                 me = true;
@@ -144,7 +144,7 @@ public class ExampleBot extends Bot {
                     }
                     return value + api.roadLengthWith(api.me(), p);
                 }
-                public int compare(Path p1, Path p2) {
+                public int compare(Edge p1, Edge p2) {
                     return value(p2) - value(p1);
                 }
             });
@@ -168,7 +168,7 @@ public class ExampleBot extends Bot {
         return ans;
     }
 
-    public Pair<Xing, Path> placeInitialSettlements(boolean first) {
+    public Pair<Xing, Edge> placeInitialSettlements(boolean first) {
         List<Xing> l = new ArrayList<Xing>();
         for (Xing i : Board.allXings())
             if (api.canBuildTownAt(i, false))
@@ -196,9 +196,9 @@ public class ExampleBot extends Bot {
         });
 
         Xing i = l.get(0);
-        List<Path> paths = Board.adjacentPaths(i);
-        int pathno = rnd.nextInt(paths.size());
-        return Pair.make(i, paths.get(pathno));
+        List<Edge> edges = Board.adjacentEdges(i);
+        int edgeno = rnd.nextInt(edges.size());
+        return Pair.make(i, edges.get(edgeno));
     }
 
 }

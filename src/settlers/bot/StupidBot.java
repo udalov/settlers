@@ -52,8 +52,8 @@ public class StupidBot extends Bot {
             api.drawDevelopment();
         }
         if (api.roadsLeft() > 0 && api.getIfPossible("BL")) {
-            List<Path> paths = Util.shuffle(Board.allPaths(), rnd);
-            for (Path p : paths) {
+            List<Edge> edges = Util.shuffle(Board.allEdges(), rnd);
+            for (Edge p : edges) {
                 if (api.canBuildRoadAt(p)) {
                     api.buildRoad(p);
                     break;
@@ -77,11 +77,11 @@ public class StupidBot extends Bot {
         return ans;
     }
 
-    public Pair<Xing, Path> placeInitialSettlements(boolean first) {
+    public Pair<Xing, Edge> placeInitialSettlements(boolean first) {
         List<Xing> xings = Util.shuffle(Board.allXings(), rnd);
         for (Xing x : xings)
             if (api.canBuildTownAt(x, false))
-                for (Path p : Board.adjacentPaths(x))
+                for (Edge p : Board.adjacentEdges(x))
                     if (api.roadAt(p) == null)
                         return Pair.make(x, p);
         return null;

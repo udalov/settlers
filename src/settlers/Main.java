@@ -21,7 +21,7 @@ public class Main {
     String eventString(Event event, Map<Player, Integer> index) {
         switch (event.type()) {
             case INITIAL_ROAD:
-                return index.get(event.player()) + " road " + event.path();
+                return index.get(event.player()) + " road " + event.edge();
             case INITIAL_SETTLEMENT:
                 return index.get(event.player()) + " settlement " + event.xing();
             case ROLL_DICE:
@@ -35,7 +35,7 @@ public class Main {
             case DISCARD:
                 return "discard " + index.get(event.player()) + " " + Util.toResourceString(event.resources());
             case ROAD:
-                return "road " + event.path();
+                return "road " + event.edge();
             case SETTLEMENT:
                 return "settlement " + event.xing();
             case CITY:
@@ -49,7 +49,7 @@ public class Main {
             case MONOPOLY:
                 return "monopoly " + event.resource().chr() + " " + event.number();
             case ROAD_BUILDING:
-                return "roadbuilding " + event.path() + " " + event.path2();
+                return "roadbuilding " + event.edge() + " " + event.edge2();
             case LONGEST_ROAD:
                 return "longestroad " + event.number();
             case LARGEST_ARMY:

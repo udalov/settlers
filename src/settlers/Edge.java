@@ -1,11 +1,11 @@
 package settlers;
 
-public class Path {
+public class Edge {
 
     private final Hex hex;
     private final int direction;
 
-    Path(Hex hex, int direction) {
+    Edge(Hex hex, int direction) {
         this.hex = hex;
         this.direction = direction;
     }
@@ -17,9 +17,9 @@ public class Path {
     public String toString() { return hex.x() + " " + hex.y() + " " + direction; }
 
     public boolean equals(Object o) {
-        if (!(o instanceof Path))
+        if (!(o instanceof Edge))
             return false;
-        Path p = (Path)o;
+        Edge p = (Edge)o;
         return hex.equals(p.hex) && direction == p.direction;
     }
 

@@ -17,15 +17,15 @@ public class Board {
     
     private final Map<Hex, Resource> resources;
     private final Map<Hex, Integer> numbers;
-    private final Map<Path, Resource> ports2to1;
-    private final List<Path> ports3to1;
+    private final Map<Edge, Resource> ports2to1;
+    private final List<Edge> ports3to1;
 
 
     private Board(
         Map<Hex, Resource> resources,
         Map<Hex, Integer> numbers,
-        Map<Path, Resource> ports2to1,
-        List<Path> ports3to1
+        Map<Edge, Resource> ports2to1,
+        List<Edge> ports3to1
     ) {
         this.resources = resources;
         this.numbers = numbers;
@@ -36,8 +36,8 @@ public class Board {
     static Board create(Random rnd) {
         Map<Hex, Resource> resources = new HashMap<Hex, Resource>();
         Map<Hex, Integer> numbers = new HashMap<Hex, Integer>();
-        Map<Path, Resource> ports2to1 = new HashMap<Path, Resource>();
-        List<Path> ports3to1 = new ArrayList<Path>();
+        Map<Edge, Resource> ports2to1 = new HashMap<Edge, Resource>();
+        List<Edge> ports3to1 = new ArrayList<Edge>();
 
         List<Resource> allResources = new ArrayList<Resource>();
         for (int i = 0; i < 4; i++) {
@@ -96,18 +96,18 @@ public class Board {
         return new Board(resources, numbers, ports2to1, ports3to1);
     }
 
-    private static void generatePorts(Random rnd, Map<Path, Resource> ports2to1, List<Path> ports3to1) {
-        List<Path> coast = new ArrayList<Path>();
+    private static void generatePorts(Random rnd, Map<Edge, Resource> ports2to1, List<Edge> ports3to1) {
+        List<Edge> coast = new ArrayList<Edge>();
         int d = 0, x = 8, y = 2;
         for (int i = 0; i < 6; i++) {
             int nextd = (d + 1) % 6;
             int prevd = (d + 5) % 6;
             for (int j = 0; j < 2; j++) {
-                coast.add(path(hex(x, y), d));
+                coast.add(edge(hex(x, y), d));
                 x += DX[nextd]; y += DY[nextd];
-                coast.add(path(hex(x, y), prevd));
+                coast.add(edge(hex(x, y), prevd));
             }
-            coast.add(path(hex(x, y), d));
+            coast.add(edge(hex(x, y), d));
             d = nextd;
         }
 
@@ -160,12 +160,12 @@ public class Board {
     }
 
     public Pair<Boolean, Resource> portAt(Xing i) {
-        for (Path p : ports2to1.keySet()) {
+        for (Edge p : ports2to1.keySet()) {
             Xing[] u = endpoints(p);
             if (u[0] == i || u[1] == i)
                 return Pair.make(true, ports2to1.get(p));
         }
-        for (Path p : ports3to1) {
+        for (Edge p : ports3to1) {
             Xing[] u = endpoints(p);
             if (u[0] == i || u[1] == i)
                 return Pair.make(true, null);
@@ -181,10 +181,10 @@ public class Board {
 
 
     private static final Hex[] hexes = new Hex[128];
-    private static final Path[] paths = new Path[1024];
+    private static final Edge[] edges = new Edge[1024];
     private static final Xing[] xings = new Xing[1024];
     private static final List<Hex> allHexes = new ArrayList<Hex>();
-    private static final List<Path> allPaths = new ArrayList<Path>();
+    private static final List<Edge> allEdges = new ArrayList<Edge>();
     private static final List<Xing> allXings = new ArrayList<Xing>();
 
     private static int enc(int x, int y) { return (x << 3) + y; }
@@ -198,22 +198,22 @@ public class Board {
         for (int y = 0; y <= 4; y++)
             for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2)
                 for (int d = 0; d < 3; d++)
-                    paths[enc(x, y, d)] = new Path(hexes[enc(x, y)], d);
+                    edges[enc(x, y, d)] = new Edge(hexes[enc(x, y)], d);
 
         for (int y = 0; y <= 4; y++) {
             for (int x = Math.abs(y - 2); x <= 8 - Math.abs(y - 2); x += 2) {
                 if (x + y == 2 || y == 0)
-                    paths[enc(x, y, 3)] = new Path(hexes[enc(x, y)], 3);
+                    edges[enc(x, y, 3)] = new Edge(hexes[enc(x, y)], 3);
                 else
-                    paths[enc(x, y, 3)] = paths[enc(x - 1, y - 1, 0)];
+                    edges[enc(x, y, 3)] = edges[enc(x - 1, y - 1, 0)];
                 if (y == 0 || x - y == 6)
-                    paths[enc(x, y, 4)] = new Path(hexes[enc(x, y)], 4);
+                    edges[enc(x, y, 4)] = new Edge(hexes[enc(x, y)], 4);
                 else
-                    paths[enc(x, y, 4)] = paths[enc(x + 1, y - 1, 1)];
+                    edges[enc(x, y, 4)] = edges[enc(x + 1, y - 1, 1)];
                 if (x - y == 6 || x + y == 10)
-                    paths[enc(x, y, 5)] = new Path(hexes[enc(x, y)], 5);
+                    edges[enc(x, y, 5)] = new Edge(hexes[enc(x, y)], 5);
                 else
-                    paths[enc(x, y, 5)] = paths[enc(x + 2, y, 2)];
+                    edges[enc(x, y, 5)] = edges[enc(x + 2, y, 2)];
             }
         }
         
@@ -250,11 +250,11 @@ public class Board {
                 allHexes.add(h);
         Board.allHexes.addAll(allHexes);
 
-        Set<Path> allPaths = new HashSet<Path>();
-        for (Path p : paths)
+        Set<Edge> allEdges = new HashSet<Edge>();
+        for (Edge p : edges)
             if (p != null)
-                allPaths.add(p);
-        Board.allPaths.addAll(allPaths);
+                allEdges.add(p);
+        Board.allEdges.addAll(allEdges);
 
         Set<Xing> allXings = new HashSet<Xing>();
         for (Xing x : xings)
@@ -270,13 +270,13 @@ public class Board {
         return hexes[ind];
     }
 
-    public static Path path(Hex hex, int direction) {
+    public static Edge edge(Hex hex, int direction) {
         if (hex == null)
             return null;
         int ind = enc(hex.x(), hex.y(), direction);
-        if (ind < 0 || ind >= paths.length || paths[ind] == null)
+        if (ind < 0 || ind >= edges.length || edges[ind] == null)
             return null;
-        return paths[ind];
+        return edges[ind];
     }
 
     public static Xing xing(Hex hex, int direction) {
@@ -293,8 +293,8 @@ public class Board {
         return new ArrayList<Hex>(allHexes);
     }
 
-    public static List<Path> allPaths() {
-        return new ArrayList<Path>(allPaths);
+    public static List<Edge> allEdges() {
+        return new ArrayList<Edge>(allEdges);
     }
 
     public static List<Xing> allXings() {
@@ -327,30 +327,30 @@ public class Board {
         return ans;
     }
 
-    public static List<Path> adjacentPaths(Xing a) {
-        List<Path> ans = new ArrayList<Path>(3);
+    public static List<Edge> adjacentEdges(Xing a) {
+        List<Edge> ans = new ArrayList<Edge>(3);
         if (a == null)
             return ans;
-        for (Path path : allPaths())
-            if (areAdjacent(a, path))
-                ans.add(path);
+        for (Edge edge : allEdges())
+            if (areAdjacent(a, edge))
+                ans.add(edge);
         return ans;
     }
 
-    public static List<Path> adjacentPaths(Path p) {
-        List<Path> ans = new ArrayList<Path>(4);
+    public static List<Edge> adjacentEdges(Edge p) {
+        List<Edge> ans = new ArrayList<Edge>(4);
         if (p == null)
             return ans;
         Xing[] x = endpoints(p);
-        for (Path path : allPaths()) {
-            if (path == p)
+        for (Edge edge : allEdges()) {
+            if (edge == p)
                 continue;
-            Xing[] y = endpoints(path);
+            Xing[] y = endpoints(edge);
             if (areAdjacent(x[0], y[0])
              || areAdjacent(x[0], y[1])
              || areAdjacent(x[1], y[0])
              || areAdjacent(x[1], y[1]))
-                ans.add(path);
+                ans.add(edge);
         }
         return ans;
     }
@@ -374,7 +374,7 @@ public class Board {
         return ans;
     }
 
-    public static Xing[] endpoints(Path p) {
+    public static Xing[] endpoints(Edge p) {
         return p == null ? new Xing[] {} : new Xing[] {
             xing(p.hex(), p.direction()),
             xing(p.hex(), (p.direction() + 1) % 6),
@@ -393,7 +393,7 @@ public class Board {
         return false;
     }
 
-    public static boolean areAdjacent(Xing a, Path p) {
+    public static boolean areAdjacent(Xing a, Edge p) {
         if (a == null || p == null)
             return false;
         Xing[] ends = endpoints(p);

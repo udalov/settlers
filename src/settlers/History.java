@@ -62,20 +62,20 @@ public class History {
         return events.size();
     }
 
-    void initialRoad(Player pl, Path p) { addEvent(EventType.INITIAL_ROAD, pl, p); }
+    void initialRoad(Player pl, Edge p) { addEvent(EventType.INITIAL_ROAD, pl, p); }
     void initialSettlement(Player pl, Xing x) { addEvent(EventType.INITIAL_SETTLEMENT, pl, x); }
     void rollDice(int n) { addEvent(EventType.ROLL_DICE, n); }
     void robber(Hex h, Player robbed) { addEvent(EventType.ROBBER, h, robbed); }
     void resources(Player pl, List<Resource> resources) { addEvent(EventType.RESOURCES, pl, resources); }
     void discard(Player pl, List<Resource> resources) { addEvent(EventType.DISCARD, pl, resources); }
-    void road(Path p) { addEvent(EventType.ROAD, p); }
+    void road(Edge p) { addEvent(EventType.ROAD, p); }
     void settlement(Xing x) { addEvent(EventType.SETTLEMENT, x); }
     void city(Xing x) { addEvent(EventType.CITY, x); }
     void development() { addEvent(EventType.DEVELOPMENT); }
     void knight() { addEvent(EventType.KNIGHT); }
     void invention(Resource r1, Resource r2) { addEvent(EventType.INVENTION, r1, r2); }
     void monopoly(Resource r, int got) { addEvent(EventType.MONOPOLY, r, got); }
-    void roadBuilding(Path p1, Path p2) { addEvent(EventType.ROAD_BUILDING, p1, p2); }
+    void roadBuilding(Edge p1, Edge p2) { addEvent(EventType.ROAD_BUILDING, p1, p2); }
     void longestRoad(int length) { addEvent(EventType.LONGEST_ROAD, length); }
     void largestArmy(int size) { addEvent(EventType.LARGEST_ARMY, size); }
     void change(String sell, String buy) { addEvent(EventType.CHANGE, sell, buy); }

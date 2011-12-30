@@ -44,7 +44,7 @@ public class BoardVis extends JPanel {
     private final Game.VisAPI api;
     private final Board board;
     private final Map<Hex, Point> hex;
-    private final Map<Path, Polygon> path;
+    private final Map<Edge, Polygon> edge;
 
     public BoardVis(Game game, Game.VisAPI api) {
         super(null);
@@ -52,7 +52,7 @@ public class BoardVis extends JPanel {
         this.api = api;
         this.board = api.board();
         this.hex = new HashMap<Hex, Point>();
-        this.path = new HashMap<Path, Polygon>();
+        this.edge = new HashMap<Edge, Polygon>();
     }
 
     private int width() { return getSize().width; }
@@ -87,7 +87,7 @@ public class BoardVis extends JPanel {
         return new Point(v[0][d], v[1][d]);
     }
 
-    Point[] pathCoords(Path p) {
+    Point[] edgeCoords(Edge p) {
         Point z = hex.get(p.hex());
         int[][] v = calcHexagonVertices(z.x, z.y);
         int d = p.direction(), nd = (d + 1) % 6;
@@ -115,7 +115,7 @@ public class BoardVis extends JPanel {
         }
     }
 
-    void drawPath(Graphics2D g, Path p) {
+    void drawEdge(Graphics2D g, Edge p) {
         Player pl = api.roadAt(p);
         if (pl == null) {
             g.setColor(Color.BLACK);
@@ -124,7 +124,7 @@ public class BoardVis extends JPanel {
             g.setColor(playerColor[pl.color()]);
             g.setStroke(new BasicStroke(5));
         }
-        Point[] z = pathCoords(p);
+        Point[] z = edgeCoords(p);
         g.drawLine(z[0].x, z[0].y, z[1].x, z[1].y);
         g.setStroke(new BasicStroke(1));
     }
@@ -190,13 +190,13 @@ public class BoardVis extends JPanel {
         for (Hex c : Board.allHexes()) {
             drawHex(g, c);
         }
-        for (Path p : Board.allPaths()) {
+        for (Edge p : Board.allEdges()) {
             if (api.roadAt(p) == null)
-                drawPath(g, p);
+                drawEdge(g, p);
         }
-        for (Path p : Board.allPaths()) {
+        for (Edge p : Board.allEdges()) {
             if (api.roadAt(p) != null)
-                drawPath(g, p);
+                drawEdge(g, p);
         }
         for (Xing i : Board.allXings()) {
             drawXing(g, i);
