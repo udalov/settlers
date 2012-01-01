@@ -42,7 +42,7 @@ public class StupidBot extends Bot {
         if (api.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
             List<Node> nodes = Util.shuffle(Board.allNodes(), rnd);
             for (Node x : nodes) {
-                if (api.canBuildTownAt(x, true)) {
+                if (api.canBuildSettlementAt(x, true)) {
                     api.buildSettlement(x);
                     break;
                 }
@@ -80,7 +80,7 @@ public class StupidBot extends Bot {
     public Pair<Node, Edge> placeInitialSettlements(boolean first) {
         List<Node> nodes = Util.shuffle(Board.allNodes(), rnd);
         for (Node x : nodes)
-            if (api.canBuildTownAt(x, false))
+            if (api.canBuildSettlementAt(x, false))
                 for (Edge p : Board.adjacentEdges(x))
                     if (api.roadAt(p) == null)
                         return Pair.make(x, p);

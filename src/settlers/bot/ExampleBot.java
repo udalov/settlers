@@ -96,7 +96,7 @@ public class ExampleBot extends Bot {
         while (api.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
             boolean can = false;
             for (Node i : Board.allNodes()) {
-                if (api.canBuildTownAt(i, true)) {
+                if (api.canBuildSettlementAt(i, true)) {
                     api.buildSettlement(i);
                     can = true;
                     break;
@@ -110,7 +110,7 @@ public class ExampleBot extends Bot {
         
         wt: while (true) {
             for (Node x : Board.allNodes())
-                if (api.canBuildTownAt(x, true))
+                if (api.canBuildSettlementAt(x, true))
                     break wt;
 
             if (api.roadsLeft() == 0 || !api.getIfPossible("BL"))
@@ -126,9 +126,9 @@ public class ExampleBot extends Bot {
                 int value(Edge p) {
                     int value = 0;
                     Node[] x = Board.endpoints(p);
-                    if (api.canBuildTownAt(x[0], false))
+                    if (api.canBuildSettlementAt(x[0], false))
                         value += 100;
-                    if (api.canBuildTownAt(x[1], false))
+                    if (api.canBuildSettlementAt(x[1], false))
                         value += 100;
                     for (Node z : x) {
                         boolean me = false, enemy = false;
@@ -171,7 +171,7 @@ public class ExampleBot extends Bot {
     public Pair<Node, Edge> placeInitialSettlements(boolean first) {
         List<Node> l = new ArrayList<Node>();
         for (Node i : Board.allNodes())
-            if (api.canBuildTownAt(i, false))
+            if (api.canBuildSettlementAt(i, false))
                 l.add(i);
 
         Collections.sort(l, new Comparator<Node>() {

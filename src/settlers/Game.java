@@ -35,7 +35,6 @@ public class Game {
             checkRobber();
         }
 
-        public Game game() { return game; }
         public Player me() { return player(bot); }
         public Random rnd() { return game.rnd; }
         public Board board() { return game.board; }
@@ -66,8 +65,8 @@ public class Game {
             game.moveRobber(c, whoToRob);
         }
 
-        public boolean canBuildTownAt(Node i, boolean mustBeRoad)
-            { return game.canBuildTownAt(i, mustBeRoad, me()); }
+        public boolean canBuildSettlementAt(Node i, boolean mustBeRoad)
+            { return game.canBuildSettlementAt(i, mustBeRoad, me()); }
         public boolean canBuildRoadAt(Edge p)
             { return game.canBuildRoadAt(p, me()); }
 
@@ -380,7 +379,7 @@ public class Game {
             throw new GameException("You do not have any settlements left");
         if (!turn.cards().areThere("BWGL"))
             throw new GameException("Not enough resources to build a settlement");
-        if (!canBuildTownAt(x, true, turn))
+        if (!canBuildSettlementAt(x, true, turn))
             throw new GameException("You cannot build a settlement here");
         towns.put(x, new Town(turn, false));
         turn.cards().sub("BWGL");
@@ -602,7 +601,7 @@ public class Game {
     }
 
 
-    boolean canBuildTownAt(Node i, boolean mustBeRoad, Player player) {
+    boolean canBuildSettlementAt(Node i, boolean mustBeRoad, Player player) {
         if (i == null || towns.get(i) != null)
             return false;
         for (Node j : Board.adjacentNodes(i))
@@ -722,7 +721,7 @@ public class Game {
                     throw new GameException("You cannot build a first settlement at null");
                 if (!Board.areAdjacent(p.first(), p.second()))
                     throw new GameException("You cannot build a road not connected to a town");
-                if (!canBuildTownAt(p.first(), false, player))
+                if (!canBuildSettlementAt(p.first(), false, player))
                     throw new GameException("You cannot build a town here");
                 towns.put(p.first(), new Town(player, false));
                 history.initialSettlement(player, p.first());
