@@ -425,7 +425,7 @@ public class Game {
     boolean hasPort(Resource r, Player player) {
         for (Node x : towns.keySet()) {
             if (towns.get(x).player() == player) {
-                Pair<Boolean, Resource> port = board.portAt(x);
+                Pair<Boolean, Resource> port = board.harborAt(x);
                 if (port.first() && port.second() == r)
                     return true;
             }

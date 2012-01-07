@@ -187,8 +187,8 @@ public class ExampleBot extends Bot {
                 int sa = sum(a), sb = sum(b);
                 if (sa < sb) return 1;
                 if (sa > sb) return -1;
-                boolean pa = api.board().portAt(a).first();
-                boolean pb = api.board().portAt(b).first();
+                boolean pa = api.board().harborAt(a).first();
+                boolean pb = api.board().harborAt(b).first();
                 if (!pa && pb) return 1;
                 if (pa && !pb) return -1;
                 return 0;

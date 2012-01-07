@@ -159,7 +159,7 @@ public class Board {
         return i == null ? 0 : i;
     }
 
-    public Pair<Boolean, Resource> portAt(Node i) {
+    public Pair<Boolean, Resource> harborAt(Node i) {
         for (Edge p : ports2to1.keySet()) {
             Node[] u = endpoints(p);
             if (u[0] == i || u[1] == i)
