@@ -21,6 +21,7 @@ public class Animator {
         }
     }
     
+    private final Object lock = new Object();
     private final List<Handle> handles = new ArrayList<Handle>();
 
     Animator(final Vis vis) {
@@ -28,17 +29,19 @@ public class Animator {
             public void run() {
                 while (true) {
                     // TODO: concurrent modification
-                    for (Iterator<Handle> it = handles.iterator(); it.hasNext(); ) {
-                        final Handle handle = it.next();
-                        final double step = handle.next * 1. / handle.length;
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                handle.animation.setStep(step);
-                                vis.repaint();
-                            }
-                        });
-                        if (++handle.next == handle.length)
-                            it.remove();
+                    synchronized (lock) {
+                        for (Iterator<Handle> it = handles.iterator(); it.hasNext(); ) {
+                            final Handle handle = it.next();
+                            final double step = handle.next * 1. / handle.length;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    handle.animation.setStep(step);
+                                    vis.repaint();
+                                }
+                            });
+                            if (++handle.next == handle.length)
+                                it.remove();
+                        }
                     }
                     try {
                         Thread.sleep(SLEEP_INTERVAL);
@@ -51,7 +54,9 @@ public class Animator {
     }
 
     void add(int duration, Animation animation) {
-        handles.add(new Handle(animation, duration / SLEEP_INTERVAL));
+        synchronized (lock) {
+            handles.add(new Handle(animation, duration / SLEEP_INTERVAL));
+        }
     }
 }
 
