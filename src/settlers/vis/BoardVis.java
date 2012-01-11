@@ -19,7 +19,7 @@ public class BoardVis extends JPanel {
     private static final int[] DY = new int[] {-1, -2, -1, 1, 2, 1};
 
     private static final int PLAYER_INFO_WIDTH = 160;
-    private static final int PLAYER_INFO_HEIGHT = 130;
+    private static final int PLAYER_INFO_HEIGHT = 70;
 
     // TODO: generate
     private static final String[] PORTS = new String[] {
@@ -42,14 +42,16 @@ public class BoardVis extends JPanel {
 
     private final Game game;
     private final Game.VisAPI api;
+    private final Animator animator;
     private final Board board;
     private final Map<Hex, Point> hex;
     private final Map<Edge, Polygon> edge;
 
-    public BoardVis(Game game, Game.VisAPI api) {
+    public BoardVis(Game game, Game.VisAPI api, Animator animator) {
         super(null);
         this.game = game;
         this.api = api;
+        this.animator = animator;
         this.board = api.board();
         this.hex = new HashMap<Hex, Point>();
         this.edge = new HashMap<Edge, Polygon>();
@@ -211,6 +213,7 @@ public class BoardVis extends JPanel {
         final int captionFont = 16;
         final int line = 14;
         final int caption = captionFont + 6;
+        final int tableIndent = 34;
 
         final Color normalText = new Color(0x444444);
         final Color manyResources = new Color(0xAA4444);
@@ -222,7 +225,7 @@ public class BoardVis extends JPanel {
         g.setColor(playerColor[player.color()]);
         g.fillRoundRect(x, y, PLAYER_INFO_WIDTH, caption + 24, arc, arc);
         g.setColor(new Color(0xFFFFEE));
-        g.fillRect(x, y + caption, PLAYER_INFO_WIDTH, 50);
+        g.fillRect(x, y + caption, PLAYER_INFO_WIDTH, 40);
         g.fillRoundRect(x, y + caption, PLAYER_INFO_WIDTH, PLAYER_INFO_HEIGHT - caption, arc, arc);
         g.setColor(new Color(0xAAAAFF));
         g.drawLine(x, y + caption, x + PLAYER_INFO_WIDTH, y + caption);
@@ -234,15 +237,20 @@ public class BoardVis extends JPanel {
 
         g.setFont(new Font("Tahoma", Font.PLAIN, line - 2));
         g.setColor(player.cardsNumber() > 7 ? manyResources : normalText);
-        g.drawString("Resources: " + player.cardsNumber(), x + 4, y + line + 4);
+        g.drawString("res", x + 4, y + line + 4);
+        g.drawString("" + player.cardsNumber(), x + 4, y + 2*line + 4);
         g.setColor(normalText);
-        g.drawString("Developments: " + player.developmentsNumber(), x + 4, y + 2*line + 4);
+        g.drawString("dev", x + 4 + tableIndent, y + line + 4);
+        g.drawString("" + player.developmentsNumber(), x + 4 + tableIndent, y + 2*line + 4);
         g.setColor(api.longestRoad() == player && api.roadLength(player) >= 5 ? longestRoad : normalText);
-        g.drawString("Road length: " + api.roadLength(player), x + 4, y + 3*line + 4);
+        g.drawString("road", x + 4 + 2*tableIndent, y + line + 4);
+        g.drawString("" + api.roadLength(player), x + 4 + 2*tableIndent, y + 2*line + 4);
         g.setColor(api.largestArmy() == player && api.armyStrength(player) >= 3 ? largestArmy : normalText);
-        g.drawString("Army size: " + api.armyStrength(player), x + 4, y + 4*line + 4);
+        g.drawString("army", x + 4 + 3*tableIndent, y + line + 4);
+        g.drawString("" + api.armyStrength(player), x + 4 + 3*tableIndent, y + 2*line + 4);
         g.setColor(normalText);
-        g.drawString("Points: " + api.points(player), x + 4, y + 5*line + 4);
+        g.drawString("vp", x + 4 + 4*tableIndent, y + line + 4);
+        g.drawString("" + api.points(player), x + 4 + 4*tableIndent, y + 2*line + 4);
 
         if (api.turn() == player) {
             g.setFont(new Font("Tahoma", Font.BOLD, line - 2));
@@ -315,15 +323,24 @@ public class BoardVis extends JPanel {
         }
     }
 
-    void drawLastHistoryEvent(Graphics g) {
-        g.setColor(Color.BLACK);
-        g.setFont(new Font("Tahoma", Font.BOLD, 24));
-        Pair<Player, settlers.Event> pair = api.history().getLastEvent();
-        String str = pair == null ? "" : eventDescription(pair.first(), pair.second());
-        g.drawString(str,
-            width() / 2 - g.getFontMetrics().stringWidth(str) / 2,
-            32
-        );
+    private final LastHistoryEventAnimation lastHistoryEventAnimation = new LastHistoryEventAnimation();
+    private class LastHistoryEventAnimation extends Animation {
+        void drawLastHistoryEvent(final Graphics g) {
+            g.setColor(Color.BLACK);
+            g.setFont(new Font("Tahoma", Font.BOLD, 24));
+            Pair<Player, settlers.Event> pair = api.history().getLastEvent();
+            String str = pair == null ? "" : eventDescription(pair.first(), pair.second());
+            if (str.isEmpty())
+                return;
+            g.drawString(str,
+                width() / 2 - g.getFontMetrics().stringWidth(str) / 2,
+                32 - (int)(50*(1 - step))
+            );
+        }
+    };
+
+    public void updateLastEvent() {
+        animator.add(50, lastHistoryEventAnimation);
     }
 
     public void paintComponent(Graphics gg) {
@@ -337,7 +354,7 @@ public class BoardVis extends JPanel {
         recalcHexes();
         drawBoard(g);
         drawPlayersInfo(g);
-        drawLastHistoryEvent(g);
+        lastHistoryEventAnimation.drawLastHistoryEvent(g);
 
         gg.drawImage(bi, 0, 0, width(), height(), null);
     }

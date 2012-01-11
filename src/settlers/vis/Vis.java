@@ -12,6 +12,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
 
     private final Game game;
     private final Game.VisAPI api;
+    private final Animator animator;
 
     private final BoardVis boardVis;
     private final JMenuBar menuBar = new JMenuBar();
@@ -23,6 +24,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
 
         this.game = game;
         this.api = api;
+        this.animator = new Animator(this);
 
         buildMenu();
         setJMenuBar(menuBar);
@@ -31,7 +33,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         getContentPane().add(nextActionButton);
         getContentPane().add(nextTurnButton);
 
-        boardVis = new BoardVis(game, api);
+        boardVis = new BoardVis(game, api, animator);
         getContentPane().add(boardVis);
 
         addWindowListener(this);
@@ -89,6 +91,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
                 // TODO: invent something different
                 try { Thread.sleep(50); } catch (InterruptedException ignored) { }
                 synchronized(game) { }
+                boardVis.updateLastEvent();
                 repaint();
             }
 
