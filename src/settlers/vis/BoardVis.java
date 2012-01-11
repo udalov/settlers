@@ -135,12 +135,23 @@ public class BoardVis extends JPanel {
         Town t = api.townAt(i);
         if (t == null)
             return;
-        g.setColor(playerColor[t.player().color()]);
         Point p = nodeCoords(i);
+        int x = p.x;
+        int y = p.y;
+        int r = TOWN_RADIUS;
+        g.setColor(playerColor[t.player().color()]);
         if (t.isCity()) {
-            g.fillRect(p.x - TOWN_RADIUS, p.y - TOWN_RADIUS, 2 * TOWN_RADIUS, 2 * TOWN_RADIUS);
+            g.fillPolygon(
+                new int[] {x + r/2, x - r/2, x - 3*r/2, x - 3*r/2, x + 2*r, x + 2*r},
+                new int[] {y - r/2, y - 3*r/2, y - r/2, y + r, y + r, y - r/2},
+                6
+            );
         } else {
-            g.fillOval(p.x - TOWN_RADIUS, p.y - TOWN_RADIUS, 2 * TOWN_RADIUS, 2 * TOWN_RADIUS);
+            g.fillPolygon(
+                new int[] {x + r, x, x - r, x - r, x + r},
+                new int[] {y - r/2, y - 3*r/2, y - r/2, y + r, y + r},
+                5
+            );
         }
     }
 
