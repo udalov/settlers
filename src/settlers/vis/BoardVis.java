@@ -21,6 +21,8 @@ public class BoardVis extends JPanel {
     private static final int PLAYER_INFO_WIDTH = 160;
     private static final int PLAYER_INFO_HEIGHT = 70;
 
+    private static final Color BACKGROUND_COLOR = new Color(0xFFFFAA);
+
     // TODO: generate
     private static final String[] PORTS = new String[] {
         "820,821,730,731,640",
@@ -219,17 +221,19 @@ public class BoardVis extends JPanel {
         }
     }
 
-    void drawPlayerInfo(Graphics g, Player player, int x, int y) {
+    void drawPlayerInfo(Graphics2D g, Player player, int x, int y) {
         final int arc = 16;
         final int captionFont = 16;
-        final int line = 14;
+        final int fontSize = 16;
         final int caption = captionFont + 6;
-        final int tableIndent = 34;
 
         final Color normalText = new Color(0x444444);
         final Color manyResources = new Color(0xAA4444);
         final Color longestRoad = new Color(0xFF4444);
         final Color largestArmy = new Color(0xFF4444);
+        final Color dashedLineColor = new Color(0xAAAAAA);
+
+        final Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4}, 0);
 
         g.setColor(new Color(0xAAAAFF));
         g.fillRoundRect(x - 2, y - 2, PLAYER_INFO_WIDTH + 4, PLAYER_INFO_HEIGHT + 4, arc, arc);
@@ -246,31 +250,48 @@ public class BoardVis extends JPanel {
         g.drawString(player + "", x + 4, y + captionFont + 2);
         y += caption;
 
-        g.setFont(new Font("Tahoma", Font.PLAIN, line - 2));
-        g.setColor(player.cardsNumber() > 7 ? manyResources : normalText);
-        g.drawString("res", x + 4, y + line + 4);
-        g.drawString("" + player.cardsNumber(), x + 4, y + 2*line + 4);
-        g.setColor(normalText);
-        g.drawString("dev", x + 4 + tableIndent, y + line + 4);
-        g.drawString("" + player.developmentsNumber(), x + 4 + tableIndent, y + 2*line + 4);
-        g.setColor(api.longestRoad() == player && api.roadLength(player) >= 5 ? longestRoad : normalText);
-        g.drawString("road", x + 4 + 2*tableIndent, y + line + 4);
-        g.drawString("" + api.roadLength(player), x + 4 + 2*tableIndent, y + 2*line + 4);
-        g.setColor(api.largestArmy() == player && api.armyStrength(player) >= 3 ? largestArmy : normalText);
-        g.drawString("army", x + 4 + 3*tableIndent, y + line + 4);
-        g.drawString("" + api.armyStrength(player), x + 4 + 3*tableIndent, y + 2*line + 4);
-        g.setColor(normalText);
-        g.drawString("vp", x + 4 + 4*tableIndent, y + line + 4);
-        g.drawString("" + api.points(player), x + 4 + 4*tableIndent, y + 2*line + 4);
+        String[] strings = new String[]
+            { "res", "dev", "road", "army", "vp" };
+        int[] values = new int[] {
+            player.cardsNumber(),
+            player.developmentsNumber(),
+            api.roadLength(player),
+            api.armyStrength(player),
+            api.points(player)
+        };
+        Font stringFont = new Font("Courier", Font.PLAIN, fontSize - 5);
+        Font valueFont = new Font("Courier", Font.PLAIN, fontSize);
+        Color[] colors = new Color[] {
+            player.cardsNumber() > 7 ? manyResources : normalText,
+            normalText,
+            api.longestRoad() == player && api.roadLength(player) >= 5 ? longestRoad : normalText,
+            api.largestArmy() == player && api.armyStrength(player) >= 3 ? largestArmy : normalText,
+            normalText
+        };
+        for (int i = 0; i < 5; i++) {
+            int tx = x + PLAYER_INFO_WIDTH * (2*i + 1) / 10;
+            if (i < 4) {
+                g.setColor(dashedLineColor);
+                int xx = tx + PLAYER_INFO_WIDTH/10;
+                g.setStroke(dashed);
+                g.drawLine(xx, y + 3, xx, y + 3*fontSize);
+                g.setStroke(new BasicStroke());
+            }
+            g.setColor(colors[i]);
+            g.setFont(stringFont);
+            g.drawString(strings[i], tx - g.getFontMetrics().stringWidth(strings[i]) / 2, y + fontSize);
+            g.setFont(valueFont);
+            g.drawString("" + values[i], tx - g.getFontMetrics().stringWidth("" + values[i]) / 2, y + 2*fontSize + 2);
+        }
 
         if (api.turn() == player) {
-            g.setFont(new Font("Tahoma", Font.BOLD, line - 2));
+            g.setFont(new Font("Tahoma", Font.BOLD, fontSize - 2));
             g.setColor(new Color(0x004400));
-            g.drawString("TURN", x + 4, y + 7*line + 4);
+            g.drawString("TURN", x + 4, y + 7*fontSize + 4);
         }
     }
 
-    void drawPlayersInfo(Graphics g) {
+    void drawPlayersInfo(Graphics2D g) {
         final int indent = 20;
         final int[] playerInfoX = new int[]
             {indent, indent, width() - PLAYER_INFO_WIDTH - indent, width() - PLAYER_INFO_WIDTH - indent};
@@ -359,7 +380,7 @@ public class BoardVis extends JPanel {
         BufferedImage bi = new BufferedImage(width(), height(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D)bi.getGraphics();
 
-        g.setColor(new Color(0xFFFF77));
+        g.setColor(BACKGROUND_COLOR);
         g.fillRect(0, 0, width(), height());
 
         recalcHexes();
