@@ -28,7 +28,6 @@ public class Animator {
         new Thread(new Runnable() {
             public void run() {
                 while (true) {
-                    // TODO: concurrent modification
                     synchronized (lock) {
                         for (Iterator<Handle> it = handles.iterator(); it.hasNext(); ) {
                             final Handle handle = it.next();
