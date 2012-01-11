@@ -221,11 +221,12 @@ public class BoardVis extends JPanel {
         }
     }
 
-    void drawPlayerInfo(Graphics2D g, Player player, int x, int y) {
+    void drawPlayerInfo(Graphics2D g, Player player, int x, int y, boolean invertTurnArrow) {
         final int arc = 16;
         final int captionFont = 16;
         final int fontSize = 16;
         final int caption = captionFont + 6;
+        final int arrowRadius = 20;
 
         final Color normalText = new Color(0x444444);
         final Color manyResources = new Color(0xAA4444);
@@ -272,8 +273,8 @@ public class BoardVis extends JPanel {
             int tx = x + PLAYER_INFO_WIDTH * (2*i + 1) / 10;
             if (i < 4) {
                 g.setColor(dashedLineColor);
-                int xx = tx + PLAYER_INFO_WIDTH/10;
                 g.setStroke(dashed);
+                int xx = tx + PLAYER_INFO_WIDTH/10;
                 g.drawLine(xx, y + 3, xx, y + 3*fontSize);
                 g.setStroke(new BasicStroke());
             }
@@ -285,9 +286,18 @@ public class BoardVis extends JPanel {
         }
 
         if (api.turn() == player) {
-            g.setFont(new Font("Tahoma", Font.BOLD, fontSize - 2));
-            g.setColor(new Color(0x004400));
-            g.drawString("TURN", x + 4, y + 7*fontSize + 4);
+            g.setColor(new Color(0x00AA00));
+            int r = arrowRadius;
+            int cx = x + PLAYER_INFO_WIDTH + 2*r;
+            int cy = y + r;
+            int[] xs = new int[]
+                { cx, cx, cx - r, cx, cx, cx + r, cx + r };
+            int[] ys = new int[]
+                { cy - r/3, cy - 2*r/3, cy, cy + 2*r/3, cy + r/3, cy + r/3, cy - r/3 };
+            if (invertTurnArrow)
+                for (int i = 0; i < xs.length; i++)
+                    xs[i] = 2 * x + PLAYER_INFO_WIDTH - xs[i];
+            g.fillPolygon(xs, ys, xs.length);
         }
     }
 
@@ -298,7 +308,7 @@ public class BoardVis extends JPanel {
         final int[] playerInfoY = new int[]
             {height() - PLAYER_INFO_HEIGHT - indent, indent, indent, height() - PLAYER_INFO_HEIGHT - indent};
         for (int i = 0; i < api.players().size(); i++) {
-            drawPlayerInfo(g, api.players().get(i), playerInfoX[i], playerInfoY[i]);
+            drawPlayerInfo(g, api.players().get(i), playerInfoX[i], playerInfoY[i], i >= 2);
         }
     }
 
