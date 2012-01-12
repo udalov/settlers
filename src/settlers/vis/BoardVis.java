@@ -172,10 +172,10 @@ public class BoardVis extends JPanel {
     }
 
     void drawPort(Graphics2D g, Node i) {
-        Pair<Boolean, Resource> br = board.harborAt(i);
-        if (!br.first())
+        Harbor harbor = board.harborAt(i);
+        if (harbor == null)
             return;
-        Resource r = br.second();
+        Resource r = harbor.resource();
         int d = -1;
         for (int j = 0; j < 6; j++) {
             if (PORTS[j].contains("" + i.x() + i.y() + i.direction())) {

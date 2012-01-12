@@ -81,13 +81,13 @@ public class Main {
         }
 
         for (Node n : Board.allNodes()) {
-            Resource r = game.board().harborAt(n).second();
-            if (r != null)
-                out.println(n + " " + r.chr());
+            Harbor harbor = game.board().harborAt(n);
+            if (harbor != null && harbor.resource() != null)
+                out.println(n + " " + harbor.resource().chr());
         }
         for (Node n : Board.allNodes()) {
-            Pair<Boolean, Resource> harbor = game.board().harborAt(n);
-            if (harbor.first() && harbor.second() == null)
+            Harbor harbor = game.board().harborAt(n);
+            if (harbor != null && harbor.resource() == null)
                 out.println(n);
         }
 

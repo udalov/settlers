@@ -17,27 +17,23 @@ public class Board {
     
     private final Map<Hex, Resource> resources;
     private final Map<Hex, Integer> numbers;
-    private final Map<Edge, Resource> ports2to1;
-    private final List<Edge> ports3to1;
+    private final Map<Edge, Harbor> harbors;
 
 
     private Board(
         Map<Hex, Resource> resources,
         Map<Hex, Integer> numbers,
-        Map<Edge, Resource> ports2to1,
-        List<Edge> ports3to1
+        Map<Edge, Harbor> harbors
     ) {
         this.resources = resources;
         this.numbers = numbers;
-        this.ports2to1 = ports2to1;
-        this.ports3to1 = ports3to1;
+        this.harbors = harbors;
     }
 
     static Board create(Random rnd) {
         Map<Hex, Resource> resources = new HashMap<Hex, Resource>();
         Map<Hex, Integer> numbers = new HashMap<Hex, Integer>();
-        Map<Edge, Resource> ports2to1 = new HashMap<Edge, Resource>();
-        List<Edge> ports3to1 = new ArrayList<Edge>();
+        Map<Edge, Harbor> harbors = new HashMap<Edge, Harbor>();
 
         List<Resource> allResources = new ArrayList<Resource>();
         for (int i = 0; i < 4; i++) {
@@ -91,12 +87,12 @@ public class Board {
         if (resources.get(h) != null)
             numbers.put(h, allNumbers[p]);
 
-        generatePorts(rnd, ports2to1, ports3to1);
+        generatePorts(rnd, harbors);
 
-        return new Board(resources, numbers, ports2to1, ports3to1);
+        return new Board(resources, numbers, harbors);
     }
 
-    private static void generatePorts(Random rnd, Map<Edge, Resource> ports2to1, List<Edge> ports3to1) {
+    private static void generatePorts(Random rnd, Map<Edge, Harbor> harbors) {
         List<Edge> coast = new ArrayList<Edge>();
         int d = 0, x = 8, y = 2;
         for (int i = 0; i < 6; i++) {
@@ -128,20 +124,20 @@ public class Board {
         for (int ind = 0; ind < 6; ind++) {
             int i = permutation.get(ind);
             if (i == 0) {
-                ports2to1.put(coast.get(ptr + 2), Resource.LUMBER);
+                harbors.put(coast.get(ptr + 2), new Harbor(Resource.LUMBER));
             } else if (i == 1) {
-                ports2to1.put(coast.get(ptr + 1), Resource.BRICK);
-                ports3to1.add(coast.get(ptr + 4));
+                harbors.put(coast.get(ptr + 1), new Harbor(Resource.BRICK));
+                harbors.put(coast.get(ptr + 4), new Harbor(null));
             } else if (i == 2) {
-                ports3to1.add(coast.get(ptr + 2));
+                harbors.put(coast.get(ptr + 2), new Harbor(null));
             } else if (i == 3) {
-                ports2to1.put(coast.get(ptr + 1), Resource.WOOL);
-                ports3to1.add(coast.get(ptr + 4));
+                harbors.put(coast.get(ptr + 1), new Harbor(Resource.WOOL));
+                harbors.put(coast.get(ptr + 4), new Harbor(null));
             } else if (i == 4) {
-                ports2to1.put(coast.get(ptr + 2), Resource.ORE);
+                harbors.put(coast.get(ptr + 2), new Harbor(Resource.ORE));
             } else if (i == 5) {
-                ports2to1.put(coast.get(ptr + 1), Resource.GRAIN);
-                ports3to1.add(coast.get(ptr + 4));
+                harbors.put(coast.get(ptr + 1), new Harbor(Resource.GRAIN));
+                harbors.put(coast.get(ptr + 4), new Harbor(null));
             }
             ptr += 5;
         }
@@ -159,18 +155,13 @@ public class Board {
         return i == null ? 0 : i;
     }
 
-    public Pair<Boolean, Resource> harborAt(Node i) {
-        for (Edge p : ports2to1.keySet()) {
-            Node[] u = endpoints(p);
-            if (u[0] == i || u[1] == i)
-                return Pair.make(true, ports2to1.get(p));
+    public Harbor harborAt(Node n) {
+        for (Edge e : harbors.keySet()) {
+            Node[] u = endpoints(e);
+            if (u[0] == n || u[1] == n)
+                return harbors.get(e);
         }
-        for (Edge p : ports3to1) {
-            Node[] u = endpoints(p);
-            if (u[0] == i || u[1] == i)
-                return Pair.make(true, null);
-        }
-        return Pair.make(false, null);
+        return null;
     }
 
 
