@@ -167,6 +167,7 @@ public class Game {
     public static final int MAX_SETTLEMENTS = 5;
     public static final int MAX_CITIES = 4;
     public static final int MAX_ROADS = 15;
+    public static final int POINTS_TO_WIN = 10;
 
     private final Random rnd;
 
@@ -758,7 +759,7 @@ public class Game {
     }
 
     boolean playerHasWon() {
-        return points(turn, true) >= 10;
+        return points(turn, true) >= POINTS_TO_WIN;
     }
 
     void updateLongestRoad() {
