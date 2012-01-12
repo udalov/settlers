@@ -18,22 +18,22 @@ import settlers.vis.Vis;
 
 public class Main {
     
-    String eventString(Event event, Map<Player, Integer> index) {
+    String eventString(Event event) {
         switch (event.type()) {
             case INITIAL_ROAD:
-                return index.get(event.player()) + " road " + event.edge();
+                return event.player().color() + " road " + event.edge();
             case INITIAL_SETTLEMENT:
-                return index.get(event.player()) + " settlement " + event.node();
+                return event.player().color() + " settlement " + event.node();
             case ROLL_DICE:
                 return "roll " + event.number();
             case ROBBER:
                 Player pl = event.player();
-                return "robber " + event.hex() + " " + (pl == null ? -1 : index.get(pl));
+                return "robber " + event.hex() + " " + (pl == null ? -1 : pl.color());
             case RESOURCES:
                 // TODO?
                 return "";
             case DISCARD:
-                return "discard " + index.get(event.player()) + " " + Util.toResourceString(event.resources());
+                return "discard " + event.player().color() + " " + Util.toResourceString(event.resources());
             case ROAD:
                 return "road " + event.edge();
             case SETTLEMENT:
@@ -57,7 +57,7 @@ public class Main {
             case CHANGE:
                 return "change " + event.sell() + " " + event.buy();
             case TRADE:
-                return "trade " + index.get(event.player()) + " " + event.sell() + " " + event.buy();
+                return "trade " + event.player().color() + " " + event.sell() + " " + event.buy();
             case VICTORY:
                 return "victory";
             case EXCEPTION:
@@ -71,19 +71,16 @@ public class Main {
 
     void printHistory(Game game, PrintStream out) {
         out.println(game.players().size());
-        Map<Player, Integer> index = new HashMap<Player, Integer>();
-        for (Player p : game.players()) {
-            index.put(p, index.size());
+        for (Player p : game.players())
             out.println(p.bot());
-        }
 
         List<Pair<Player, List<Event>>> history = game.history().getAll();
         for (Pair<Player, List<Event>> pair : history) {
             Player player = pair.first();
             List<Event> events = pair.second();
-            int ind = player == null ? -1 : index.get(player);
+            int ind = player == null ? -1 : player.color();
             for (Event event : events) {
-                String s = eventString(event, index);
+                String s = eventString(event);
                 if (ind >= 0) s = ind + " " + s;
                 out.println(s);
                 if (event.type() == EventType.EXCEPTION)
