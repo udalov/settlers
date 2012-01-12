@@ -17,7 +17,7 @@ public class Animator {
         private int next = 0;
         private Handle(Animation animation, int length) {
             this.animation = animation;
-            this.length = length;
+            this.length = Math.max(length, 1);
         }
     }
     
@@ -38,7 +38,7 @@ public class Animator {
                                     vis.repaint();
                                 }
                             });
-                            if (++handle.next == handle.length)
+                            if (++handle.next >= handle.length)
                                 it.remove();
                         }
                     }

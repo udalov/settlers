@@ -91,7 +91,6 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
                 // TODO: invent something different
                 try { Thread.sleep(50); } catch (InterruptedException ignored) { }
                 synchronized(game) { }
-                boardVis.updateLastEvent();
                 repaint();
             }
 

@@ -379,24 +379,17 @@ public class BoardVis extends JPanel {
         }
     }
 
-    private final LastHistoryEventAnimation lastHistoryEventAnimation = new LastHistoryEventAnimation();
-    private class LastHistoryEventAnimation extends Animation {
-        void drawLastHistoryEvent(final Graphics g) {
-            g.setColor(Color.BLACK);
-            g.setFont(new Font("Tahoma", Font.BOLD, 24));
-            Pair<Player, settlers.Event> pair = api.history().getLastEvent();
-            String str = pair == null ? "" : eventDescription(pair.first(), pair.second());
-            if (str.isEmpty())
-                return;
-            g.drawString(str,
-                width() / 2 - g.getFontMetrics().stringWidth(str) / 2,
-                32 - (int)(50*(1 - step))
-            );
-        }
-    };
-
-    public void updateLastEvent() {
-        animator.add(50, lastHistoryEventAnimation);
+    void drawLastHistoryEvent(final Graphics g) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Tahoma", Font.BOLD, 24));
+        Pair<Player, settlers.Event> pair = api.history().getLastEvent();
+        String str = pair == null ? "" : eventDescription(pair.first(), pair.second());
+        if (str.isEmpty())
+            return;
+        g.drawString(str,
+            width() / 2 - g.getFontMetrics().stringWidth(str) / 2,
+            32
+        );
     }
 
     public void paintComponent(Graphics gg) {
@@ -410,7 +403,7 @@ public class BoardVis extends JPanel {
         recalcHexes();
         drawBoard(g);
         drawPlayersInfo(g);
-        lastHistoryEventAnimation.drawLastHistoryEvent(g);
+        drawLastHistoryEvent(g);
 
         gg.drawImage(bi, 0, 0, width(), height(), null);
     }
