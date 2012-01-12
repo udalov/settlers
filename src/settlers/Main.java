@@ -69,10 +69,27 @@ public class Main {
         }
     }
 
-    void printHistory(Game game, PrintStream out) {
+    void printGameLog(Game game, PrintStream out) {
         out.println(game.players().size());
         for (Player p : game.players())
             out.println(p.bot());
+
+        for (Hex h : Board.allHexes()) {
+            Resource r = game.board().resourceAt(h);
+            if (r != null)
+                out.println(h + " " + r.chr() + " " + game.board().numberAt(h));
+        }
+
+        for (Node n : Board.allNodes()) {
+            Resource r = game.board().harborAt(n).second();
+            if (r != null)
+                out.println(n + " " + r.chr());
+        }
+        for (Node n : Board.allNodes()) {
+            Pair<Boolean, Resource> harbor = game.board().harborAt(n);
+            if (harbor.first() && harbor.second() == null)
+                out.println(n);
+        }
 
         List<Pair<Player, List<Event>>> history = game.history().getAll();
         for (Pair<Player, List<Event>> pair : history) {
@@ -158,7 +175,7 @@ public class Main {
                 new Vis(game, game.new VisAPI());
             } else {
                 game.play();
-                printHistory(game, System.out);
+                printGameLog(game, System.out);
             }
         }
         catch (java.net.MalformedURLException e) { e.printStackTrace(); }
