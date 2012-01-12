@@ -279,8 +279,8 @@ public class BoardVis extends JPanel {
         Color[] colors = new Color[] {
             player.cardsNumber() > 7 ? manyResources : normalText,
             normalText,
-            api.longestRoad() == player && api.roadLength(player) >= 5 ? longestRoad : normalText,
-            api.largestArmy() == player && api.armyStrength(player) >= 3 ? largestArmy : normalText,
+            api.longestRoad() == player && api.roadLength(player) >= Game.MINIMUM_ROAD_LENGTH ? longestRoad : normalText,
+            api.largestArmy() == player && api.armyStrength(player) >= Game.MINIMUM_ARMY_STRENGTH ? largestArmy : normalText,
             normalText
         };
         for (int i = 0; i < 5; i++) {

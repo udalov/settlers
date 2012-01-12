@@ -110,9 +110,9 @@ public class Main {
             int vp = p.developments().victoryPoint();
             if (vp > 0)
                 out.print(" " + vp + "VP");
-            if (game.largestArmy() == p && game.armyStrength(p) >= 3)
+            if (game.largestArmy() == p && game.armyStrength(p) >= Game.MINIMUM_ARMY_STRENGTH)
                 out.print(" ARMY");
-            if (game.longestRoad() == p && game.roadLength(p) >= 5)
+            if (game.longestRoad() == p && game.roadLength(p) >= Game.MINIMUM_ROAD_LENGTH)
                 out.print(" ROAD");
             out.println();
         }

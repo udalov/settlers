@@ -167,7 +167,16 @@ public class Game {
     public static final int MAX_SETTLEMENTS = 5;
     public static final int MAX_CITIES = 4;
     public static final int MAX_ROADS = 15;
+    public static final int EACH_RESOURCE = 19;
+    public static final int KNIGHTS = 14;
+    public static final int ROAD_BUILDINGS = 2;
+    public static final int INVENTIONS = 2;
+    public static final int MONOPOLIES = 2;
+    public static final int VICTORY_POINTS = 5;
+
     public static final int POINTS_TO_WIN = 10;
+    public static final int MINIMUM_ROAD_LENGTH = 5;
+    public static final int MINIMUM_ARMY_STRENGTH = 3;
 
     private final Random rnd;
 
@@ -199,18 +208,19 @@ public class Game {
         for (Hex hex : Board.allHexes())
             if (board.numberAt(hex) == 0)
                 robber = hex;
-        for (int i = 0; i < 14; i++)
+        for (int i = 0; i < KNIGHTS; i++)
             developments.add(Development.KNIGHT);
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < ROAD_BUILDINGS; i++)
             developments.add(Development.ROAD_BUILDING);
+        for (int i = 0; i < INVENTIONS; i++)
             developments.add(Development.INVENTION);
+        for (int i = 0; i < MONOPOLIES; i++)
             developments.add(Development.MONOPOLY);
-        }
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < VICTORY_POINTS; i++)
             developments.add(Development.VICTORY_POINT);
         Collections.shuffle(developments, rnd);
         for (Resource r : Resource.all())
-            bank.add(r, 19);
+            bank.add(r, EACH_RESOURCE);
     }
 
     List<Player> players() { return Collections.unmodifiableList(players); }
@@ -745,9 +755,9 @@ public class Game {
         for (Node i : towns.keySet())
             if (towns.get(i).player() == player)
                 points += towns.get(i).isCity() ? 2 : 1;
-        if (longestRoad == player && roadLength(player) >= 5)
+        if (longestRoad == player && roadLength(player) >= MINIMUM_ROAD_LENGTH)
             points += 2;
-        if (largestArmy == player && armyStrength(player) >= 3)
+        if (largestArmy == player && armyStrength(player) >= MINIMUM_ARMY_STRENGTH)
             points += 2;
         if (includeVP)
             points += player.developments().victoryPoint();
@@ -767,7 +777,7 @@ public class Game {
         for (Player p : players)
             if (p != turn && roadLength(p) >= z)
                 return;
-        if (z >= 5 && longestRoad != turn)
+        if (z >= MINIMUM_ROAD_LENGTH && longestRoad != turn)
             history.longestRoad(z);
         longestRoad = turn;
     }
@@ -777,7 +787,7 @@ public class Game {
         for (Player p : players)
             if (p != turn && armyStrength(p) >= z)
                 return;
-        if (z >= 3 && largestArmy != turn)
+        if (z >= MINIMUM_ARMY_STRENGTH && largestArmy != turn)
             history.largestArmy(z);
         largestArmy = turn;
     }
