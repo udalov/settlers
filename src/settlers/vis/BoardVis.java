@@ -12,8 +12,8 @@ import settlers.util.*;
 public class BoardVis extends JPanel {
 
     private static final int HEX_SIZE = 54;
-    private static final int TOWN_RADIUS = 10;
-    private static final int PORT_DISTANCE = 8;
+    private static final int TOWN_RADIUS = 9;
+    private static final int PORT_DISTANCE = 9;
 
     private static final int[] DX = new int[] {2, 0, -2, -2, 0, 2};
     private static final int[] DY = new int[] {-1, -2, -1, 1, 2, 1};
@@ -141,6 +141,20 @@ public class BoardVis extends JPanel {
         int x = p.x;
         int y = p.y;
         int r = TOWN_RADIUS;
+        g.setColor(Color.BLACK);
+        if (t.isCity()) {
+            g.fillPolygon(
+                new int[] {x + r/2 + 1, x - r/2, x - 3*r/2 - 1, x - 3*r/2 - 1, x + 2*r + 1, x + 2*r + 1},
+                new int[] {y - r/2 - 1, y - 3*r/2 - 1, y - r/2, y + r + 1, y + r + 1, y - r/2 - 1},
+                6
+            );
+        } else {
+            g.fillPolygon(
+                new int[] {x + r + 1, x, x - r - 1, x - r - 1, x + r + 1},
+                new int[] {y - r/2, y - 3*r/2 - 1, y - r/2, y + r + 1, y + r + 1},
+                5
+            );
+        }
         g.setColor(playerColor[t.player().color()]);
         if (t.isCity()) {
             g.fillPolygon(
