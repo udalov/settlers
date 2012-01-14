@@ -60,20 +60,21 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     void buildMenu() {
         final JMenu game = new JMenu("Game");
 
-        final JMenuItem gameNew = new JMenuItem("New...");
+        final JMenuItem gameRestart = new JMenuItem("Restart");
         final JMenuItem gameQuit = new JMenuItem("Quit");
 
         final ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Object o = e.getSource();
-                if (o == gameNew) {
+                if (o == gameRestart) {
+                    // TODO
                 } else if (o == gameQuit) {
                     System.exit(0);
                 }
             }
         };
 
-        gameNew.addActionListener(listener);
+        gameRestart.addActionListener(listener);
         gameQuit.addActionListener(listener);
         // game.add(gameNew);
         // game.addSeparator();
