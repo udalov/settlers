@@ -513,6 +513,7 @@ public class Game {
         }
         if (buy.isEmpty())
             return true;
+        boolean has3to1 = hasPort3to1(turn);
         String sell = "";
         int buyingIndex = 0;
         // first 2:1, then 3:1 or 4:1
@@ -523,7 +524,7 @@ public class Game {
                 int x = left.get(r);
                 if (x == 0)
                     continue;
-                int coeff = it == 0 ? 2 : hasPort3to1(turn) ? 3 : 4;
+                int coeff = it == 0 ? 2 : has3to1 ? 3 : 4;
                 int sub = Math.min(buy.length() - buyingIndex, x / coeff);
                 for (int i = 0; i < sub; i++)
                     for (int j = 0; j < coeff; j++)
@@ -535,6 +536,9 @@ public class Game {
             }
         }
         if (buyingIndex < buy.length())
+            return false;
+        // there may be not enough resources in bank
+        if (!canChange(sell, buy, turn))
             return false;
         change(sell, buy);
         return true;
