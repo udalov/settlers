@@ -46,7 +46,16 @@ public class ExampleBot extends Bot {
             }
         }
         if (api.developments().monopoly() > 0) {
-            api.monopoly(cards.ore() >= 3 && cards.grain() < 4 ? Resource.GRAIN : Resource.ORE);
+            Resource take = null;
+            int min = Game.EACH_RESOURCE + 1;
+            for (Resource r : Resource.all()) {
+                int x = api.bank().howMany(r) - cards.howMany(r);
+                if (x < min) {
+                    min = x;
+                    take = r;
+                }
+            }
+            api.monopoly(take);
         }
         while (api.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             boolean can = false;
