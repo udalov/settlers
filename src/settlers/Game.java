@@ -741,8 +741,10 @@ public class Game {
                 if (it == 1) {
                     for (Hex c : Board.adjacentHexes(p.first())) {
                         Resource r = board.resourceAt(c);
-                        if (r != null)
+                        if (r != null) {
                             player.cards().add(r, 1);
+                            bank.sub(r, 1);
+                        }
                     }
                 }
             }
