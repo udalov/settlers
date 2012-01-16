@@ -109,12 +109,17 @@ public class BoardVis extends JPanel {
         g.fillPolygon(p);
         int number = board.numberAt(c);
         if (number != 0) {
-            g.setColor(Color.BLACK);
-            g.setFont(new Font("Tahoma",
-                number == 6 || number == 8 ? Font.BOLD : Font.PLAIN, 36));
+            color = Color.BLACK;
+            int style = Font.PLAIN;
+            if (api.robber() == c) {
+                color = Color.GRAY;
+                style = Font.ITALIC;
+            } else if (number == 6 || number == 8) {
+                style = Font.BOLD;
+            }
+            g.setColor(color);
+            g.setFont(new Font("Tahoma", style, 36));
             String str = number + "";
-            if (api.robber() == c)
-                str = "[" + str + "]";
             g.drawString(str, z.x - g.getFontMetrics().stringWidth(str) / 2, z.y + 13);
         }
     }
