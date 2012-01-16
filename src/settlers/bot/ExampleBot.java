@@ -29,13 +29,39 @@ public class ExampleBot extends Bot {
         return null;
     }
 
+    Map<Resource, Integer> income() {
+        Map<Resource, Integer> ans = new EnumMap<Resource, Integer>(Resource.class);
+        for (Resource r : Resource.all())
+            ans.put(r, 0);
+        for (Node n : Board.allNodes()) {
+            Town t = api.townAt(n);
+            if (t == null || t.player() != api.me())
+                continue;
+            int coeff = t.isCity() ? 2 : 1;
+            for (Hex h : Board.adjacentHexes(n)) {
+                Resource r = api.board().resourceAt(h);
+                if (r != null) {
+                    int number = api.board().numberAt(h);
+                    int old = ans.get(r);
+                    ans.put(r, old + 6 - Math.abs(7 - number) * coeff);
+                }
+            }
+        }
+        return ans;
+    }
+
     public void makeTurn() {
         Player me = api.me();
         ResourceDeck cards = api.cards();
+        Board board = api.board();
+
+        // roll the dice and, if 7, move the robber
         if (api.rollDice() == 7) {
             Pair<Hex, Player> rob = rob();
             api.moveRobber(rob.first(), rob.second());
         }
+
+        // if we have a knight, play it
         if (api.developments().knight() > 0) {
             boolean bad = api.largestArmy() != me || api.armyStrength(me) < 3;
             for (Player p : api.robbable(api.robber()))
@@ -45,6 +71,8 @@ public class ExampleBot extends Bot {
                 api.knight(rob.first(), rob.second());
             }
         }
+
+        // if we have a monopoly, play it
         if (api.developments().monopoly() > 0) {
             Resource take = null;
             int min = Game.EACH_RESOURCE + 1;
@@ -57,6 +85,33 @@ public class ExampleBot extends Bot {
             }
             api.monopoly(take);
         }
+
+        // trade the least valuable resource to the most valuable one, if we have any
+        Map<Resource, Integer> income = income();
+        int maxIncome = 0;
+        int minIncome = Integer.MAX_VALUE;
+        for (Resource r : income.keySet()) {
+            int n = income.get(r);
+            maxIncome = Math.max(maxIncome, n);
+            minIncome = Math.min(minIncome, n);
+        }
+        trade: for (Resource sell : Resource.all()) {
+            if (income.get(sell) != maxIncome || cards.howMany(sell) == 0)
+                continue;
+            for (Resource buy : Resource.all()) {
+                if (income.get(buy) != minIncome)
+                    continue;
+                List<TradeResult> results = Util.shuffle(api.trade(sell.chr() + "", buy.chr() + ""), api.rnd());
+                for (TradeResult result : results) {
+                    if (result.isAccepted()) {
+                        result.complete();
+                        break trade;
+                    }
+                }
+            }
+        }
+
+        // if we can obtain the resources, build a city
         while (api.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             boolean can = false;
             for (Node i : Board.allNodes()) {
@@ -69,6 +124,8 @@ public class ExampleBot extends Bot {
             }
             if (!can) break;
         }
+
+        // if we have an invention, play it on resources we most need
         if (api.developments().invention() > 0) {
             Resource[] invent = new Resource[5];
             int inp = 0;
@@ -88,8 +145,10 @@ public class ExampleBot extends Bot {
             }
             api.invention(invent[0], invent[1]);
         }
+
+        // if we can obtain the resources, build roads
         if (api.developments().roadBuilding() > 0 && api.roadsLeft() > 0) {
-            // TODO: the right behaviour
+            // TODO: calculate roads' priority
             Edge[] roads = new Edge[2];
             int inp = 0;
             for (Edge p : Board.allEdges()) {
@@ -102,6 +161,8 @@ public class ExampleBot extends Bot {
             if ((inp == 2 && api.roadsLeft() >= 2) || (inp == 1 && api.roadsLeft() == 1))
                 api.roadBuilding(roads[0], roads[1]);
         }
+
+        // if we can obtain the resources, build a settlement
         while (api.settlementsLeft() > 0 && api.getIfPossible("BWGL")) {
             boolean can = false;
             for (Node i : Board.allNodes()) {
@@ -113,10 +174,13 @@ public class ExampleBot extends Bot {
             }
             if (!can) break;
         }
+
+        // if we can obtain the resources, draw a development card
         while (api.developmentsLeft() > 0 && api.getIfPossible("WOG")) {
             api.drawDevelopment();
         }
         
+        // build roads while there're no places to build a settlement
         wt: while (true) {
             for (Node x : Board.allNodes())
                 if (api.canBuildSettlementAt(x, true))
@@ -166,7 +230,15 @@ public class ExampleBot extends Bot {
     }
 
     public TradeResult trade(TradeOffer offer) {
-        return api.declineOffer(offer);
+        // accept if proposed resources are far more valuable than requested
+        Map<Resource, Integer> income = income();
+        int sells = 0;
+        for (char c : offer.sell().toCharArray())
+            sells += income.get(Resource.fromChar(c));
+        int buys = 0;
+        for (char c : offer.buy().toCharArray())
+            buys += income.get(Resource.fromChar(c));
+        return sells < buys / 2 ? api.acceptOffer(offer) : api.declineOffer(offer);
     }
 
     public List<Resource> discardHalfOfTheCards() {
