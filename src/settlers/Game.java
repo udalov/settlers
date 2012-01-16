@@ -129,11 +129,11 @@ public class Game {
         public List<TradeResult> trade(String sell, String buy)
             { check(); return game.trade(new TradeOffer(me(), sell, buy)); }
         public TradeResult acceptOffer(TradeOffer offer)
-            { check(); return offer.accept(me()); }
+            { return offer.accept(me()); }
         public TradeResult declineOffer(TradeOffer offer)
-            { check(); return offer.decline(me()); }
+            { return offer.decline(me()); }
         public TradeResult counterOffer(TradeOffer offer, String sell, String buy)
-            { check(); return offer.counteroffer(new TradeOffer(me(), sell, buy)); }
+            { return offer.counteroffer(new TradeOffer(me(), sell, buy)); }
     }
 
     public class VisAPI {
