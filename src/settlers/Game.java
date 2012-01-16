@@ -127,13 +127,13 @@ public class Game {
             { return game.points(player); }
 
         public List<TradeResult> trade(String sell, String buy)
-            { check(); return game.trade(new TradeOffer(me(), sell, buy)); }
+            { check(); return game.trade(new TradeOffer(game, me(), sell, buy)); }
         public TradeResult acceptOffer(TradeOffer offer)
             { return offer.accept(me()); }
         public TradeResult declineOffer(TradeOffer offer)
             { return offer.decline(me()); }
         public TradeResult counterOffer(TradeOffer offer, String sell, String buy)
-            { return offer.counteroffer(new TradeOffer(me(), sell, buy)); }
+            { return offer.counteroffer(new TradeOffer(game, me(), sell, buy)); }
     }
 
     public class VisAPI {
@@ -255,7 +255,7 @@ public class Game {
     List<TradeResult> trade(TradeOffer offer) {
         List<TradeResult> ans = new ArrayList<TradeResult>();
         for (Player p : players)
-            if (p != offer.trader())
+            if (p != offer.trader() && p.cards().areThere(offer.buy()))
                 ans.add(p.bot().trade(offer));
         return ans;
     }

@@ -7,17 +7,19 @@ import settlers.util.Util;
 
 public class TradeOffer {
     
+    private final Game game;
     private final Player trader;
     private final String sell;
     private final String buy;
 
-    TradeOffer(Player trader, String sell, String buy) {
+    TradeOffer(Game game, Player trader, String sell, String buy) {
         if (sell == null || buy == null || "".equals(sell) || "".equals(buy))
             throw new GameException("You cannot trade with nothing");
         if (!Util.isResourceString(sell) || !Util.isResourceString(buy))
             throw new GameException("Invalid characters in trade offer");
         if (!trader.cards().areThere(sell))
             throw new GameException("You cannot sell resources you do not have");
+        this.game = game;
         this.trader = trader;
         this.sell = sell;
         this.buy = buy;
@@ -44,6 +46,7 @@ public class TradeOffer {
         trader.cards().add(buy);
         with.cards().sub(buy);
         with.cards().add(sell);
+        game.history().trade(with, sell, buy);
     }
 }
 
