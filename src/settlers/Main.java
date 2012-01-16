@@ -98,7 +98,8 @@ public class Main {
             int ind = player == null ? -1 : player.color();
             for (Event event : events) {
                 String s = eventString(event);
-                if (ind >= 0) s = ind + " " + s;
+                if (ind >= 0)
+                    s = ind + " " + s;
                 out.println(s);
                 if (event.type() == EventType.EXCEPTION)
                     return;
@@ -106,8 +107,8 @@ public class Main {
         }
 
         for (Player p : game.players()) {
-            out.print(game.points(p));
             int vp = p.developments().victoryPoint();
+            out.print(game.points(p) + vp);
             if (vp > 0)
                 out.print(" " + vp + "VP");
             if (game.largestArmy() == p && game.armyStrength(p) >= Game.MINIMUM_ARMY_STRENGTH)
