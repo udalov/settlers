@@ -105,7 +105,7 @@ public class ExampleBot extends Bot {
                 for (TradeResult result : results) {
                     if (result.isAccepted()) {
                         result.complete();
-                        break trade;
+                        continue trade;
                     }
                 }
             }
@@ -125,7 +125,7 @@ public class ExampleBot extends Bot {
             if (!can) break;
         }
 
-        // if we have an invention, play it on resources we most need
+        // if we have an invention, play it on resources we need most
         if (api.developments().invention() > 0) {
             Resource[] invent = new Resource[5];
             int inp = 0;
