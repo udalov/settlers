@@ -42,6 +42,12 @@ public class Util {
         return l;
     }
 
+    public static <T extends Comparable<? super T>> List<T> sort(List<T> list) {
+        List<T> l = new ArrayList<T>(list);
+        Collections.sort(l);
+        return l;
+    }
+
     public static <T> List<T> filter(List<T> list, Filter<T> filter) {
         List<T> ans = new ArrayList<T>();
         for (T obj : list)
