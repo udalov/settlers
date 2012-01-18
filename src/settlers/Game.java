@@ -279,9 +279,9 @@ public class Game {
                         p.cards().sub(r, 1);
                         bank.add(r, 1);
                     }
-                    history.discard(p, discard);
                     if (p.cards().size() != (were + 1) / 2)
                         throw new GameException("You must discard half of your cards");
+                    history.discard(p, discard);
                 }
             }
         } else {
@@ -699,8 +699,8 @@ public class Game {
         turn.developments().reenable();
 
         if (playerHasWon()) {
-            history.victory(turn.developments().victoryPoint());
             finished = true;
+            history.victory(turn.developments().victoryPoint());
             return true;
         }
 
@@ -722,8 +722,8 @@ public class Game {
             placeInitialSettlements();
             while (!nextTurn());
         } catch (Exception e) {
-            history.exception(e);
             finished = true;
+            history.exception(e);
         }
     }
 
