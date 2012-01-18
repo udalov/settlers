@@ -86,31 +86,6 @@ public class ExampleBot extends Bot {
             api.monopoly(take);
         }
 
-        // trade the least valuable resource to the most valuable one, if we have any
-        Map<Resource, Integer> income = income();
-        int maxIncome = 0;
-        int minIncome = Integer.MAX_VALUE;
-        for (Resource r : income.keySet()) {
-            int n = income.get(r);
-            maxIncome = Math.max(maxIncome, n);
-            minIncome = Math.min(minIncome, n);
-        }
-        trade: for (Resource sell : Resource.all()) {
-            if (income.get(sell) != maxIncome || cards.howMany(sell) == 0)
-                continue;
-            for (Resource buy : Resource.all()) {
-                if (income.get(buy) != minIncome)
-                    continue;
-                List<TradeResult> results = Util.shuffle(api.trade(sell.chr() + "", buy.chr() + ""), api.rnd());
-                for (TradeResult result : results) {
-                    if (result.isAccepted()) {
-                        result.complete();
-                        continue trade;
-                    }
-                }
-            }
-        }
-
         // if we can obtain the resources, build a city
         while (api.citiesLeft() > 0 && api.getIfPossible("OOOGG")) {
             boolean can = false;
@@ -173,6 +148,31 @@ public class ExampleBot extends Bot {
                 }
             }
             if (!can) break;
+        }
+
+        // trade the least valuable resource to the most valuable one, if we have any
+        Map<Resource, Integer> income = income();
+        int maxIncome = 0;
+        int minIncome = Integer.MAX_VALUE;
+        for (Resource r : income.keySet()) {
+            int n = income.get(r);
+            maxIncome = Math.max(maxIncome, n);
+            minIncome = Math.min(minIncome, n);
+        }
+        trade: for (Resource sell : Resource.all()) {
+            if (income.get(sell) != maxIncome || cards.howMany(sell) == 0)
+                continue;
+            for (Resource buy : Resource.all()) {
+                if (income.get(buy) != minIncome)
+                    continue;
+                List<TradeResult> results = Util.shuffle(api.trade(sell.chr() + "", buy.chr() + ""), api.rnd());
+                for (TradeResult result : results) {
+                    if (result.isAccepted()) {
+                        result.complete();
+                        continue trade;
+                    }
+                }
+            }
         }
 
         // if we can obtain the resources, draw a development card
