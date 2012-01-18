@@ -1,6 +1,14 @@
 package settlers.vis;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Stroke;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
@@ -66,7 +74,10 @@ public class BoardVis extends JPanel {
         final int width = width();
         final int height = height();
         for (Hex c : Board.allHexes()) {
-            hex.put(c, new Point((c.x() - 4) * HEX_SIZE + width / 2, height / 2 - (c.y() - 1) * HEX_SIZE * 3 / 2));
+            hex.put(c, new Point(
+                (c.x() - 4) * HEX_SIZE + width / 2,
+                height / 2 - (3 * c.y() - 4) * HEX_SIZE / 2
+            ));
         }
     }
 
@@ -188,8 +199,6 @@ public class BoardVis extends JPanel {
                 break;
             }
         }
-        if (d < 0)
-            throw new IllegalStateException("Internal: invalid port location");
         Point p = nodeCoords(i);
         String str = resourceToPort(r);
         g.setFont(new Font("Tahoma", Font.BOLD, 10));
@@ -240,20 +249,26 @@ public class BoardVis extends JPanel {
         }
     }
 
-    void drawPlayerInfo(Graphics2D g, Player player, int x, int y, boolean invertTurnArrow) {
+    void drawPlayerInfo(Graphics2D g, Player player, List<Resource> income, int x, int y, int position) {
         final int arc = 16;
         final int captionFont = 16;
         final int fontSize = 16;
         final int caption = captionFont + 6;
         final int arrowRadius = 20;
+        final int incomeIndent = 24;
 
         final Color normalText = new Color(0x444444);
         final Color manyResources = new Color(0xAA4444);
         final Color longestRoad = new Color(0xFF4444);
         final Color largestArmy = new Color(0xFF4444);
         final Color dashedLineColor = new Color(0xAAAAAA);
+        final Color arrowTurnColor = new Color(0x00AA00);
 
         final Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4}, 0);
+
+        final Font stringFont = new Font("Courier", Font.PLAIN, fontSize - 5);
+        final Font valueFont = new Font("Courier", Font.PLAIN, fontSize);
+        final Font incomeFont = new Font("Courier", Font.BOLD, fontSize + 4);
 
         g.setColor(new Color(0xAAAAFF));
         g.fillRoundRect(x - 2, y - 2, PLAYER_INFO_WIDTH + 4, PLAYER_INFO_HEIGHT + 4, arc, arc);
@@ -279,8 +294,6 @@ public class BoardVis extends JPanel {
             api.armyStrength(player),
             api.points(player)
         };
-        Font stringFont = new Font("Courier", Font.PLAIN, fontSize - 5);
-        Font valueFont = new Font("Courier", Font.PLAIN, fontSize);
         Color[] colors = new Color[] {
             player.cardsNumber() > 7 ? manyResources : normalText,
             normalText,
@@ -305,7 +318,7 @@ public class BoardVis extends JPanel {
         }
 
         if (api.turn() == player) {
-            g.setColor(new Color(0x00AA00));
+            g.setColor(arrowTurnColor);
             int r = arrowRadius;
             int cx = x + PLAYER_INFO_WIDTH + 2*r;
             int cy = y + r;
@@ -313,21 +326,48 @@ public class BoardVis extends JPanel {
                 { cx, cx, cx - r, cx, cx, cx + r, cx + r };
             int[] ys = new int[]
                 { cy - r/3, cy - 2*r/3, cy, cy + 2*r/3, cy + r/3, cy + r/3, cy - r/3 };
-            if (invertTurnArrow)
+            if (position == 2 || position == 3)
                 for (int i = 0; i < xs.length; i++)
                     xs[i] = 2 * x + PLAYER_INFO_WIDTH - xs[i];
             g.fillPolygon(xs, ys, xs.length);
         }
+
+        if (!income.isEmpty()) {
+            g.setFont(incomeFont);
+            g.setColor(Color.BLACK);
+            String str = "+" + Util.toResourceString(income);
+            FontMetrics fmt = g.getFontMetrics();
+            int cx = x + PLAYER_INFO_WIDTH / 2 - fmt.stringWidth(str) / 2;
+            int cy = y - caption;
+            int ind = incomeIndent;
+            cy += fmt.getHeight() / 3;
+            if (position == 1 || position == 2) {
+                cy += PLAYER_INFO_HEIGHT + ind;
+            } else {
+                cy -= ind;
+            }
+            for (char c : str.toCharArray()) {
+                Resource r = Resource.fromChar(c);
+                if (r == null)
+                    g.setColor(Color.GRAY);
+                else
+                    g.setColor(resourceToColor(r));
+                g.drawString("" + c, cx, cy);
+                cx += fmt.charWidth(c);
+            }
+        }
     }
 
-    void drawPlayersInfo(Graphics2D g) {
+    void drawPlayersInfo(Graphics2D g, Map<Player, List<Resource>> income) {
         final int indent = 20;
         final int[] playerInfoX = new int[]
             {indent, indent, width() - PLAYER_INFO_WIDTH - indent, width() - PLAYER_INFO_WIDTH - indent};
         final int[] playerInfoY = new int[]
             {height() - PLAYER_INFO_HEIGHT - indent, indent, indent, height() - PLAYER_INFO_HEIGHT - indent};
         for (int i = 0; i < api.players().size(); i++) {
-            drawPlayerInfo(g, api.players().get(i), playerInfoX[i], playerInfoY[i], i >= 2);
+            Player player = api.players().get(i);
+            List<Resource> l = income.containsKey(player) ? income.get(player) : Collections.<Resource>emptyList();
+            drawPlayerInfo(g, player, l, playerInfoX[i], playerInfoY[i], i);
         }
     }
 
@@ -381,11 +421,10 @@ public class BoardVis extends JPanel {
         }
     }
 
-    void drawLastHistoryEvent(final Graphics g) {
+    void drawHistoryEvent(Graphics g, Player player, Event event) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Tahoma", Font.BOLD, 24));
-        Pair<Player, settlers.Event> pair = api.history().getLastEvent();
-        String str = pair == null ? "" : eventDescription(pair.first(), pair.second());
+        String str = eventDescription(player, event);
         if (str.isEmpty())
             return;
         g.drawString(str,
@@ -404,8 +443,15 @@ public class BoardVis extends JPanel {
 
         recalcHexes();
         drawBoard(g);
-        drawPlayersInfo(g);
-        drawLastHistoryEvent(g);
+
+        Pair<Player, Event> pair = api.history().getLastEvent();
+        if (pair != null)
+            drawHistoryEvent(g, pair.first(), pair.second());
+
+        Map<Player, List<Resource>> income =
+            pair != null && pair.second().type() == EventType.ROLL_DICE ?
+            pair.second().income() : Collections.<Player, List<Resource>>emptyMap();
+        drawPlayersInfo(g, income);
 
         gg.drawImage(bi, 0, 0, width(), height(), null);
     }
