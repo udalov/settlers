@@ -29,9 +29,6 @@ public class Main {
             case ROBBER:
                 Player pl = event.player();
                 return "robber " + event.hex() + " " + (pl == null ? -1 : pl.color());
-            case RESOURCES:
-                // TODO?
-                return "";
             case DISCARD:
                 return "discard " + event.player().color() + " " + Util.toResourceString(event.resources());
             case ROAD:

@@ -6,7 +6,6 @@ public enum EventType {
 
     ROLL_DICE,
     ROBBER,
-    RESOURCES,
     DISCARD,
 
     ROAD,

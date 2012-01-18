@@ -266,7 +266,7 @@ public class Game {
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
         if (diceRolled == 7) {
             robberMoveStatus = 1;
-            history.rollDice(diceRolled);
+            history.rollDice(diceRolled, Collections.<Player, List<Resource>>emptyMap());
             for (Player p : players) {
                 int were = p.cards().size();
                 if (were > 7) {
@@ -286,9 +286,9 @@ public class Game {
             }
         } else {
             int[] neededResCards = new int[Resource.all().length];
-            Map<Player, List<Resource>> gets = new HashMap<Player, List<Resource>>();
+            Map<Player, List<Resource>> income = new HashMap<Player, List<Resource>>();
             for (Player p : players)
-                gets.put(p, new ArrayList<Resource>());
+                income.put(p, new ArrayList<Resource>());
             for (int step = 0; step < 2; step++) {
                 for (Hex hex : Board.allHexes()) {
                     if (board.numberAt(hex) != diceRolled)
@@ -306,15 +306,15 @@ public class Game {
                             neededResCards[index] += q;
                         } else if (neededResCards[index] <= bank.howMany(res)) {
                             town.player().cards().add(res, q);
-                            gets.get(town.player()).add(res);
+                            income.get(town.player()).add(res);
                             if (q == 2)
-                                gets.get(town.player()).add(res);
+                                income.get(town.player()).add(res);
                             bank.sub(res, q);
                         }
                     }
                 }
             }
-            history.rollDice(diceRolled);
+            history.rollDice(diceRolled, income);
         }
         return diceRolled;
     }

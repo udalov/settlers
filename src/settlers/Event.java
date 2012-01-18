@@ -1,7 +1,9 @@
 package settlers;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Event {
     
@@ -23,7 +25,6 @@ public class Event {
         switch (type) {
             case INITIAL_ROAD:
             case INITIAL_SETTLEMENT:
-            case RESOURCES:
             case DISCARD:
             case TRADE:
                 return (Player)args[0];
@@ -72,6 +73,20 @@ public class Event {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<Player, List<Resource>> income() {
+        switch (type) {
+            case ROLL_DICE:
+                Map<Player, List<Resource>> map = (Map<Player, List<Resource>>)args[1];
+                Map<Player, List<Resource>> ans = new HashMap<Player, List<Resource>>();
+                for (Player p : map.keySet())
+                    ans.put(p, Collections.unmodifiableList(map.get(p)));
+                return ans;
+            default:
+                throw noRecord("income");
+        }
+    }
+
     public Hex hex() {
         switch (type) {
             case ROBBER:
@@ -84,7 +99,6 @@ public class Event {
     @SuppressWarnings("unchecked")
     public List<Resource> resources() {
         switch (type) {
-            case RESOURCES:
             case DISCARD:
                 return Collections.unmodifiableList((List<Resource>)args[1]);
             default:

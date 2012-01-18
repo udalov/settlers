@@ -3,6 +3,7 @@ package settlers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import settlers.util.Pair;
 
 public class History {
@@ -64,9 +65,8 @@ public class History {
 
     void initialRoad(Player pl, Edge p) { addEvent(EventType.INITIAL_ROAD, pl, p); }
     void initialSettlement(Player pl, Node x) { addEvent(EventType.INITIAL_SETTLEMENT, pl, x); }
-    void rollDice(int n) { addEvent(EventType.ROLL_DICE, n); }
+    void rollDice(int n, Map<Player, List<Resource>> income) { addEvent(EventType.ROLL_DICE, n, income); }
     void robber(Hex h, Player robbed) { addEvent(EventType.ROBBER, h, robbed); }
-    void resources(Player pl, List<Resource> resources) { addEvent(EventType.RESOURCES, pl, resources); }
     void discard(Player pl, List<Resource> resources) { addEvent(EventType.DISCARD, pl, resources); }
     void road(Edge p) { addEvent(EventType.ROAD, p); }
     void settlement(Node x) { addEvent(EventType.SETTLEMENT, x); }

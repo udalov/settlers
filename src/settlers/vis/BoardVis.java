@@ -344,9 +344,6 @@ public class BoardVis extends JPanel {
                 Player pl = event.player();
                 return color + " moves the robber and robs " +
                     (pl == null ? "nobody" : playerColorName[pl.color()]);
-            case RESOURCES:
-                // TODO?
-                return "";
             case DISCARD:
                 return playerColorName[event.player().color()] + " discards " +
                     Util.toResourceString(event.resources());
