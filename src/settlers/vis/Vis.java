@@ -14,7 +14,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     private final Game.VisAPI api;
     private final Animator animator;
 
-    private final BoardVis boardVis;
+    private final GameVis gameVis;
     private final JMenuBar menuBar = new JMenuBar();
     private final JButton nextActionButton = new JButton("Next action");
     private final JButton nextTurnButton = new JButton("Next turn");
@@ -33,8 +33,8 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         getContentPane().add(nextActionButton);
         getContentPane().add(nextTurnButton);
 
-        boardVis = new BoardVis(game, api, animator);
-        getContentPane().add(boardVis);
+        gameVis = new GameVis(game, api, animator);
+        getContentPane().add(gameVis);
 
         addWindowListener(this);
         addMouseListener(this);
@@ -146,7 +146,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         nextTurnButton.setLocation(width / 2 - nextTurnWidth / 2, height - 180 + nextActionHeight);
         nextTurnButton.setSize(nextTurnWidth, nextTurnHeight);
 
-        boardVis.setSize(
+        gameVis.setSize(
             width - insets.left - insets.right,
             height - insets.top - insets.bottom - menuBar.getSize().height
         );
