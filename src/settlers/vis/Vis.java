@@ -55,6 +55,8 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         }).start();
         nextTurnButton.setText("Skip building phase");
         setVisible(true);
+
+        repaint();
     }
 
     void buildMenu() {
@@ -76,7 +78,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
 
         gameRestart.addActionListener(listener);
         gameQuit.addActionListener(listener);
-        // game.add(gameNew);
+        // game.add(gameRestart);
         // game.addSeparator();
         game.add(gameQuit);
         menuBar.add(game);
