@@ -314,6 +314,8 @@ public class Game {
                     }
                 }
             }
+            for (Player p : players)
+                income.put(p, Util.sort(income.get(p)));
             history.rollDice(diceRolled, income);
         }
         return diceRolled;
