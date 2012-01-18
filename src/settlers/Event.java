@@ -1,5 +1,6 @@
 package settlers;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Event {
@@ -85,7 +86,7 @@ public class Event {
         switch (type) {
             case RESOURCES:
             case DISCARD:
-                return (List<Resource>)args[1];
+                return Collections.unmodifiableList((List<Resource>)args[1]);
             default:
                 throw noRecord("resources");
         }
