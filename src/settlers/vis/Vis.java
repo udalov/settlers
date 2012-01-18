@@ -53,7 +53,6 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
                 Vis.this.api.play();
             }
         }).start();
-        nextTurnButton.setText("Skip building phase");
         setVisible(true);
 
         repaint();
@@ -110,8 +109,6 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
                     } while (api.history().size() == turn && !api.isFinished());
                 }
                 repaintVis();
-                if (api.history().size() == 2)
-                    nextTurnButton.setText("Next turn");
             }
         };
         nextActionButton.addActionListener(listener);
