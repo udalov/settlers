@@ -52,16 +52,14 @@ public class GameVis extends JPanel {
 
     private final Game game;
     private final Game.VisAPI api;
-    private final Animator animator;
     private final Board board;
     private final Map<Hex, Point> hex;
     private final Map<Edge, Polygon> edge;
 
-    public GameVis(Game game, Game.VisAPI api, Animator animator) {
+    public GameVis(Game game, Game.VisAPI api) {
         super(null);
         this.game = game;
         this.api = api;
-        this.animator = animator;
         this.board = api.board();
         this.hex = new HashMap<Hex, Point>();
         this.edge = new HashMap<Edge, Polygon>();
