@@ -31,7 +31,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         getContentPane().add(nextActionButton);
         getContentPane().add(nextTurnButton);
 
-        gameVis = new GameVis(game, api);
+        gameVis = new GameVis(api);
         getContentPane().add(gameVis);
 
         addWindowListener(this);

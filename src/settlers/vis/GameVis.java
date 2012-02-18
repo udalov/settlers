@@ -17,7 +17,7 @@ import javax.swing.*;
 import settlers.*;
 import settlers.util.*;
 
-public class GameVis extends JPanel {
+class GameVis extends JPanel {
 
     private static final int HEX_SIZE = 54;
     private static final int TOWN_RADIUS = 9;
@@ -50,19 +50,15 @@ public class GameVis extends JPanel {
         new Color(0xFFFFFF)
     };
 
-    private final Game game;
     private final Game.VisAPI api;
     private final Board board;
     private final Map<Hex, Point> hex;
-    private final Map<Edge, Polygon> edge;
 
-    public GameVis(Game game, Game.VisAPI api) {
+    public GameVis(Game.VisAPI api) {
         super(null);
-        this.game = game;
         this.api = api;
         this.board = api.board();
         this.hex = new HashMap<Hex, Point>();
-        this.edge = new HashMap<Edge, Polygon>();
     }
 
     private int width() { return getSize().width; }
@@ -337,12 +333,11 @@ public class GameVis extends JPanel {
             FontMetrics fmt = g.getFontMetrics();
             int cx = x + PLAYER_INFO_WIDTH / 2 - fmt.stringWidth(str) / 2;
             int cy = y - caption;
-            int ind = incomeIndent;
             cy += fmt.getHeight() / 3;
             if (position == 1 || position == 2) {
-                cy += PLAYER_INFO_HEIGHT + ind;
+                cy += PLAYER_INFO_HEIGHT + incomeIndent;
             } else {
-                cy -= ind;
+                cy -= incomeIndent;
             }
             for (char c : str.toCharArray()) {
                 Resource r = Resource.fromChar(c);
