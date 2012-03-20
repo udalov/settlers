@@ -24,7 +24,7 @@ public class SampleBot extends Bot {
         return null;
     }
 
-    public Pair<Xing, Edge> placeInitialSettlements(boolean first) {
+    public Pair<Node, Edge> placeInitialSettlements(boolean first) {
         throw new RuntimeException("THE CAKE IS A LIE");
     }
 
