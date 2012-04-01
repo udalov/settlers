@@ -66,46 +66,47 @@ public class Main {
         }
     }
 
-    void printGameLog(Game game, PrintStream out) {
-        out.printf("Hello! This is Settlers game between %d bots:\n", game.players().size());
-        for (Player p : game.players()) {
-            out.println(p.color() + ": " + p.bot());
-        }
-        out.printf("\n====== Board ======\n");
-
-        for (Hex h : Board.allHexes()) {
-            Resource r = game.board().resourceAt(h);
-            if (r != null)
-                out.println(h + " " + r.chr() + " " + game.board().numberAt(h));
-        }
-
-        out.printf("\n====== Harbors ======\n");
-        for (Node n : Board.allNodes()) {
-            Harbor harbor = game.board().harborAt(n);
-            if (harbor != null && harbor.resource() != null)
-                out.println(n + " " + harbor.resource().chr());
-        }
-        for (Node n : Board.allNodes()) {
-            Harbor harbor = game.board().harborAt(n);
-            if (harbor != null && harbor.resource() == null)
-                out.println(n);
-        }
-
-        out.printf("\n====== Game log ======\n");
-        List<Pair<Player, List<Event>>> history = game.history().getAll();
-        for (Pair<Player, List<Event>> pair : history) {
-            Player player = pair.first();
-            List<Event> events = pair.second();
-            int ind = player == null ? -1 : player.color();
-            for (Event event : events) {
-                String s = eventString(event);
-                if (ind >= 0)
-                    s = ind + " " + s;
-                out.println(s);
-                if (event.type() == EventType.EXCEPTION)
-                    return;
+    void printGameLog(Game game, PrintStream out, boolean silent) {
+        if (!silent) {
+            out.printf("Hello! This is Settlers game between %d bots:\n", game.players().size());
+            for (Player p : game.players()) {
+                out.println(p.color() + ": " + p.bot());
             }
-            out.println();
+            out.printf("\n====== Board ======\n");
+
+            for (Hex h : Board.allHexes()) {
+                Resource r = game.board().resourceAt(h);
+                if (r != null)
+                    out.println(h + " " + r.chr() + " " + game.board().numberAt(h));
+            }
+
+            out.printf("\n====== Harbors ======\n");
+            for (Node n : Board.allNodes()) {
+                Harbor harbor = game.board().harborAt(n);
+                if (harbor != null && harbor.resource() != null)
+                    out.println(n + " " + harbor.resource().chr());
+            }
+            for (Node n : Board.allNodes()) {
+                Harbor harbor = game.board().harborAt(n);
+                if (harbor != null && harbor.resource() == null)
+                    out.println(n);
+            }
+
+            out.printf("\n====== Game log ======\n");
+            for (Pair<Player, List<Event>> pair : game.history().getAll()) {
+                Player player = pair.first();
+                List<Event> events = pair.second();
+                int ind = player == null ? -1 : player.color();
+                for (Event event : events) {
+                    String s = eventString(event);
+                    if (ind >= 0)
+                        s = ind + " " + s;
+                    out.println(s);
+                    if (event.type() == EventType.EXCEPTION)
+                        return;
+                }
+                out.println();
+            }
         }
 
         out.printf("======= Summary =======\n");
@@ -121,7 +122,7 @@ public class Main {
             out.println();
         }
 
-        out.println("Total " + (history.size() - 1) + " turns");
+        out.println("Total " + (game.history().getAll().size() - 1) + " turns");
     }
 
     void run(String[] args) {
@@ -133,6 +134,7 @@ public class Main {
             Bot[] bots = null;
             boolean vis = false;
             long randSeed = 0;
+            boolean silent = false;
 
             for (int i = 0; i < args.length; i++)
                 if ("-seed".equals(args[i]))
@@ -165,6 +167,8 @@ public class Main {
                     vis = true;
                 } else if ("-seed".equals(args[i])) {
                     ++i;
+                } else if ("-silent".equals(args[i])) {
+                    silent = true;
                 } else {
                     throw new IllegalArgumentException("Unknown parameter: " + args[i]);
                 }
@@ -183,7 +187,7 @@ public class Main {
                 new Vis(game, game.new VisAPI());
             } else {
                 game.play();
-                printGameLog(game, System.out);
+                printGameLog(game, System.out, silent);
             }
         }
         catch (java.net.MalformedURLException e) { e.printStackTrace(); }
@@ -197,7 +201,7 @@ public class Main {
     private void printHelp(PrintStream out) {
         out.printf(
                 "Usage:\n" +
-                "java -jar Settlers.jar [-seed <seed>] [-vis] -3|-4 <botname1> <botname2> <botname3> [<botname4>]\n\n" +
+                "java -jar Settlers.jar [-seed <seed>] [-vis] [-silent] -3|-4 <botname1> <botname2> <botname3> [<botname4>]\n\n" +
                 "An example of running the testing system on a game between 3 example bots:\n" +
                 "java -jar Settlers.jar -3 Example Example Example\n\n" +
                 "Full list of arguments you can use:\n" +
@@ -207,8 +211,9 @@ public class Main {
                 "E.g. sample/bin/SampleBot.jar:smartasses.SampleBot\n" +
                 "\n-vis - enable visualization mode\n" +
                 "\n-seed - specify a random seed used by Game's random object to generate a board and everything else; " +
-                "one integer number must follow. If you specify 0, the seed will be chosen at random\n"
-                );
+                "one integer number must follow. If you specify 0, the seed will be chosen at random\n" +
+                "\n-silent - print only summary of the game\n\n"
+        );
     }
 
     public static void main(String[] args) {
