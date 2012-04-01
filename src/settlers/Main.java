@@ -126,6 +126,10 @@ public class Main {
 
     void run(String[] args) {
         try {
+            if (args.length == 0) {
+                printHelp(System.out);
+                return;
+            }
             Bot[] bots = null;
             boolean vis = false;
             long randSeed = 0;
@@ -188,6 +192,23 @@ public class Main {
         catch (InstantiationException e) { e.printStackTrace(); }
         catch (IllegalAccessException e) { e.printStackTrace(); }
         catch (java.lang.reflect.InvocationTargetException e) { e.printStackTrace(); }
+    }
+
+    private void printHelp(PrintStream out) {
+        out.printf(
+                "Usage:\n" +
+                "java -jar Settlers.jar [-seed <seed>] [-vis] -3|-4 <botname1> <botname2> <botname3> [<botname4>]\n\n" +
+                "An example of running the testing system on a game between 3 example bots:\n" +
+                "java -jar Settlers.jar -3 Example Example Example\n\n" +
+                "Full list of arguments you can use:\n" +
+                "\n-3/-4 - 3 or 4 players in a game; descriptions of players must follow. " +
+                "A description is either Example or Stupid (for built-in bots) or a path to your bot's jarfile, " +
+                "followed by a colon, followed by its full class name. " +
+                "E.g. sample/bin/SampleBot.jar:smartasses.SampleBot\n" +
+                "\n-vis - enable visualization mode\n" +
+                "\n-seed - specify a random seed used by Game's random object to generate a board and everything else; " +
+                "one integer number must follow. If you specify 0, the seed will be chosen at random\n"
+                );
     }
 
     public static void main(String[] args) {
