@@ -67,9 +67,11 @@ public class Main {
     }
 
     void printGameLog(Game game, PrintStream out) {
-        out.println(game.players().size());
-        for (Player p : game.players())
-            out.println(p.bot());
+        out.printf("Hello! This is Settlers game between %d bots:\n", game.players().size());
+        for (Player p : game.players()) {
+            out.println(p.color() + ": " + p.bot());
+        }
+        out.printf("\n====== Board ======\n");
 
         for (Hex h : Board.allHexes()) {
             Resource r = game.board().resourceAt(h);
@@ -77,6 +79,7 @@ public class Main {
                 out.println(h + " " + r.chr() + " " + game.board().numberAt(h));
         }
 
+        out.printf("\n====== Harbors ======\n");
         for (Node n : Board.allNodes()) {
             Harbor harbor = game.board().harborAt(n);
             if (harbor != null && harbor.resource() != null)
@@ -88,6 +91,7 @@ public class Main {
                 out.println(n);
         }
 
+        out.printf("\n====== Game log ======\n");
         List<Pair<Player, List<Event>>> history = game.history().getAll();
         for (Pair<Player, List<Event>> pair : history) {
             Player player = pair.first();
@@ -101,11 +105,13 @@ public class Main {
                 if (event.type() == EventType.EXCEPTION)
                     return;
             }
+            out.println();
         }
 
+        out.printf("======= Summary =======\n");
         for (Player p : game.players()) {
             int vp = p.developments().victoryPoint();
-            out.print(game.points(p) + vp);
+            out.printf("%d (%s): %d", p.color(), p.bot(), game.points(p) + vp);
             if (vp > 0)
                 out.print(" " + vp + "VP");
             if (game.largestArmy() == p && game.armyStrength(p) >= Game.MINIMUM_ARMY_STRENGTH)
@@ -115,7 +121,7 @@ public class Main {
             out.println();
         }
 
-        out.println(history.size() - 1 + " turns");
+        out.println("Total " + (history.size() - 1) + " turns");
     }
 
     void run(String[] args) {
