@@ -249,7 +249,7 @@ class GameVis extends JPanel {
         final int fontSize = 16;
         final int caption = captionFont + 6;
         final int arrowRadius = 20;
-        final int incomeIndent = 24;
+        final int resourcesIndent = 24;
 
         final Color normalText = new Color(0x444444);
         final Color manyResources = new Color(0xAA4444);
@@ -262,7 +262,7 @@ class GameVis extends JPanel {
 
         final Font stringFont = new Font("Courier", Font.PLAIN, fontSize - 5);
         final Font valueFont = new Font("Courier", Font.PLAIN, fontSize);
-        final Font incomeFont = new Font("Courier", Font.BOLD, fontSize + 4);
+        final Font resourcesFont = new Font("Courier", Font.BOLD, fontSize + 4);
 
         g.setColor(new Color(0xAAAAFF));
         g.fillRoundRect(x - 2, y - 2, PLAYER_INFO_WIDTH + 4, PLAYER_INFO_HEIGHT + 4, arc, arc);
@@ -327,24 +327,28 @@ class GameVis extends JPanel {
         }
 
         if (!income.isEmpty()) {
-            g.setFont(incomeFont);
-            g.setColor(Color.BLACK);
-            String str = "+" + Util.toResourceString(income);
-            FontMetrics fmt = g.getFontMetrics();
-            int cx = x + PLAYER_INFO_WIDTH / 2 - fmt.stringWidth(str) / 2;
-            int cy = y - caption;
-            cy += fmt.getHeight() / 3;
-            if (position == 1 || position == 2) {
-                cy += PLAYER_INFO_HEIGHT + incomeIndent;
-            } else {
-                cy -= incomeIndent;
-            }
-            for (char c : str.toCharArray()) {
-                Resource r = Resource.fromChar(c);
-                g.setColor(r == null ? Color.GRAY : resourceToColor(r));
-                g.drawString("" + c, cx, cy);
-                cx += fmt.charWidth(c);
-            }
+            //TODO: maybe draw income
+        }
+
+        g.setFont(resourcesFont);
+        g.setColor(Color.BLACK);
+        String str = api.cards(player) + "";
+        FontMetrics fmt = g.getFontMetrics();
+        int cx = x;
+        int cy = y - caption;
+        cy += fmt.getHeight() / 3;
+        if (position == 2 || position == 3)
+            cx += PLAYER_INFO_WIDTH - fmt.stringWidth(str);
+        if (position == 1 || position == 2) {
+            cy += PLAYER_INFO_HEIGHT + resourcesIndent;
+        } else {
+            cy -= resourcesIndent;
+        }
+        for (char c : str.toCharArray()) {
+            Resource r = Resource.fromChar(c);
+            g.setColor(r == null ? Color.GRAY : resourceToColor(r));
+            g.drawString("" + c, cx, cy);
+            cx += fmt.charWidth(c);
         }
     }
 
