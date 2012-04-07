@@ -78,11 +78,7 @@ public class ResourceDeck {
     }
 
     public String toString() {
-        String ans = "";
-        for (Resource r : list())
-            ans += r.chr();
-        return ans;
+        return Util.toResourceString(list());
     }
-
 }
 
