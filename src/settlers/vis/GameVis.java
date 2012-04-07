@@ -181,7 +181,7 @@ class GameVis extends JPanel {
         }
     }
 
-    void drawPort(Graphics2D g, Node i) {
+    void drawHarbor(Graphics2D g, Node i) {
         Harbor harbor = board.harborAt(i);
         if (harbor == null)
             return;
@@ -194,7 +194,7 @@ class GameVis extends JPanel {
             }
         }
         Point p = nodeCoords(i);
-        String str = resourceToPort(r);
+        String str = resourceToHarbor(r);
         g.setFont(new Font("Tahoma", Font.BOLD, 10));
         Color c = r == null ? new Color(0x8888FF) : resourceToColor(r);
         if (r == Resource.LUMBER || r == Resource.BRICK)
@@ -206,7 +206,7 @@ class GameVis extends JPanel {
         );
     }
 
-    String resourceToPort(Resource r) {
+    String resourceToHarbor(Resource r) {
         return r == null ? "3:1" : r.chr() + "";
     }
 
@@ -239,7 +239,7 @@ class GameVis extends JPanel {
             drawNode(g, i);
         }
         for (Node i : Board.allNodes()) {
-            drawPort(g, i);
+            drawHarbor(g, i);
         }
     }
 
