@@ -117,7 +117,7 @@ public class Main {
             out.println();
         }
 
-        out.println(history.size() - 1 + " turns");
+        out.println(game.history().size() - 1 + " turns");
     }
 
     void run(String[] args) {
