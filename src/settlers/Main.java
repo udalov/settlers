@@ -101,7 +101,6 @@ public class Main {
                     if (event.type() == EventType.EXCEPTION)
                         return;
                 }
-                out.println();
             }
         }
 
