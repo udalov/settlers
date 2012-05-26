@@ -250,6 +250,7 @@ class GameVis extends JPanel {
         final int caption = captionFont + 6;
         final int arrowRadius = 20;
         final int resourcesIndent = 24;
+        final int resDevIndent = 24;
 
         final Color normalText = new Color(0x444444);
         final Color manyResources = new Color(0xAA4444);
@@ -331,22 +332,36 @@ class GameVis extends JPanel {
         }
 
         g.setFont(resourcesFont);
-        g.setColor(Color.BLACK);
         String str = api.cards(player) + "";
         FontMetrics fmt = g.getFontMetrics();
         int cx = x;
         int cy = y - caption;
         cy += fmt.getHeight() / 3;
-        if (position == 2 || position == 3)
-            cx += PLAYER_INFO_WIDTH - fmt.stringWidth(str);
         if (position == 1 || position == 2) {
             cy += PLAYER_INFO_HEIGHT + resourcesIndent;
         } else {
             cy -= resourcesIndent;
         }
+        if (position == 2 || position == 3)
+            cx += PLAYER_INFO_WIDTH - fmt.stringWidth(str);
         for (char c : str.toCharArray()) {
             Resource r = Resource.fromChar(c);
             g.setColor(r == null ? Color.GRAY : resourceToColor(r));
+            g.drawString("" + c, cx, cy);
+            cx += fmt.charWidth(c);
+        }
+
+        g.setColor(Color.GRAY);
+        str = api.developments(player) + "";
+        cx = x;
+        if (position == 1 || position == 2) {
+            cy += resDevIndent;
+        } else {
+            cy -= resDevIndent;
+        }
+        if (position == 2 || position == 3)
+            cx += PLAYER_INFO_WIDTH - fmt.stringWidth(str);
+        for (char c : str.toCharArray()) {
             g.drawString("" + c, cx, cy);
             cx += fmt.charWidth(c);
         }
