@@ -150,6 +150,7 @@ public class Game {
         }
         public List<Player> players() { return game.players(); }
         public ResourceDeck cards(Player p) { return p.cards(); }
+        public DevelopmentDeck developments(Player p) { return p.developments(); }
         public Board board() { return game.board(); }
         public History history() { return game.history(); }
         public Player largestArmy() { return game.largestArmy(); }
