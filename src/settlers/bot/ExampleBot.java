@@ -75,9 +75,9 @@ public class ExampleBot extends Bot {
         // if we have a monopoly, play it
         if (api.developments().monopoly() > 0) {
             Resource take = null;
-            int min = Game.EACH_RESOURCE + 1;
+            int min = Integer.MAX_VALUE;
             for (Resource r : Resource.values()) {
-                int x = api.bank().howMany(r) - cards.howMany(r);
+                int x = api.bank().howMany(r) + cards.howMany(r);
                 if (x < min) {
                     min = x;
                     take = r;
