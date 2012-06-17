@@ -69,8 +69,8 @@ class GameVis extends JPanel {
         final int height = height();
         for (Hex c : Board.allHexes()) {
             hex.put(c, new Point(
-                (c.x() - 4) * HEX_SIZE + width / 2,
-                height / 2 - (3 * c.y() - 4) * HEX_SIZE / 2
+                (c.x - 4) * HEX_SIZE + width / 2,
+                height / 2 - (3 * c.y - 4) * HEX_SIZE / 2
             ));
         }
     }
@@ -90,16 +90,16 @@ class GameVis extends JPanel {
     }
 
     Point nodeCoords(Node i) {
-        Point z = hex.get(i.hex());
+        Point z = hex.get(i.hex);
         int[][] v = calcHexagonVertices(z.x, z.y);
-        int d = i.direction();
+        int d = i.direction;
         return new Point(v[0][d], v[1][d]);
     }
 
     Point[] edgeCoords(Edge p) {
-        Point z = hex.get(p.hex());
+        Point z = hex.get(p.hex);
         int[][] v = calcHexagonVertices(z.x, z.y);
-        int d = p.direction(), nd = (d + 1) % 6;
+        int d = p.direction, nd = (d + 1) % 6;
         return new Point[]{
             new Point(v[0][d], v[1][d]),
             new Point(v[0][nd], v[1][nd])
@@ -188,7 +188,7 @@ class GameVis extends JPanel {
         Resource r = harbor.resource();
         int d = -1;
         for (int j = 0; j < 6; j++) {
-            if (PORTS[j].contains("" + i.x() + i.y() + i.direction())) {
+            if (PORTS[j].contains("" + i.hex.x + i.hex.y + i.direction)) {
                 d = j;
                 break;
             }

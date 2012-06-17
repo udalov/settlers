@@ -230,7 +230,7 @@ public class Board {
                     if (z == null) continue;
                     for (int i = 0; i < 3; i++)
                         if (c[i] != null)
-                            nodes[enc(c[i].x(), c[i].y(), 4 - 2*i + it)] = z;
+                            nodes[enc(c[i].x, c[i].y, 4 - 2*i + it)] = z;
                 }
             }
         }
@@ -264,7 +264,7 @@ public class Board {
     public static Edge edge(Hex hex, int direction) {
         if (hex == null)
             return null;
-        int ind = enc(hex.x(), hex.y(), direction);
+        int ind = enc(hex.x, hex.y, direction);
         if (ind < 0 || ind >= edges.length || edges[ind] == null)
             return null;
         return edges[ind];
@@ -273,7 +273,7 @@ public class Board {
     public static Node node(Hex hex, int direction) {
         if (hex == null)
             return null;
-        int ind = enc(hex.x(), hex.y(), direction);
+        int ind = enc(hex.x, hex.y, direction);
         if (ind < 0 || ind >= nodes.length || nodes[ind] == null)
             return null;
         return nodes[ind];
@@ -311,7 +311,7 @@ public class Board {
         if (c == null)
             return ans;
         for (int d = 0; d < 6; d++) {
-            Hex h = hex(c.x() + DX[d], c.y() + DY[d]);
+            Hex h = hex(c.x + DX[d], c.y + DY[d]);
             if (h != null)
                 ans.add(h);
         }
@@ -367,8 +367,8 @@ public class Board {
 
     public static Node[] endpoints(Edge p) {
         return p == null ? new Node[] {} : new Node[] {
-            node(p.hex(), p.direction()),
-            node(p.hex(), (p.direction() + 1) % 6),
+            node(p.hex, p.direction),
+            node(p.hex, (p.direction + 1) % 6),
         };
     }
 
