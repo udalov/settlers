@@ -21,7 +21,7 @@ public class Util {
 
     public static boolean isResourceString(String s) {
         i: for (int i = 0, n = s.length(); i < n; i++) {
-            for (Resource r : Resource.all())
+            for (Resource r : Resource.values())
                 if (r.chr() == s.charAt(i))
                     continue i;
             return false;

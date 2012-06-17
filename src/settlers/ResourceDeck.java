@@ -12,7 +12,7 @@ public class ResourceDeck {
         new EnumMap<Resource, Integer>(Resource.class);
 
     ResourceDeck() {
-        for (Resource r : Resource.all())
+        for (Resource r : Resource.values())
             resources.put(r, 0);
     }
 
@@ -20,14 +20,14 @@ public class ResourceDeck {
 
     public int size() {
         int ans = 0;
-        for (Resource r : Resource.all())
+        for (Resource r : Resource.values())
             ans += resources.get(r);
         return ans;
     }
 
     public List<Resource> list() {
         List<Resource> list = new ArrayList<Resource>();
-        for (Resource r : Resource.all())
+        for (Resource r : Resource.values())
             for (int i = 0, n = resources.get(r); i < n; i++)
                 list.add(r);
         return list;
@@ -36,7 +36,7 @@ public class ResourceDeck {
     public boolean areThere(String needed) {
         if (needed == null || "".equals(needed))
             return true;
-        for (Resource r : Resource.all()) {
+        for (Resource r : Resource.values()) {
             int x = Util.numberOfOccurrences(r.chr(), needed);
             if (resources.get(r) < x)
                 return false;
@@ -62,7 +62,7 @@ public class ResourceDeck {
     }
 
     void add(String res) {
-        for (Resource r : Resource.all()) {
+        for (Resource r : Resource.values()) {
             int x = Util.numberOfOccurrences(r.chr(), res);
             if (x > 0)
                 add(r, x);
@@ -70,7 +70,7 @@ public class ResourceDeck {
     }
 
     void sub(String res) {
-        for (Resource r : Resource.all()) {
+        for (Resource r : Resource.values()) {
             int x = Util.numberOfOccurrences(r.chr(), res);
             if (x > 0)
                 sub(r, x);

@@ -221,7 +221,7 @@ public class Game {
         for (int i = 0; i < VICTORY_POINTS; i++)
             developments.add(Development.VICTORY_POINT);
         Collections.shuffle(developments, rnd);
-        for (Resource r : Resource.all())
+        for (Resource r : Resource.values())
             bank.add(r, EACH_RESOURCE);
     }
 
@@ -287,7 +287,7 @@ public class Game {
                 }
             }
         } else {
-            int[] neededResCards = new int[Resource.all().length];
+            int[] neededResCards = new int[Resource.values().length];
             Map<Player, List<Resource>> income = new HashMap<Player, List<Resource>>();
             for (Player p : players)
                 income.put(p, new ArrayList<Resource>());
@@ -460,7 +460,7 @@ public class Game {
         if (!bank.areThere(buy))
             return false;
         int res = 0;
-        for (Resource r : Resource.all()) {
+        for (Resource r : Resource.values()) {
             int rsell = Util.numberOfOccurrences(r.chr(), sell);
             int rbuy = Util.numberOfOccurrences(r.chr(), buy);
             int min = Math.min(rsell, rbuy);
@@ -504,7 +504,7 @@ public class Game {
             throw new GameException("Invalid characters in resource string");
         Map<Resource, Integer> left = new EnumMap<Resource, Integer>(Resource.class);
         String buy = "";
-        for (Resource r : Resource.all()) {
+        for (Resource r : Resource.values()) {
             int needed = Util.numberOfOccurrences(r.chr(), what);
             int has = turn.cards().howMany(r);
             if (has >= needed) {
@@ -522,7 +522,7 @@ public class Game {
         int buyingIndex = 0;
         // first 2:1, then 3:1 or 4:1
         it: for (int it = 0; it < 2; it++) {
-            for (Resource r : Resource.all()) {
+            for (Resource r : Resource.values()) {
                 if (it == 0 && !hasPort(r, turn))
                     continue;
                 int x = left.get(r);

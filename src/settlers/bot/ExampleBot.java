@@ -31,7 +31,7 @@ public class ExampleBot extends Bot {
 
     Map<Resource, Integer> income() {
         Map<Resource, Integer> ans = new EnumMap<Resource, Integer>(Resource.class);
-        for (Resource r : Resource.all())
+        for (Resource r : Resource.values())
             ans.put(r, 0);
         for (Node n : Board.allNodes()) {
             Town t = api.townAt(n);
@@ -76,7 +76,7 @@ public class ExampleBot extends Bot {
         if (api.developments().monopoly() > 0) {
             Resource take = null;
             int min = Game.EACH_RESOURCE + 1;
-            for (Resource r : Resource.all()) {
+            for (Resource r : Resource.values()) {
                 int x = api.bank().howMany(r) - cards.howMany(r);
                 if (x < min) {
                     min = x;
@@ -159,10 +159,10 @@ public class ExampleBot extends Bot {
             maxIncome = Math.max(maxIncome, n);
             minIncome = Math.min(minIncome, n);
         }
-        trade: for (Resource sell : Resource.all()) {
+        trade: for (Resource sell : Resource.values()) {
             if (income.get(sell) != maxIncome || cards.howMany(sell) == 0)
                 continue;
-            for (Resource buy : Resource.all()) {
+            for (Resource buy : Resource.values()) {
                 if (income.get(buy) != minIncome)
                     continue;
                 List<TradeResult> results = Util.shuffle(api.trade(sell.chr() + "", buy.chr() + ""), api.rnd());
