@@ -457,7 +457,7 @@ public class Game {
             return false;
         if (!Util.isResourceString(sell) || !Util.isResourceString(buy))
             throw new GameException("Invalid characters in change string");
-        if (!bank.areThere(buy))
+        if (!bank.areThere(buy) || !player.cards().areThere(sell))
             return false;
         int res = 0;
         for (Resource r : Resource.values()) {
