@@ -7,10 +7,6 @@ public enum Development {
     MONOPOLY,
     VICTORY_POINT;
 
-    public static Development[] all() {
-        return Development.class.getEnumConstants();
-    }
-
     public char chr() {
         return toString().charAt(0);
     }

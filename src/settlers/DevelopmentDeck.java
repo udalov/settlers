@@ -11,7 +11,7 @@ public class DevelopmentDeck {
         new EnumMap<Development, Integer>(Development.class);
 
     DevelopmentDeck() {
-        for (Development d : Development.all()) {
+        for (Development d : Development.values()) {
             developments.put(d, 0);
             disabled.put(d, 0);
         }
@@ -27,7 +27,7 @@ public class DevelopmentDeck {
 
     public int size() {
         int ans = 0;
-        for (Development d : Development.all()) {
+        for (Development d : Development.values()) {
             ans += developments.get(d);
             ans += disabled.get(d);
         }
@@ -56,14 +56,14 @@ public class DevelopmentDeck {
         if (developments.get(d) == 0)
             throw new GameException("You don't have a " + d + " development!");
         developments.put(d, developments.get(d) - 1);
-        for (Development e : Development.all()) {
+        for (Development e : Development.values()) {
             disabled.put(e, developments.get(e) + disabled.get(e));
             developments.put(e, 0);
         }
     }
 
     void reenable() {
-        for (Development d : Development.all()) {
+        for (Development d : Development.values()) {
             developments.put(d, developments.get(d) + disabled.get(d));
             disabled.put(d, 0);
         }
@@ -71,7 +71,7 @@ public class DevelopmentDeck {
 
     public String toString() {
         String ans = "";
-        for (Development d : Development.all())
+        for (Development d : Development.values())
             for (int i = 0, n = developments.get(d) + disabled.get(d); i < n; i++)
                 ans += d.chr();
         return ans;
