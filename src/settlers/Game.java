@@ -22,15 +22,15 @@ public class Game {
         API() { game = Game.this; }
         void setBot(Bot bot) { this.bot = bot; }
 
-        void checkTurn() {
+        private void checkTurn() {
             if (player(bot) != turn)
                 throw new GameException("You cannot do anything not on your turn");
         }
-        void checkRobber() {
+        private void checkRobber() {
             if (diceRolled == 7 && robberMoveStatus == 1)
                 throw new GameException("You must move the robber right after rolling 7");
         }
-        void check() {
+        private void check() {
             checkTurn();
             checkRobber();
         }
@@ -53,7 +53,7 @@ public class Game {
         public int rollDice() { check(); return game.rollDice(); }
 
         public Hex robber()
-            { return game.robber(); }
+            { return robber; }
         public List<Player> robbable(Hex c)
             { return game.robbable(c); }
         public void moveRobber(Hex c, Player whoToRob) {
@@ -158,25 +158,25 @@ public class Game {
         public int roadLength(Player p) { return game.roadLength(p); }
         public int armyStrength(Player p) { return game.armyStrength(p); }
         public int points(Player p) { return game.points(p); }
-        public Player turn() { return game.turn(); }
-        public Hex robber() { return game.robber(); }
+        public Player turn() { return turn; }
+        public Hex robber() { return robber; }
         public Player roadAt(Edge p) { return game.roadAt(p); }
         public Town townAt(Node i) { return game.townAt(i); }
-        public int turnNumber() { return game.turnNumber(); }
-        public boolean isFinished() { return game.isFinished(); }
+        public int turnNumber() { return turnNumber; }
+        public boolean isFinished() { return finished; }
     }
 
-    public static final int MAX_SETTLEMENTS = 5;
-    public static final int MAX_CITIES = 4;
-    public static final int MAX_ROADS = 15;
-    public static final int EACH_RESOURCE = 19;
-    public static final int KNIGHTS = 14;
-    public static final int ROAD_BUILDINGS = 2;
-    public static final int INVENTIONS = 2;
-    public static final int MONOPOLIES = 2;
-    public static final int VICTORY_POINTS = 5;
+    private static final int MAX_SETTLEMENTS = 5;
+    private static final int MAX_CITIES = 4;
+    private static final int MAX_ROADS = 15;
+    private static final int EACH_RESOURCE = 19;
+    private static final int KNIGHTS = 14;
+    private static final int ROAD_BUILDINGS = 2;
+    private static final int INVENTIONS = 2;
+    private static final int MONOPOLIES = 2;
+    private static final int VICTORY_POINTS = 5;
 
-    public static final int POINTS_TO_WIN = 10;
+    private static final int POINTS_TO_WIN = 10;
     public static final int MINIMUM_ROAD_LENGTH = 5;
     public static final int MINIMUM_ARMY_STRENGTH = 3;
 
@@ -230,13 +230,9 @@ public class Game {
     History history() { return history; }
     Player largestArmy() { return largestArmy; }
     Player longestRoad() { return longestRoad; }
-    Player turn() { return turn; }
-    Hex robber() { return robber; }
-    Player roadAt(Edge p) { return roads.get(p); }
-    Town townAt(Node i) { return towns.get(i); }
+    private Player roadAt(Edge p) { return roads.get(p); }
+    private Town townAt(Node i) { return towns.get(i); }
 
-    int turnNumber() { return turnNumber; }
-    boolean isFinished() { return finished; }
 
 
 
@@ -254,7 +250,7 @@ public class Game {
         }
     }
 
-    List<TradeResult> trade(TradeOffer offer) {
+    private List<TradeResult> trade(TradeOffer offer) {
         List<TradeResult> ans = new ArrayList<TradeResult>();
         for (Player p : players)
             if (p != offer.trader() && p.cards().areThere(offer.buy()))
@@ -262,7 +258,7 @@ public class Game {
         return ans;
     }
 
-    int rollDice() {
+    private int rollDice() {
         if (diceRolled != 0)
             throw new GameException("You cannot roll the dice twice a turn");
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
@@ -323,7 +319,7 @@ public class Game {
         return diceRolled;
     }
 
-    List<Player> robbable(Hex hex) {
+    private List<Player> robbable(Hex hex) {
         Set<Player> ans = new HashSet<Player>();
         for (Node x : Board.adjacentNodes(hex)) {
             if (towns.get(x) == null)
@@ -335,7 +331,7 @@ public class Game {
         return new ArrayList<Player>(ans);
     }
 
-    void moveRobber(Hex hex, Player whoToRob) {
+    private void moveRobber(Hex hex, Player whoToRob) {
         if (hex == null)
             throw new GameException("You cannot move the robber to null");
         if (hex == robber)
@@ -363,7 +359,7 @@ public class Game {
         history.robber(hex, whoToRob);
     }
 
-    int settlementsLeft(Player p) {
+    private int settlementsLeft(Player p) {
         int placed = 0;
         for (Town t : towns.values())
             if (t.player() == p && !t.isCity())
@@ -371,7 +367,7 @@ public class Game {
         return MAX_SETTLEMENTS - placed;
     }
 
-    int citiesLeft(Player p) {
+    private int citiesLeft(Player p) {
         int placed = 0;
         for (Town t : towns.values())
             if (t.player() == p && t.isCity())
@@ -379,7 +375,7 @@ public class Game {
         return MAX_CITIES - placed;
     }
 
-    int roadsLeft(Player p) {
+    private int roadsLeft(Player p) {
         int placed = 0;
         for (Player q : roads.values())
             if (p == q)
@@ -387,7 +383,7 @@ public class Game {
         return MAX_ROADS - placed;
     }
 
-    void buildSettlement(Node x) {
+    private void buildSettlement(Node x) {
         if (x == null)
             throw new GameException("You cannot build a settlement at null");
         if (settlementsLeft(turn) == 0)
@@ -402,7 +398,7 @@ public class Game {
         history.settlement(x);
     }
 
-    void buildCity(Node x) {
+    private void buildCity(Node x) {
         if (x == null)
             throw new GameException("You cannot build a town at null");
         if (citiesLeft(turn) == 0)
@@ -421,7 +417,7 @@ public class Game {
         history.city(x);
     }
 
-    void buildRoad(Edge p) {
+    private void buildRoad(Edge p) {
         if (p == null)
             throw new GameException("You cannot build a road at null");
         if (roadsLeft(turn) == 0)
@@ -437,7 +433,7 @@ public class Game {
         history.road(p);
     }
 
-    boolean hasPort(Resource r, Player player) {
+    private boolean hasPort(Resource r, Player player) {
         for (Node x : towns.keySet()) {
             if (towns.get(x).player() == player) {
                 Harbor harbor = board.harborAt(x);
@@ -448,11 +444,11 @@ public class Game {
         return false;
     }
 
-    boolean hasPort3to1(Player player) {
+    private boolean hasPort3to1(Player player) {
         return hasPort(null, player);
     }
 
-    boolean canChange(String sell, String buy, Player player) {
+    private boolean canChange(String sell, String buy, Player player) {
         if (sell == null || buy == null || "".equals(sell) || "".equals(buy))
             return false;
         if (!Util.isResourceString(sell) || !Util.isResourceString(buy))
@@ -487,7 +483,7 @@ public class Game {
         return res == 0;
     }
 
-    void change(String sell, String buy) {
+    private void change(String sell, String buy) {
         if (!canChange(sell, buy, turn))
             throw new GameException("You cannot change " + sell + " to " + buy);
         turn.cards().sub(sell);
@@ -497,7 +493,7 @@ public class Game {
         history.change(sell, buy);
     }
 
-    boolean getIfPossible(String what) {
+    private boolean getIfPossible(String what) {
         if (what == null || "".equals(what))
             return true;
         if (!Util.isResourceString(what))
@@ -548,7 +544,7 @@ public class Game {
         return true;
     }
 
-    void drawDevelopment() {
+    private void drawDevelopment() {
         if (developments.isEmpty())
             throw new GameException("No more developments left in the game");
         if (!turn.cards().areThere("WOG"))
@@ -560,7 +556,7 @@ public class Game {
         history.development();
     }
 
-    void monopoly(Resource r) {
+    private void monopoly(Resource r) {
         if (r == null)
             throw new GameException("You cannot declare monopoly on null");
         turn.developments().use(Development.MONOPOLY);
@@ -576,7 +572,7 @@ public class Game {
         history.monopoly(r, got);
     }
 
-    void roadBuilding(Edge p1, Edge p2) {
+    private void roadBuilding(Edge p1, Edge p2) {
         turn.developments().use(Development.ROAD_BUILDING);
         if (roadsLeft(turn) == 0)
             throw new GameException("You do not have any roads left to use road building card");
@@ -597,7 +593,7 @@ public class Game {
         history.roadBuilding(p1, p2);
     }
 
-    void invention(Resource r1, Resource r2) {
+    private void invention(Resource r1, Resource r2) {
         if (r1 == null || r2 == null)
             throw new GameException("You cannot use invention card on null");
         if (bank.howMany(r1) == 0 || bank.howMany(r2) == 0)
@@ -610,7 +606,7 @@ public class Game {
         history.invention(r1, r2);
     }
 
-    void knight(Hex hex, Player whoToRob) {
+    private void knight(Hex hex, Player whoToRob) {
         turn.developments().use(Development.KNIGHT);
         Integer army = armyStrength.get(turn);
         armyStrength.put(turn, army != null ? army + 1 : 1);
@@ -620,7 +616,7 @@ public class Game {
     }
 
 
-    boolean canBuildSettlementAt(Node i, boolean mustBeRoad, Player player) {
+    private boolean canBuildSettlementAt(Node i, boolean mustBeRoad, Player player) {
         if (i == null || towns.get(i) != null)
             return false;
         for (Node j : Board.adjacentNodes(i))
@@ -634,7 +630,7 @@ public class Game {
         return false;
     }
 
-    boolean canBuildRoadAt(Edge p, Player player) {
+    private boolean canBuildRoadAt(Edge p, Player player) {
         if (p == null || roads.get(p) != null)
             return false;
         for (Node i : Board.endpoints(p)) {
@@ -653,7 +649,7 @@ public class Game {
 
 
 
-    int dfsRoadLength(Player player, Node i, Set<Edge> visited, Edge with) {
+    private int dfsRoadLength(Player player, Node i, Set<Edge> visited, Edge with) {
         int ans = 0;
         for (Edge p : Board.adjacentEdges(i)) {
             if (visited.contains(p))
@@ -669,11 +665,7 @@ public class Game {
         return ans;
     }
 
-    int roadLength(Player player) {
-        return roadLengthWith(player, null);
-    }
-
-    int roadLengthWith(Player player, Edge p) {
+    private int roadLengthWith(Player player, Edge p) {
         if (player == null)
             return 0;
         int ans = 0;
@@ -681,6 +673,10 @@ public class Game {
         for (Node start : Board.allNodes())
             ans = Math.max(ans, dfsRoadLength(player, start, visited, p));
         return ans;
+    }
+
+    int roadLength(Player player) {
+        return roadLengthWith(player, null);
     }
 
     int armyStrength(Player player) {
@@ -692,7 +688,7 @@ public class Game {
         players.add(player);
     }
 
-    boolean nextTurn() {
+    private boolean nextTurn() {
         turn = players.get(turnNumber++ % n);
         diceRolled = 0;
         robberMoveStatus = 0;
@@ -731,7 +727,7 @@ public class Game {
         }
     }
 
-    void placeInitialSettlements() {
+    private void placeInitialSettlements() {
         for (int it = 0; it < 2; it++) {
             for (int i = it * (n - 1); 0 <= i && i < n; i += 1 - 2*it) {
                 Player player = players.get(i);
@@ -760,7 +756,7 @@ public class Game {
         turnNumber = 0;
     }
 
-    int points(Player player, boolean includeVP) {
+    private int points(Player player, boolean includeVP) {
         int points = 0;
         for (Node i : towns.keySet())
             if (towns.get(i).player() == player)
@@ -778,11 +774,11 @@ public class Game {
         return points(player, false);
     }
 
-    boolean playerHasWon() {
+    private boolean playerHasWon() {
         return points(turn, true) >= POINTS_TO_WIN;
     }
 
-    void updateLongestRoad() {
+    private void updateLongestRoad() {
         int z = roadLength(turn);
         for (Player p : players)
             if (p != turn && roadLength(p) >= z)
@@ -792,7 +788,7 @@ public class Game {
         longestRoad = turn;
     }
 
-    void updateLargestArmy() {
+    private void updateLargestArmy() {
         int z = armyStrength(turn);
         for (Player p : players)
             if (p != turn && armyStrength(p) >= z)
@@ -802,7 +798,7 @@ public class Game {
         largestArmy = turn;
     }
 
-    Player player(Bot bot) {
+    private Player player(Bot bot) {
         for (Player player : players)
             if (player.bot() == bot)
                 return player;

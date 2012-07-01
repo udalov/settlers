@@ -380,7 +380,7 @@ class GameVis extends JPanel {
         }
     }
 
-    static String eventDescription(Player player, settlers.Event event) {
+    private static String eventDescription(Player player, settlers.Event event) {
         String color = player == null ? null : playerColorName[player.color()];
         switch (event.type()) {
             case INITIAL_ROAD:
