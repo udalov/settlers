@@ -5,10 +5,8 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import javax.swing.JFrame;
+
 import settlers.bot.Bot;
 import settlers.bot.ExampleBot;
 import settlers.bot.StupidBot;
@@ -90,8 +88,8 @@ public class Main {
             }
 
             for (Pair<Player, List<Event>> pair : game.history().getAll()) {
-                Player player = pair.first();
-                List<Event> events = pair.second();
+                Player player = pair.first;
+                List<Event> events = pair.second;
                 int ind = player == null ? -1 : player.color();
                 for (Event event : events) {
                     String s = eventString(event);

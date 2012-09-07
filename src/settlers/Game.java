@@ -732,18 +732,18 @@ public class Game {
             for (int i = it * (n - 1); 0 <= i && i < n; i += 1 - 2*it) {
                 Player player = players.get(i);
                 Pair<Node, Edge> p = player.bot().placeInitialSettlements(it == 0);
-                if (p == null || p.first() == null || p.second() == null)
+                if (p == null || p.first == null || p.second == null)
                     throw new GameException("You cannot build a first settlement at null");
-                if (!Board.areAdjacent(p.first(), p.second()))
+                if (!Board.areAdjacent(p.first, p.second))
                     throw new GameException("You cannot build a road not connected to a town");
-                if (!canBuildSettlementAt(p.first(), false, player))
+                if (!canBuildSettlementAt(p.first, false, player))
                     throw new GameException("You cannot build a town here");
-                towns.put(p.first(), new Town(player, false));
-                history.initialSettlement(player, p.first());
-                roads.put(p.second(), player);
-                history.initialRoad(player, p.second());
+                towns.put(p.first, new Town(player, false));
+                history.initialSettlement(player, p.first);
+                roads.put(p.second, player);
+                history.initialRoad(player, p.second);
                 if (it == 1) {
-                    for (Hex c : Board.adjacentHexes(p.first())) {
+                    for (Hex c : Board.adjacentHexes(p.first)) {
                         Resource r = board.resourceAt(c);
                         if (r != null) {
                             player.cards().add(r, 1);

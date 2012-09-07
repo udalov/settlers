@@ -22,7 +22,7 @@ public class History {
     }
 
     private void addEvent(Event e) {
-        events.get(events.size() - 1).second().add(e);
+        events.get(events.size() - 1).second.add(e);
         game.eventHappened();
     }
 
@@ -34,15 +34,15 @@ public class History {
         if (events.isEmpty())
             return null;
         Pair<Player, List<Event>> pair = events.get(events.size() - 1);
-        if (pair.second().isEmpty())
+        if (pair.second.isEmpty())
             return null;
-        return Pair.make(pair.first(), pair.second().get(pair.second().size() - 1));
+        return Pair.make(pair.first, pair.second.get(pair.second.size() - 1));
     }
 
     public List<Pair<Player, List<Event>>> getAll() {
         List<Pair<Player, List<Event>>> ans = new ArrayList<Pair<Player, List<Event>>>(events.size());
         for (Pair<Player, List<Event>> pair : events)
-            ans.add(new Pair<Player, List<Event>>(pair.first(), new ArrayList<Event>(pair.second())));
+            ans.add(new Pair<Player, List<Event>>(pair.first, new ArrayList<Event>(pair.second)));
         return ans;
     }
 
@@ -51,10 +51,10 @@ public class History {
         List<Pair<Player, List<Event>>> ans = new ArrayList<Pair<Player, List<Event>>>(events.size());
         if (events.isEmpty())
             return ans;
-        final Player me = events.get(events.size() - 1).first();
-        for (int i = events.size() - 2; i >= 0 && events.get(i).first() != me; i--)
-            ans.add(new Pair<Player, List<Event>>(events.get(i).first(),
-                new ArrayList<Event>(events.get(i).second())));
+        final Player me = events.get(events.size() - 1).first;
+        for (int i = events.size() - 2; i >= 0 && events.get(i).first != me; i--)
+            ans.add(new Pair<Player, List<Event>>(events.get(i).first,
+                new ArrayList<Event>(events.get(i).second)));
         Collections.reverse(ans);
         return ans;
     }

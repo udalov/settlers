@@ -58,7 +58,7 @@ public class ExampleBot extends Bot {
         // roll the dice and, if 7, move the robber
         if (api.rollDice() == 7) {
             Pair<Hex, Player> rob = rob();
-            api.moveRobber(rob.first(), rob.second());
+            api.moveRobber(rob.first, rob.second);
         }
 
         // if we have a knight, play it
@@ -68,7 +68,7 @@ public class ExampleBot extends Bot {
                 bad |= p == me;
             if (bad) {
                 Pair<Hex, Player> rob = rob();
-                api.knight(rob.first(), rob.second());
+                api.knight(rob.first, rob.second);
             }
         }
 

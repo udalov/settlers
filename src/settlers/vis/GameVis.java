@@ -9,8 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Stroke;
-import java.awt.event.*;
-import java.awt.geom.*;
 import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
@@ -455,11 +453,11 @@ class GameVis extends JPanel {
 
         Pair<Player, Event> pair = api.history().getLastEvent();
         if (pair != null)
-            drawHistoryEvent(g, pair.first(), pair.second());
+            drawHistoryEvent(g, pair.first, pair.second);
 
         Map<Player, List<Resource>> income =
-            pair != null && pair.second().type() == EventType.ROLL_DICE ?
-            pair.second().income() : Collections.<Player, List<Resource>>emptyMap();
+            pair != null && pair.second.type() == EventType.ROLL_DICE ?
+            pair.second.income() : Collections.<Player, List<Resource>>emptyMap();
         drawPlayersInfo(g, income);
 
         gg.drawImage(bi, 0, 0, width(), height(), null);
