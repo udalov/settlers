@@ -1,5 +1,12 @@
 <project name="Settlers" default="dist">
 
+    <property name="junit.jar" value="junit-4.10.jar"/>
+
+    <target name="update">
+        <mkdir dir="lib"/>
+        <get src="http://cloud.github.com/downloads/KentBeck/junit/${junit.jar}" dest="lib/${junit.jar}"/>
+    </target>
+
     <target name="init">
         <mkdir dir="build"/>
         <mkdir dir="bin"/>
@@ -17,6 +24,26 @@
                 <attribute name="Main-Class" value="settlers.Main"/>
             </manifest>
         </jar>
+    </target>
+
+    <target name="compile-test" depends="clean,compile">
+        <javac srcdir="test" destdir="build" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
+            <classpath path="lib/${junit.jar};build"/>
+            <compilerarg value="-Xlint:unchecked"/>
+        </javac>
+    </target>
+
+    <target name="test" depends="compile-test">
+        <junit fork="yes">
+            <jvmarg value="-ea"/>
+            <classpath path="lib/${junit.jar};build"/>
+            <formatter type="plain" usefile="no"/>
+            <batchtest>
+                <fileset dir="test">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
     </target>
 
     <target name="clean">
