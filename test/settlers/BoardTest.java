@@ -54,6 +54,39 @@ public class BoardTest extends SettlersTestCase {
         assertEquals(RAND_SEEDS.length, boards.size());
     }
 
+    public void testBoardNumbers() {
+        for (int randSeed : RAND_SEEDS) {
+            TestBoard board = TestBoard.create(new Random(randSeed));
+            Map<Hex, Integer> numbers = board.numbers;
+
+            // -1 for desert
+            assertEquals(Board.allHexes().size() - 1, numbers.size());
+
+            int[] numberCount = new int[13];
+            for (Hex hex : numbers.keySet()) {
+                int mine = numbers.get(hex);
+                for (Hex adjacent : Board.adjacentHexes(hex)) {
+                    if (!numbers.containsKey(adjacent))
+                        continue;
+                    int other = numbers.get(adjacent);
+                    assertFalse(mine == other);
+                    assertFalse((mine == 6 || mine == 8) && (other == 6 || other == 8));
+                }
+
+                numberCount[mine]++;
+            }
+
+            assertEquals(0, numberCount[0]);
+            assertEquals(0, numberCount[1]);
+            assertEquals(1, numberCount[2]);
+            assertEquals(0, numberCount[7]);
+            assertEquals(1, numberCount[12]);
+            for (int i = 3; i <= 11; i++)
+                if (i != 7)
+                    assertEquals(2, numberCount[i]);
+        }
+    }
+
 
 
     private void doTestAllEdgesOrNodes(List<?> allEdgesOrNodes, String filename, boolean edges) {
