@@ -107,6 +107,37 @@ public class BoardTest extends SettlersTestCase {
         }
     }
 
+    public void testBoardHarbors() {
+        for (int randSeed : RAND_SEEDS) {
+            TestBoard board = TestBoard.create(new Random(randSeed));
+            Map<Edge, Harbor> harbors = board.harbors;
+
+            // 5 for each resource plus 4 of 3:1
+            assertEquals(9, harbors.size());
+
+            Set<Resource> resources = new HashSet<Resource>();
+            int threeToOnes = 0;
+            for (Harbor harbor : harbors.values()) {
+                Resource resource = harbor.resource;
+                if (resource == null) {
+                    threeToOnes++;
+                } else {
+                    assertFalse(resources.contains(resource));
+                    resources.add(resource);
+                }
+            }
+
+            assertEquals(4, threeToOnes);
+
+            for (Edge e1 : harbors.keySet())
+                for (Edge e2 : harbors.keySet())
+                    if (e1 != e2)
+                        assertFalse(areAdjacent(e1, e2));
+
+            // maybe test harbors' positions
+        }
+    }
+
 
 
     private void doTestAllEdgesOrNodes(List<?> allEdgesOrNodes, String filename, boolean edges) {
@@ -123,6 +154,12 @@ public class BoardTest extends SettlersTestCase {
                 notFound.add(eon);
 
         assertTrue("Not found: " + notFound, notFound.isEmpty());
+    }
+
+    private static boolean areAdjacent(Edge e1, Edge e2) {
+        Node[] a = Board.endpoints(e1);
+        Node[] b = Board.endpoints(e2);
+        return a[0] == b[0] || a[0] == b[1] || a[1] == b[0] || a[1] == b[1];
     }
 
     private static List<TestHex> prepareExpectedHexes() {
