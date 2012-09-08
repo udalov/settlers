@@ -78,12 +78,12 @@ public class Main {
 
             for (Node n : Board.allNodes()) {
                 Harbor harbor = api.board().harborAt(n);
-                if (harbor != null && harbor.resource() != null)
-                    out.println(n + " " + harbor.resource().chr());
+                if (harbor != null && harbor.resource != null)
+                    out.println(n + " " + harbor.resource.chr());
             }
             for (Node n : Board.allNodes()) {
                 Harbor harbor = api.board().harborAt(n);
-                if (harbor != null && harbor.resource() == null)
+                if (harbor != null && harbor.resource == null)
                     out.println(n);
             }
 

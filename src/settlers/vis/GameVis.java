@@ -183,7 +183,7 @@ class GameVis extends JPanel {
         Harbor harbor = board.harborAt(i);
         if (harbor == null)
             return;
-        Resource r = harbor.resource();
+        Resource r = harbor.resource;
         int d = -1;
         for (int j = 0; j < 6; j++) {
             if (PORTS[j].contains("" + i.hex.x + i.hex.y + i.direction)) {

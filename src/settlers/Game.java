@@ -429,7 +429,7 @@ public class Game {
         for (Node x : towns.keySet()) {
             if (towns.get(x).player() == player) {
                 Harbor harbor = board.harborAt(x);
-                if (harbor != null && harbor.resource() == r)
+                if (harbor != null && harbor.resource == r)
                     return true;
             }
         }
