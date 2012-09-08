@@ -49,7 +49,8 @@ public class Board {
         Collections.shuffle(allResources, rnd);
 
         for (int i = 0, n = allHexes.size(); i < n; i++)
-            resources.put(allHexes.get(i), allResources.get(i));
+            if (allResources.get(i) != null)
+                resources.put(allHexes.get(i), allResources.get(i));
 
         final int[] allNumbers = new int[] {
           5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11

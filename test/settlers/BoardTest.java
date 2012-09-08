@@ -87,6 +87,26 @@ public class BoardTest extends SettlersTestCase {
         }
     }
 
+    public void testBoardResources() {
+        for (int randSeed : RAND_SEEDS) {
+            TestBoard board = TestBoard.create(new Random(randSeed));
+            Map<Hex, Resource> resources = board.resources;
+
+            // -1 for desert
+            assertEquals(Board.allHexes().size() - 1, resources.size());
+
+            int[] resourceCount = new int[Resource.values().length];
+            for (Resource resource : resources.values())
+                resourceCount[resource.ordinal()]++;
+
+            assertEquals(3, resourceCount[Resource.BRICK.ordinal()]);
+            assertEquals(4, resourceCount[Resource.WOOL.ordinal()]);
+            assertEquals(3, resourceCount[Resource.ORE.ordinal()]);
+            assertEquals(4, resourceCount[Resource.GRAIN.ordinal()]);
+            assertEquals(4, resourceCount[Resource.LUMBER.ordinal()]);
+        }
+    }
+
 
 
     private void doTestAllEdgesOrNodes(List<?> allEdgesOrNodes, String filename, boolean edges) {
