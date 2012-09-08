@@ -167,9 +167,9 @@ public class Board {
     private static final Hex[] hexes = new Hex[128];
     private static final Edge[] edges = new Edge[1024];
     private static final Node[] nodes = new Node[1024];
-    private static final List<Hex> allHexes = new ArrayList<Hex>();
-    private static final List<Edge> allEdges = new ArrayList<Edge>();
-    private static final List<Node> allNodes = new ArrayList<Node>();
+    private static final List<Hex> allHexes = new ArrayList<Hex>(19);
+    private static final List<Edge> allEdges = new ArrayList<Edge>(72);
+    private static final List<Node> allNodes = new ArrayList<Node>(54);
 
     private static int enc(int x, int y) { return (x << 3) + y; }
     private static int enc(int x, int y, int d) { return (d << 7) + enc(x, y); }
