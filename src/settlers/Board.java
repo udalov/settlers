@@ -1,20 +1,16 @@
 package settlers;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import settlers.util.Pair;
+import java.util.*;
 
 public class Board {
 
     private static final int[] DX = {1, -1, -2, -1, 1, 2};
     private static final int[] DY = {1, 1, 0, -1, -1, 0};
-    
+
+    private static final int[] ALL_NUMBERS = {
+        5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11
+    };
+
     private final Map<Hex, Resource> resources;
     private final Map<Hex, Integer> numbers;
     private final Map<Edge, Harbor> harbors;
@@ -35,7 +31,7 @@ public class Board {
         Map<Hex, Integer> numbers = new HashMap<Hex, Integer>();
         Map<Edge, Harbor> harbors = new HashMap<Edge, Harbor>();
 
-        List<Resource> allResources = new ArrayList<Resource>();
+        List<Resource> allResources = new ArrayList<Resource>(ALL_NUMBERS.length + 1);
         for (int i = 0; i < 4; i++) {
             allResources.add(Resource.WOOL);
             allResources.add(Resource.GRAIN);
@@ -52,10 +48,6 @@ public class Board {
             if (allResources.get(i) != null)
                 resources.put(allHexes.get(i), allResources.get(i));
 
-        final int[] allNumbers = new int[] {
-          5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11
-        };
-
         final int[] startX = new int[] {0,2,6,8,6,2};
         final int[] startY = new int[] {2,0,0,2,4,4};
         int d = rnd.nextInt(6);
@@ -66,7 +58,7 @@ public class Board {
         for (int i = 0; i < 12; i++) {
             Hex h = hex(x, y);
             if (resources.get(h) != null)
-                numbers.put(h, allNumbers[p++]);
+                numbers.put(h, ALL_NUMBERS[p++]);
             if (hex(x + DX[d], y + DY[d]) == null)
                 d = (d + 5) % 6;
             x += DX[d];
@@ -78,15 +70,15 @@ public class Board {
         for (int i = 0; i < 6; i++) {
             Hex h = hex(x, y);
             if (resources.get(h) != null)
-                numbers.put(h, allNumbers[p++]);
+                numbers.put(h, ALL_NUMBERS[p++]);
             d = (d + 5) % 6;
             x += DX[d];
             y += DY[d];
         }
 
-        Hex h = hex(4,2);
+        Hex h = hex(4, 2);
         if (resources.get(h) != null)
-            numbers.put(h, allNumbers[p]);
+            numbers.put(h, ALL_NUMBERS[p]);
 
         generatePorts(rnd, harbors);
 
