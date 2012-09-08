@@ -2,12 +2,17 @@ package settlers;
 
 import settlers.util.Pair;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class BoardTest extends SettlersTestCase {
+
+    private static final int[] RAND_SEEDS;
+
+    static {
+        RAND_SEEDS = new int[1000];
+        for (int i = 0; i < 1000; i++)
+            RAND_SEEDS[i] = i + 1;
+    }
 
     public void testAllHexes() {
         List<Hex> hexes = Board.allHexes();
@@ -29,6 +34,24 @@ public class BoardTest extends SettlersTestCase {
 
     public void testAllNodes() {
         doTestAllEdgesOrNodes(Board.allNodes(), "test/data/nodes.txt", false);
+    }
+
+    public void testCreateWithSameRandSeed() {
+        for (int randSeed : RAND_SEEDS) {
+            TestBoard board = TestBoard.create(new Random(randSeed));
+            for (int i = 0; i < 10; i++)
+                assertEquals(board, TestBoard.create(new Random(randSeed)));
+        }
+    }
+
+    public void testCreateWithDifferentRandSeeds() {
+        Set<TestBoard> boards = new HashSet<TestBoard>();
+        for (int randSeed : RAND_SEEDS) {
+            TestBoard board = TestBoard.create(new Random(randSeed));
+            assertFalse(boards.contains(board));
+            boards.add(board);
+        }
+        assertEquals(RAND_SEEDS.length, boards.size());
     }
 
 
@@ -140,6 +163,38 @@ public class BoardTest extends SettlersTestCase {
                 result.add(edgeOrNode);
             }
             assertEquals(1, result.size());
+        }
+    }
+
+    private static class TestBoard {
+        private final Map<Hex, Resource> resources;
+        private final Map<Hex, Integer> numbers;
+        private final Map<Edge, Harbor> harbors;
+
+        private TestBoard(Map<Hex, Resource> resources, Map<Hex, Integer> numbers, Map<Edge, Harbor> harbors) {
+            this.resources = resources;
+            this.numbers = numbers;
+            this.harbors = harbors;
+        }
+
+        @SuppressWarnings("unchecked")
+        private static TestBoard create(Random rnd) {
+            Board board = Board.create(rnd);
+            Map<Hex, Resource> resources = (Map)TestUtil.getField(board, Board.class, "resources");
+            Map<Hex, Integer> numbers = (Map)TestUtil.getField(board, Board.class, "numbers");
+            Map<Edge, Harbor> harbors = (Map)TestUtil.getField(board, Board.class, "harbors");
+            return new TestBoard(resources, numbers, harbors);
+        }
+
+        public int hashCode() {
+            return resources.hashCode() + numbers.hashCode() + harbors.hashCode();
+        }
+
+        public boolean equals(Object o) {
+            if (!(o instanceof TestBoard))
+                return false;
+            TestBoard b = (TestBoard)o;
+            return resources.equals(b.resources) && numbers.equals(b.numbers) && harbors.equals(b.harbors);
         }
     }
 }
