@@ -27,7 +27,7 @@ public class Game {
                 throw new GameException("You cannot do anything not on your turn");
         }
         private void checkRobber() {
-            if (diceRolled == 7 && robberMoveStatus == 1)
+            if (diceRolled == 7 && robberMoveStatus == RobberMoveStatus.NEEDS_TO_MOVE)
                 throw new GameException("You must move the robber right after rolling 7");
         }
         private void check() {
@@ -58,9 +58,9 @@ public class Game {
             { return game.robbable(c); }
         public void moveRobber(Hex c, Player whoToRob) {
             checkTurn();
-            if (robberMoveStatus == 0)
+            if (robberMoveStatus == RobberMoveStatus.NON_MOVABLE)
                 throw new GameException("You cannot move the robber after not rolling 7");
-            if (robberMoveStatus == 2)
+            if (robberMoveStatus == RobberMoveStatus.MOVED)
                 throw new GameException("You cannot move the robber twice");
             game.moveRobber(c, whoToRob);
         }
@@ -189,7 +189,7 @@ public class Game {
     private int turnNumber;
     private Player turn;
     private int diceRolled;
-    private int robberMoveStatus; // 0 -- robber needs not to be moved, 1 -- needs to be moved, 2 -- moved
+    private RobberMoveStatus robberMoveStatus;
     private final ResourceDeck bank = new ResourceDeck();
     private Player largestArmy;
     private Player longestRoad;
@@ -203,6 +203,12 @@ public class Game {
 
     private boolean visual = false;
     private boolean finished = false;
+
+    private enum RobberMoveStatus {
+        NON_MOVABLE,
+        NEEDS_TO_MOVE,
+        MOVED
+    }
 
     Game(long randSeed) {
         rnd = randSeed == 0 ? new Random() : new Random(randSeed);
@@ -263,7 +269,7 @@ public class Game {
             throw new GameException("You cannot roll the dice twice a turn");
         diceRolled = rnd.nextInt(6) + rnd.nextInt(6) + 2;
         if (diceRolled == 7) {
-            robberMoveStatus = 1;
+            robberMoveStatus = RobberMoveStatus.NEEDS_TO_MOVE;
             history.rollDice(diceRolled, Collections.<Player, List<Resource>>emptyMap());
             for (Player p : players) {
                 int were = p.cards().size();
@@ -347,7 +353,7 @@ public class Game {
             (!robbable.isEmpty() && !robbable.contains(whoToRob)))
             throw new GameException("You cannot rob a player not having a town near the robber");
         robber = hex;
-        robberMoveStatus = 2;
+        robberMoveStatus = RobberMoveStatus.MOVED;
         if (whoToRob == null) {
             history.robber(hex, whoToRob);
             return;
@@ -691,7 +697,7 @@ public class Game {
     private boolean nextTurn() {
         turn = players.get(turnNumber++ % n);
         diceRolled = 0;
-        robberMoveStatus = 0;
+        robberMoveStatus = RobberMoveStatus.NON_MOVABLE;
         history.nextTurn(turn);
 
         turn.bot().makeTurn();
@@ -706,7 +712,7 @@ public class Game {
 
         if (diceRolled == 0)
             throw new GameException("You must roll the dice once a turn");
-        if (diceRolled == 7 && robberMoveStatus == 1)
+        if (diceRolled == 7 && robberMoveStatus == RobberMoveStatus.NEEDS_TO_MOVE)
             throw new GameException("You must move the robber if you rolled 7");
 
         return false;
