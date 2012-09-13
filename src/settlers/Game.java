@@ -231,14 +231,14 @@ public class Game {
             bank.add(r, EACH_RESOURCE);
     }
 
-    List<Player> players() { return Collections.unmodifiableList(players); }
-    Board board() { return board; }
-    History history() { return history; }
-    Player largestArmy() { return largestArmy; }
-    Player longestRoad() { return longestRoad; }
+    private List<Player> players() { return Collections.unmodifiableList(players); }
+    private Board board() { return board; }
+    private Player largestArmy() { return largestArmy; }
+    private Player longestRoad() { return longestRoad; }
     private Player roadAt(Edge p) { return roads.get(p); }
     private Town townAt(Node i) { return towns.get(i); }
 
+    History history() { return history; }
 
 
 

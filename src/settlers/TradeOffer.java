@@ -1,8 +1,5 @@
 package settlers;
 
-import java.util.HashMap;
-import java.util.Map;
-import settlers.bot.Bot;
 import settlers.util.Util;
 
 public class TradeOffer {
