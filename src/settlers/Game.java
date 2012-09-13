@@ -15,16 +15,33 @@ import settlers.util.Util;
 
 public class Game {
 
+    private abstract class CommonAPI {
+        protected final Game game;
+
+        CommonAPI() { game = Game.this; }
+
+        public List<Player> players() { return game.players(); }
+        public Board board() { return game.board; }
+        public History history() { return game.history; }
+        public Player largestArmy() { return game.largestArmy; }
+        public Player longestRoad() { return game.longestRoad; }
+        public int roadLength(Player p) { return game.roadLength(p); }
+        public int armyStrength(Player p) { return game.armyStrength(p); }
+        public int points(Player p) { return game.points(p); }
+        public Player turn() { return turn; }
+        public Hex robber() { return robber; }
+        public Player roadAt(Edge p) { return game.roadAt(p); }
+        public Town townAt(Node i) { return game.townAt(i); }
+    }
+
     @SuppressWarnings("UnusedDeclaration")
-    public class API {
-        private final Game game;
+    public class API extends CommonAPI {
         private Bot bot;
 
-        API() { game = Game.this; }
         void setBot(Bot bot) { this.bot = bot; }
 
         private void checkTurn() {
-            if (player(bot) != turn)
+            if (turn != me())
                 throw new GameException("You cannot do anything not on your turn");
         }
         private void checkRobber() {
@@ -38,23 +55,14 @@ public class Game {
 
         public Player me() { return player(bot); }
         public Random rnd() { return game.rnd; }
-        public Board board() { return game.board; }
-        public History history() { return game.history; }
-        public List<Player> players() { return game.players(); }
         public int turnNumber() { return turnNumber; }
-        public Player turn() { return turn; }
 
-        public ResourceDeck cards() { return player(bot).cards(); }
-        public DevelopmentDeck developments() { return player(bot).developments(); }
+        public ResourceDeck cards() { return me().cards(); }
+        public DevelopmentDeck developments() { return me().developments(); }
         public ResourceDeck bank() { return game.bank; }
-
-        public Player roadAt(Edge p) { return game.roadAt(p); }
-        public Town townAt(Node x) { return game.townAt(x); }
 
         public int rollDice() { check(); return game.rollDice(); }
 
-        public Hex robber()
-            { return robber; }
         public List<Player> robbable(Hex c)
             { return game.robbable(c); }
         public void moveRobber(Hex c, Player whoToRob) {
@@ -114,18 +122,8 @@ public class Game {
         public void knight(Hex hex, Player whoToRob)
             { check(); game.knight(hex, whoToRob); }
 
-        public Player largestArmy()
-            { return game.largestArmy(); }
-        public Player longestRoad()
-            { return game.longestRoad(); }
-        public int armyStrength(Player player)
-            { return game.armyStrength(player); }
-        public int roadLength(Player player)
-            { return game.roadLength(player); }
         public int roadLengthWith(Player player, Edge p)
             { return game.roadLengthWith(player, p); }
-        public int points(Player player)
-            { return game.points(player); }
 
         public List<TradeResult> trade(String sell, String buy)
             { check(); return game.trade(new TradeOffer(game, me(), sell, buy)); }
@@ -137,10 +135,8 @@ public class Game {
             { return offer.counteroffer(new TradeOffer(game, me(), sell, buy)); }
     }
 
-    public class RunAPI {
-        public final Game game;
+    public final class RunAPI extends CommonAPI {
         RunAPI(boolean visual) {
-            game = Game.this;
             game.visual = visual;
         }
         public void play() { game.play(); }
@@ -151,21 +147,13 @@ public class Game {
         }
         public boolean isFinished() { return finished; }
         public void addPlayer(Player p) { game.addPlayer(p); }
-
-        public List<Player> players() { return game.players(); }
         public ResourceDeck cards(Player p) { return p.cards(); }
         public DevelopmentDeck developments(Player p) { return p.developments(); }
-        public Board board() { return game.board(); }
-        public History history() { return game.history(); }
-        public Player largestArmy() { return game.largestArmy(); }
-        public Player longestRoad() { return game.longestRoad(); }
-        public int roadLength(Player p) { return game.roadLength(p); }
-        public int armyStrength(Player p) { return game.armyStrength(p); }
-        public int points(Player p) { return game.points(p); }
-        public Player turn() { return turn; }
-        public Hex robber() { return robber; }
-        public Player roadAt(Edge p) { return game.roadAt(p); }
-        public Town townAt(Node i) { return game.townAt(i); }
+        public void beforeRepaint() {
+            // TODO: invent something different
+            try { Thread.sleep(50); } catch (InterruptedException ignored) { }
+            synchronized(game) { }
+        }
     }
 
     private static final int MAX_SETTLEMENTS = 5;
@@ -234,12 +222,10 @@ public class Game {
     }
 
     private List<Player> players() { return Collections.unmodifiableList(players); }
-    private Board board() { return board; }
-    private Player largestArmy() { return largestArmy; }
-    private Player longestRoad() { return longestRoad; }
     private Player roadAt(Edge p) { return roads.get(p); }
     private Town townAt(Node i) { return towns.get(i); }
 
+    // TODO: kill dependency
     History history() { return history; }
 
 
@@ -720,7 +706,7 @@ public class Game {
         return false;
     }
 
-    void play() {
+    private void play() {
         n = players.size();
         Collections.shuffle(players, rnd);
         turnNumber = -1;
@@ -778,7 +764,7 @@ public class Game {
         return points;
     }
 
-    int points(Player player) {
+    private int points(Player player) {
         return points(player, false);
     }
 
