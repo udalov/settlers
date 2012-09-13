@@ -14,7 +14,8 @@ import settlers.util.Pair;
 import settlers.util.Util;
 
 public class Game {
-    
+
+    @SuppressWarnings("UnusedDeclaration")
     public class API {
         private final Game game;
         private Bot bot;
@@ -162,7 +163,6 @@ public class Game {
         public Hex robber() { return robber; }
         public Player roadAt(Edge p) { return game.roadAt(p); }
         public Town townAt(Node i) { return game.townAt(i); }
-        public int turnNumber() { return turnNumber; }
         public boolean isFinished() { return finished; }
     }
 

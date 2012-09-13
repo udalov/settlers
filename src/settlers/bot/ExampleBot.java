@@ -53,7 +53,6 @@ public class ExampleBot extends Bot {
     public void makeTurn() {
         Player me = api.me();
         ResourceDeck cards = api.cards();
-        Board board = api.board();
 
         // roll the dice and, if 7, move the robber
         if (api.rollDice() == 7) {
