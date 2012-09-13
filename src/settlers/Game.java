@@ -138,9 +138,9 @@ public class Game {
 
     public class RunAPI {
         private final Game game;
-        RunAPI() {
+        RunAPI(boolean visual) {
             game = Game.this;
-            game.visual = true;
+            game.visual = visual;
         }
         public void play() { game.play(); }
         public void next() {

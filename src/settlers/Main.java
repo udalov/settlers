@@ -64,30 +64,30 @@ public class Main {
         }
     }
 
-    void printGameLog(Game game, PrintStream out, boolean silent) {
+    void printGameLog(Game.RunAPI api, PrintStream out, boolean silent) {
         if (!silent) {
-            out.println(game.players().size());
-            for (Player p : game.players())
+            out.println(api.players().size());
+            for (Player p : api.players())
                 out.println(p.bot());
 
             for (Hex h : Board.allHexes()) {
-                Resource r = game.board().resourceAt(h);
+                Resource r = api.board().resourceAt(h);
                 if (r != null)
-                    out.println(h + " " + r.chr() + " " + game.board().numberAt(h));
+                    out.println(h + " " + r.chr() + " " + api.board().numberAt(h));
             }
 
             for (Node n : Board.allNodes()) {
-                Harbor harbor = game.board().harborAt(n);
+                Harbor harbor = api.board().harborAt(n);
                 if (harbor != null && harbor.resource() != null)
                     out.println(n + " " + harbor.resource().chr());
             }
             for (Node n : Board.allNodes()) {
-                Harbor harbor = game.board().harborAt(n);
+                Harbor harbor = api.board().harborAt(n);
                 if (harbor != null && harbor.resource() == null)
                     out.println(n);
             }
 
-            for (Pair<Player, List<Event>> pair : game.history().getAll()) {
+            for (Pair<Player, List<Event>> pair : api.history().getAll()) {
                 Player player = pair.first;
                 List<Event> events = pair.second;
                 int ind = player == null ? -1 : player.color();
@@ -102,19 +102,19 @@ public class Main {
             }
         }
 
-        for (Player p : game.players()) {
+        for (Player p : api.players()) {
             int vp = p.developments().victoryPoint();
-            out.print(game.points(p) + vp);
+            out.print(api.points(p) + vp);
             if (vp > 0)
                 out.print(" " + vp + "VP");
-            if (game.largestArmy() == p && game.armyStrength(p) >= Game.MINIMUM_ARMY_STRENGTH)
+            if (api.largestArmy() == p && api.armyStrength(p) >= Game.MINIMUM_ARMY_STRENGTH)
                 out.print(" ARMY");
-            if (game.longestRoad() == p && game.roadLength(p) >= Game.MINIMUM_ROAD_LENGTH)
+            if (api.longestRoad() == p && api.roadLength(p) >= Game.MINIMUM_ROAD_LENGTH)
                 out.print(" ROAD");
             out.println();
         }
 
-        out.println(game.history().size() - 1 + " turns");
+        out.println(api.history().size() - 1 + " turns");
     }
 
     void run(String[] args) {
@@ -175,11 +175,12 @@ public class Main {
                 }
             }
 
+            Game.RunAPI api = game.new RunAPI(vis);
             if (vis) {
-                new Vis(game, game.new RunAPI());
+                new Vis(game, api);
             } else {
                 game.play();
-                printGameLog(game, System.out, silent);
+                printGameLog(api, System.out, silent);
             }
         }
         catch (java.net.MalformedURLException e) { e.printStackTrace(); }
