@@ -20,7 +20,7 @@ public class Game {
 
         CommonAPI() { game = Game.this; }
 
-        public List<Player> players() { return game.players(); }
+        public List<Player> players() { return Collections.unmodifiableList(game.players); }
         public Board board() { return game.board; }
         public History history() { return game.history; }
         public Player largestArmy() { return game.largestArmy; }
@@ -220,7 +220,6 @@ public class Game {
             bank.add(r, EACH_RESOURCE);
     }
 
-    private List<Player> players() { return Collections.unmodifiableList(players); }
     private Player roadAt(Edge p) { return roads.get(p); }
     private Town townAt(Node i) { return towns.get(i); }
 
