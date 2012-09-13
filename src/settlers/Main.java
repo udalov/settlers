@@ -166,20 +166,20 @@ public class Main {
                 }
             }
 
+            Game.RunAPI api = game.new RunAPI(vis);
             for (int i = 0; i < bots.length; i++) {
                 try {
-                    game.addPlayer(new Player(bots[i], i));
+                    api.addPlayer(new Player(bots[i], i));
                 } catch (GameException e) {
                     e.printStackTrace();
                     return;
                 }
             }
 
-            Game.RunAPI api = game.new RunAPI(vis);
             if (vis) {
-                new Vis(game, api);
+                new Vis(api);
             } else {
-                game.play();
+                api.play();
                 printGameLog(api, System.out, silent);
             }
         }

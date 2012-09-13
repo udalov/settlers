@@ -138,7 +138,7 @@ public class Game {
     }
 
     public class RunAPI {
-        private final Game game;
+        public final Game game;
         RunAPI(boolean visual) {
             game = Game.this;
             game.visual = visual;
@@ -149,6 +149,9 @@ public class Game {
                 game.notifyAll();
             }
         }
+        public boolean isFinished() { return finished; }
+        public void addPlayer(Player p) { game.addPlayer(p); }
+
         public List<Player> players() { return game.players(); }
         public ResourceDeck cards(Player p) { return p.cards(); }
         public DevelopmentDeck developments(Player p) { return p.developments(); }
@@ -163,7 +166,6 @@ public class Game {
         public Hex robber() { return robber; }
         public Player roadAt(Edge p) { return game.roadAt(p); }
         public Town townAt(Node i) { return game.townAt(i); }
-        public boolean isFinished() { return finished; }
     }
 
     private static final int MAX_SETTLEMENTS = 5;
@@ -681,16 +683,16 @@ public class Game {
         return ans;
     }
 
-    int roadLength(Player player) {
+    private int roadLength(Player player) {
         return roadLengthWith(player, null);
     }
 
-    int armyStrength(Player player) {
+    private int armyStrength(Player player) {
         Integer ans = armyStrength.get(player);
         return ans == null ? 0 : ans;
     }
 
-    void addPlayer(Player player) {
+    private void addPlayer(Player player) {
         players.add(player);
     }
 

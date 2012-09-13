@@ -10,7 +10,6 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     private static final int BOARD_WIDTH = 1020;
     private static final int BOARD_HEIGHT = 740;
 
-    private final Game game;
     private final Game.RunAPI api;
 
     private final GameVis gameVis;
@@ -18,10 +17,9 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     private final JButton nextActionButton = new JButton("Next action");
     private final JButton nextTurnButton = new JButton("Next turn");
 
-    public Vis(Game game, Game.RunAPI api) {
+    public Vis(Game.RunAPI api) {
         setLayout(null);
 
-        this.game = game;
         this.api = api;
 
         buildMenu();
@@ -90,7 +88,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
             private void repaintVis() {
                 // TODO: invent something different
                 try { Thread.sleep(50); } catch (InterruptedException ignored) { }
-                synchronized(game) { }
+                synchronized(api.game) { }
                 repaint();
             }
 
