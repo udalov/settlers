@@ -174,7 +174,6 @@ public class Game {
 
     private final List<Player> players = new ArrayList<Player>();
     private final Board board;
-    private int n;
 
     private int turnNumber;
     private Player turn;
@@ -683,7 +682,7 @@ public class Game {
     }
 
     private boolean nextTurn() {
-        turn = players.get(turnNumber++ % n);
+        turn = players.get(turnNumber++ % players.size());
         diceRolled = 0;
         robberMoveStatus = RobberMoveStatus.NON_MOVABLE;
         history.nextTurn(turn);
@@ -707,7 +706,6 @@ public class Game {
     }
 
     private void play() {
-        n = players.size();
         Collections.shuffle(players, rnd);
         turnNumber = -1;
         eventHappened();
@@ -722,6 +720,7 @@ public class Game {
     }
 
     private void placeInitialSettlements() {
+        int n = players.size();
         for (int it = 0; it < 2; it++) {
             for (int i = it * (n - 1); 0 <= i && i < n; i += 1 - 2*it) {
                 Player player = players.get(i);
