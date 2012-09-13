@@ -11,14 +11,14 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
     private static final int BOARD_HEIGHT = 740;
 
     private final Game game;
-    private final Game.VisAPI api;
+    private final Game.RunAPI api;
 
     private final GameVis gameVis;
     private final JMenuBar menuBar = new JMenuBar();
     private final JButton nextActionButton = new JButton("Next action");
     private final JButton nextTurnButton = new JButton("Next turn");
 
-    public Vis(Game game, Game.VisAPI api) {
+    public Vis(Game game, Game.RunAPI api) {
         setLayout(null);
 
         this.game = game;

@@ -176,7 +176,7 @@ public class Main {
             }
 
             if (vis) {
-                new Vis(game, game.new VisAPI());
+                new Vis(game, game.new RunAPI());
             } else {
                 game.play();
                 printGameLog(game, System.out, silent);

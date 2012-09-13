@@ -48,11 +48,11 @@ class GameVis extends JPanel {
         new Color(0xFFFFFF)
     };
 
-    private final Game.VisAPI api;
+    private final Game.RunAPI api;
     private final Board board;
     private final Map<Hex, Point> hex;
 
-    public GameVis(Game.VisAPI api) {
+    public GameVis(Game.RunAPI api) {
         super(null);
         this.api = api;
         this.board = api.board();

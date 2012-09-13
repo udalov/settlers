@@ -136,9 +136,9 @@ public class Game {
             { return offer.counteroffer(new TradeOffer(game, me(), sell, buy)); }
     }
 
-    public class VisAPI {
+    public class RunAPI {
         private final Game game;
-        VisAPI() {
+        RunAPI() {
             game = Game.this;
             game.visual = true;
         }
