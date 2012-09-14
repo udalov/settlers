@@ -192,21 +192,23 @@ public class Main {
     }
 
     private void printHelp(PrintStream out) {
-        out.printf(
-                "Usage:\n" +
-                "java -jar Settlers.jar [-seed <seed>] [-vis] [-silent] -3|-4 <botname1> <botname2> <botname3> [<botname4>]\n\n" +
-                "An example of running the testing system on a game between 3 example bots:\n" +
-                "java -jar Settlers.jar -3 Example Example Example\n\n" +
-                "Full list of arguments you can use:\n" +
-                "\n-3/-4 - 3 or 4 players in a game; descriptions of players must follow. " +
-                "A description is either Example or Stupid (for built-in bots) or a path to your bot's jarfile, " +
-                "followed by a colon, followed by its full class name. " +
-                "E.g. sample/bin/SampleBot.jar:smartasses.SampleBot\n" +
-                "\n-vis - enable visualization mode\n" +
-                "\n-seed - specify a random seed used by Game's random object to generate a board and everything else; " +
-                "one integer number must follow. If you specify 0, the seed will be chosen at random\n" +
-                "\n-silent - print only summary of the game\n\n"
-        );
+        out.println("Settlers Online testing system (c) Alexander Udalov 2011-2012");
+        out.println("http://settlersonline.org");
+        out.println("");
+        out.println("Usage:");
+        out.println("  java -jar Settlers.jar [-seed <seed>] [-vis] [-silent] -3|-4");
+        out.println("                         <botname1> <botname2> <botname3> [<botname4>]");
+        out.println("");
+        out.println("Arguments:");
+        out.println("  -3/-4         - 3 or 4 players");
+        out.println("  -vis          - enable visualization mode");
+        out.println("  -seed <seed>  - specify random seed used by Game (0 means random)");
+        out.println("  -silent       - print only summary of the game");
+        out.println("  <botname>     - either Example or Stupid or path to your bot:");
+        out.println("                  sample/bin/SampleBot.jar:smartasses.SampleBot");
+        out.println("");
+        out.println("Example of running a game between 3 example bots:");
+        out.println("  java -jar Settlers.jar -3 Example Example Example");
     }
 
     public static void main(String[] args) {
