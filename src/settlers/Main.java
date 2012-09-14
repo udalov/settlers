@@ -120,9 +120,10 @@ public class Main {
     private void run(String[] args) {
         try {
             if (args.length == 0) {
-                printHelp(System.out);
+                printHelp();
                 return;
             }
+
             Bot[] bots = null;
             boolean vis = false;
             long randSeed = 0;
@@ -136,9 +137,9 @@ public class Main {
 
             for (int i = 0; i < args.length; i++) {
                 if ("-3".equals(args[i]) || "-4".equals(args[i])) {
-                    int nbots = -Integer.parseInt(args[i]);
-                    bots = new Bot[nbots];
-                    for (int j = 0; j < nbots; j++) {
+                    int nBots = args[i].charAt(1) - '0';
+                    bots = new Bot[nBots];
+                    for (int j = 0; j < nBots; j++) {
                         Game.API api = game.new API();
                         String bot = args[++i];
                         if ("Example".equals(bot)) {
@@ -149,9 +150,12 @@ public class Main {
                             int colon = bot.lastIndexOf(':');
                             File jar = new File(bot.substring(0, colon));
                             String className = bot.substring(colon + 1);
-                            ClassLoader cl = new URLClassLoader(new URL[]{jar.toURI().toURL()});
-                            Constructor<?> cns = cl.loadClass(className).getConstructor(Game.API.class);
-                            bots[j] = (Bot)cns.newInstance(api);
+                            ClassLoader classLoader = new URLClassLoader(
+                                    new URL[] {jar.toURI().toURL()},
+                                    this.getClass().getClassLoader()
+                            );
+                            Constructor<?> constructor = classLoader.loadClass(className).getConstructor(Game.API.class);
+                            bots[j] = (Bot)constructor.newInstance(api);
                         }
                         api.setBot(bots[j]);
                     }
@@ -182,33 +186,30 @@ public class Main {
                 api.play();
                 printGameLog(api, System.out, silent);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            printHelp();
         }
-        catch (java.net.MalformedURLException e) { e.printStackTrace(); }
-        catch (ClassNotFoundException e) { e.printStackTrace(); }
-        catch (NoSuchMethodException e) { e.printStackTrace(); }
-        catch (InstantiationException e) { e.printStackTrace(); }
-        catch (IllegalAccessException e) { e.printStackTrace(); }
-        catch (java.lang.reflect.InvocationTargetException e) { e.printStackTrace(); }
     }
 
-    private void printHelp(PrintStream out) {
-        out.println("Settlers Online testing system (c) Alexander Udalov 2011-2012");
-        out.println("http://settlersonline.org");
-        out.println("");
-        out.println("Usage:");
-        out.println("  java -jar Settlers.jar [-seed <seed>] [-vis] [-silent] -3|-4");
-        out.println("                         <botname1> <botname2> <botname3> [<botname4>]");
-        out.println("");
-        out.println("Arguments:");
-        out.println("  -3/-4         - 3 or 4 players");
-        out.println("  -vis          - enable visualization mode");
-        out.println("  -seed <seed>  - specify random seed used by Game (0 means random)");
-        out.println("  -silent       - print only summary of the game");
-        out.println("  <botname>     - either Example or Stupid or path to your bot:");
-        out.println("                  sample/bin/SampleBot.jar:smartasses.SampleBot");
-        out.println("");
-        out.println("Example of running a game between 3 example bots:");
-        out.println("  java -jar Settlers.jar -3 Example Example Example");
+    private void printHelp() {
+        System.out.println("Settlers Online testing system (c) Alexander Udalov 2011-2012");
+        System.out.println("http://settlersonline.org");
+        System.out.println();
+        System.out.println("Usage:");
+        System.out.println("  java -jar Settlers.jar [-seed <seed>] [-vis] [-silent] -3|-4");
+        System.out.println("                         <botname1> <botname2> <botname3> [<botname4>]");
+        System.out.println();
+        System.out.println("Arguments:");
+        System.out.println("  -3/-4         - 3 or 4 players");
+        System.out.println("  -vis          - enable visualization mode");
+        System.out.println("  -seed <seed>  - specify random seed used by Game (0 means random)");
+        System.out.println("  -silent       - print only summary of the game");
+        System.out.println("  <botname>     - either Example or Stupid or path to your bot:");
+        System.out.println("                  sample/bin/SampleBot.jar:smartasses.SampleBot");
+        System.out.println();
+        System.out.println("Example of running a game between 3 example bots:");
+        System.out.println("  java -jar Settlers.jar -3 Example Example Example");
     }
 
     public static void main(String[] args) {
