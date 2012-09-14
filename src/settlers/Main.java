@@ -64,44 +64,58 @@ public class Main {
         }
     }
 
-    private void printGameLog(Game.RunAPI api, PrintStream out, boolean silent) {
+    private void renderGame(Game.RunAPI api, PrintStream out, boolean silent) {
         if (!silent) {
-            out.println(api.players().size());
-            for (Player p : api.players())
-                out.println(p.bot());
-
-            for (Hex h : Board.allHexes()) {
-                Resource r = api.board().resourceAt(h);
-                if (r != null)
-                    out.println(h + " " + r.chr() + " " + api.board().numberAt(h));
-            }
-
-            for (Node n : Board.allNodes()) {
-                Harbor harbor = api.board().harborAt(n);
-                if (harbor != null && harbor.resource != null)
-                    out.println(n + " " + harbor.resource.chr());
-            }
-            for (Node n : Board.allNodes()) {
-                Harbor harbor = api.board().harborAt(n);
-                if (harbor != null && harbor.resource == null)
-                    out.println(n);
-            }
-
-            for (Pair<Player, List<Event>> pair : api.history().getAll()) {
-                Player player = pair.first;
-                List<Event> events = pair.second;
-                int ind = player == null ? -1 : player.color();
-                for (Event event : events) {
-                    String s = eventString(event);
-                    if (ind >= 0)
-                        s = ind + " " + s;
-                    out.println(s);
-                    if (event.type() == EventType.EXCEPTION)
-                        return;
-                }
-            }
+            renderPlayers(api.players(), out);
+            renderBoard(api.board(), out);
+            renderHistory(api.history(), out);
         }
 
+        if (api.history().getLastEvent().second.type() == EventType.EXCEPTION)
+            return;
+
+        renderStats(api, out);
+    }
+
+    private void renderPlayers(List<Player> players, PrintStream out) {
+        out.println(players.size());
+        for (Player p : players)
+            out.println(p.bot());
+    }
+
+    private void renderBoard(Board board, PrintStream out) {
+        for (Hex h : Board.allHexes()) {
+            Resource r = board.resourceAt(h);
+            if (r != null)
+                out.println(h + " " + r.chr() + " " + board.numberAt(h));
+        }
+
+        for (Node n : Board.allNodes()) {
+            Harbor harbor = board.harborAt(n);
+            if (harbor != null && harbor.resource != null)
+                out.println(n + " " + harbor.resource.chr());
+        }
+        for (Node n : Board.allNodes()) {
+            Harbor harbor = board.harborAt(n);
+            if (harbor != null && harbor.resource == null)
+                out.println(n);
+        }
+    }
+
+    private void renderHistory(History history, PrintStream out) {
+        for (Pair<Player, List<Event>> pair : history.getAll()) {
+            Player player = pair.first;
+            int ind = player == null ? -1 : player.color();
+            for (Event event : pair.second) {
+                String s = eventString(event);
+                if (ind >= 0)
+                    s = ind + " " + s;
+                out.println(s);
+            }
+        }
+    }
+
+    private void renderStats(Game.RunAPI api, PrintStream out) {
         for (Player p : api.players()) {
             int vp = p.developments().victoryPoint();
             out.print(api.points(p) + vp);
@@ -184,7 +198,7 @@ public class Main {
                 new Vis(api);
             } else {
                 api.play();
-                printGameLog(api, System.out, silent);
+                renderGame(api, System.out, silent);
             }
         } catch (Exception e) {
             e.printStackTrace();
