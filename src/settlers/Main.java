@@ -16,7 +16,7 @@ import settlers.vis.Vis;
 
 public class Main {
     
-    String eventString(Event event) {
+    private String eventString(Event event) {
         switch (event.type()) {
             case INITIAL_ROAD:
                 return event.player().color() + " road " + event.edge();
@@ -64,7 +64,7 @@ public class Main {
         }
     }
 
-    void printGameLog(Game.RunAPI api, PrintStream out, boolean silent) {
+    private void printGameLog(Game.RunAPI api, PrintStream out, boolean silent) {
         if (!silent) {
             out.println(api.players().size());
             for (Player p : api.players())
@@ -117,7 +117,7 @@ public class Main {
         out.println(api.history().size() - 1 + " turns");
     }
 
-    void run(String[] args) {
+    private void run(String[] args) {
         try {
             if (args.length == 0) {
                 printHelp(System.out);
