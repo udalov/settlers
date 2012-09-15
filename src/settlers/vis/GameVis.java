@@ -62,7 +62,7 @@ class GameVis extends JPanel {
     private int width() { return getSize().width; }
     private int height() { return getSize().height; }
 
-    void recalcHexes() {
+    private void recalcHexes() {
         final int width = width();
         final int height = height();
         for (Hex c : Board.allHexes()) {
@@ -73,7 +73,7 @@ class GameVis extends JPanel {
         }
     }
 
-    int[][] calcHexagonVertices(int x, int y) {
+    private int[][] calcHexagonVertices(int x, int y) {
         int[][] ans = new int[2][6];
         for (int d = 0; d < 6; d++) {
             ans[0][d] = x + HEX_SIZE * DX[d] / 2;
@@ -82,19 +82,19 @@ class GameVis extends JPanel {
         return ans;
     }
 
-    Polygon createHexagon(Point z) {
+    private Polygon createHexagon(Point z) {
         int[][] v = calcHexagonVertices(z.x, z.y);
         return new Polygon(v[0], v[1], 6);
     }
 
-    Point nodeCoords(Node i) {
+    private Point nodeCoords(Node i) {
         Point z = hex.get(i.hex);
         int[][] v = calcHexagonVertices(z.x, z.y);
         int d = i.direction;
         return new Point(v[0][d], v[1][d]);
     }
 
-    Point[] edgeCoords(Edge p) {
+    private Point[] edgeCoords(Edge p) {
         Point z = hex.get(p.hex);
         int[][] v = calcHexagonVertices(z.x, z.y);
         int d = p.direction, nd = (d + 1) % 6;
@@ -104,7 +104,7 @@ class GameVis extends JPanel {
         };
     }
 
-    void drawHex(Graphics2D g, Hex c) {
+    private void drawHex(Graphics2D g, Hex c) {
         Point z = hex.get(c);
         Polygon p = createHexagon(z);
         Color color = resourceToColor(board.resourceAt(c));
@@ -127,7 +127,7 @@ class GameVis extends JPanel {
         }
     }
 
-    void drawEdge(Graphics2D g, Edge p) {
+    private void drawEdge(Graphics2D g, Edge p) {
         Player pl = api.roadAt(p);
         if (pl == null) {
             g.setColor(Color.BLACK);
@@ -141,7 +141,7 @@ class GameVis extends JPanel {
         g.setStroke(new BasicStroke(1));
     }
 
-    void drawNode(Graphics2D g, Node i) {
+    private void drawNode(Graphics2D g, Node i) {
         Town t = api.townAt(i);
         if (t == null)
             return;
@@ -179,7 +179,7 @@ class GameVis extends JPanel {
         }
     }
 
-    void drawHarbor(Graphics2D g, Node i) {
+    private void drawHarbor(Graphics2D g, Node i) {
         Harbor harbor = board.harborAt(i);
         if (harbor == null)
             return;
@@ -204,11 +204,11 @@ class GameVis extends JPanel {
         );
     }
 
-    String resourceToHarbor(Resource r) {
+    private String resourceToHarbor(Resource r) {
         return r == null ? "3:1" : r.chr() + "";
     }
 
-    Color resourceToColor(Resource r) {
+    private Color resourceToColor(Resource r) {
         if (r == null)
             return new Color(0x778822);
         switch (r) {
@@ -221,7 +221,7 @@ class GameVis extends JPanel {
         }
     }
 
-    void drawBoard(Graphics2D g) {
+    private void drawBoard(Graphics2D g) {
         for (Hex c : Board.allHexes()) {
             drawHex(g, c);
         }
@@ -241,7 +241,7 @@ class GameVis extends JPanel {
         }
     }
 
-    void drawPlayerInfo(Graphics2D g, Player player, List<Resource> income, int x, int y, int position) {
+    private void drawPlayerInfo(Graphics2D g, Player player, List<Resource> income, int x, int y, int position) {
         final int arc = 16;
         final int captionFont = 16;
         final int fontSize = 16;
@@ -365,7 +365,7 @@ class GameVis extends JPanel {
         }
     }
 
-    void drawPlayersInfo(Graphics2D g, Map<Player, List<Resource>> income) {
+    private void drawPlayersInfo(Graphics2D g, Map<Player, List<Resource>> income) {
         final int indent = 20;
         final int[] playerInfoX = new int[]
             {indent, indent, width() - PLAYER_INFO_WIDTH - indent, width() - PLAYER_INFO_WIDTH - indent};
@@ -428,7 +428,7 @@ class GameVis extends JPanel {
         }
     }
 
-    void drawHistoryEvent(Graphics g, Player player, Event event) {
+    private void drawHistoryEvent(Graphics g, Player player, Event event) {
         g.setColor(Color.BLACK);
         g.setFont(new Font("Tahoma", Font.BOLD, 24));
         String str = eventDescription(player, event);

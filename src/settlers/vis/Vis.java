@@ -54,7 +54,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         repaint();
     }
 
-    void buildMenu() {
+    private void buildMenu() {
         final JMenu game = new JMenu("Game");
 
         final JMenuItem gameRestart = new JMenuItem("Restart");
@@ -79,7 +79,7 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         menuBar.add(game);
     }
 
-    void buildButtons() {
+    private void buildButtons() {
         final ActionListener listener = new ActionListener() {
             private void nextAction() {
                 api.next();
