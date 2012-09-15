@@ -155,22 +155,7 @@ public class Main {
                     bots = new Bot[nBots];
                     for (int j = 0; j < nBots; j++) {
                         Game.API api = game.new API();
-                        String bot = args[++i];
-                        if ("Example".equals(bot)) {
-                            bots[j] = new ExampleBot(api);
-                        } else if ("Stupid".equals(bot)) {
-                            bots[j] = new StupidBot(api);
-                        } else {
-                            int colon = bot.lastIndexOf(':');
-                            File jar = new File(bot.substring(0, colon));
-                            String className = bot.substring(colon + 1);
-                            ClassLoader classLoader = new URLClassLoader(
-                                    new URL[] {jar.toURI().toURL()},
-                                    this.getClass().getClassLoader()
-                            );
-                            Constructor<?> constructor = classLoader.loadClass(className).getConstructor(Game.API.class);
-                            bots[j] = (Bot)constructor.newInstance(api);
-                        }
+                        bots[j] = createBot(args[++i], api);
                         api.setBot(bots[j]);
                     }
                 } else if ("-vis".equals(args[i])) {
@@ -203,6 +188,24 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
             printHelp();
+        }
+    }
+
+    private Bot createBot(String bot, Game.API api) throws Exception {
+        if ("Example".equals(bot)) {
+            return new ExampleBot(api);
+        } else if ("Stupid".equals(bot)) {
+            return new StupidBot(api);
+        } else {
+            int colon = bot.lastIndexOf(':');
+            File jar = new File(bot.substring(0, colon));
+            String className = bot.substring(colon + 1);
+            ClassLoader classLoader = new URLClassLoader(
+                    new URL[] {jar.toURI().toURL()},
+                    this.getClass().getClassLoader()
+            );
+            Constructor<?> constructor = classLoader.loadClass(className).getConstructor(Game.API.class);
+            return (Bot)constructor.newInstance(api);
         }
     }
 
