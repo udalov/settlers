@@ -180,7 +180,7 @@ public class Main {
             }
 
             if (vis) {
-                new Vis(api);
+                new Vis(api).play();
             } else {
                 api.play();
                 renderGame(api, System.out, silent);

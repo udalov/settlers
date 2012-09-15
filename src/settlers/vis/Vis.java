@@ -43,14 +43,16 @@ public class Vis extends JFrame implements WindowListener, MouseListener, Compon
         final int height = BOARD_HEIGHT + insets.top + insets.bottom + menuBar.getSize().height;
         setSize(width, height);
         setMinimumSize(new Dimension(width, height));
+    }
 
+    public void play() {
         new Thread(new Runnable() {
             public void run() {
                 Vis.this.api.play();
             }
         }).start();
-        setVisible(true);
 
+        setVisible(true);
         repaint();
     }
 
